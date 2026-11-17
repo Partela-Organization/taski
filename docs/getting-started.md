@@ -1,6 +1,6 @@
 # Arranque local
 
-B1 permite ejecutar un Worker y una base D1 local. Todavía no hay gestión de tickets, UI, código de equipo ni MCP: se implementan en sus bloques. El único endpoint de aplicación disponible es `GET /health`.
+El arranque de B1 permite ejecutar un Worker y una base D1 local. Sobre esa base ya están disponibles tickets, acceso de equipo, [API HTTP](api.md), [cliente TypeScript](client.md) y [MCP probado con SDK](mcp.md). Esta guía comprueba la disponibilidad mediante `GET /health`; la web conectada sigue pendiente.
 
 ## Requisitos
 
@@ -18,7 +18,7 @@ npm run db:migrate
 npm run db:check
 ```
 
-La migración crea una tabla mínima `taski_bootstrap`, sin tickets ni datos de ningún equipo. `db:check` debe devolver `bootstrap_version: 1`. Volver a ejecutar `db:migrate` conserva la base y no repite migraciones aplicadas. Wrangler puede pedir confirmación de la migración local en una terminal interactiva; no modifica recursos remotos.
+Las migraciones crean `taski_bootstrap` y las tablas vacías de tickets, auditoría y acceso, sin datos de ningún equipo. `db:check` debe devolver `bootstrap_version: 1`. Volver a ejecutar `db:migrate` conserva la base y no repite migraciones aplicadas. Wrangler puede pedir confirmación de la migración local en una terminal interactiva; no modifica recursos remotos.
 
 ## Ejecutar y comprobar
 
@@ -42,15 +42,15 @@ Detén con Ctrl+C. Al arrancar de nuevo, `npm run db:check` y `/health` deben se
 
 ## Qué significa `/health`
 
-Es una comprobación de disponibilidad: realiza una lectura real de D1 y exige el marcador de inicialización. Si la base no está preparada, responde HTTP 503 con `status: unavailable` y `checks.database: unavailable`. No expone el mensaje SQL interno. Las respuestas no se cachean. Otros métodos reciben 405 y otras rutas 404.
+Es una comprobación de disponibilidad: realiza una lectura real de D1 y exige el marcador de inicialización. Si la base no está preparada, responde HTTP 503 con `status: unavailable` y `checks.database: unavailable`. No expone el mensaje SQL interno. Las respuestas no se cachean. Otros métodos de `/health` reciben 405 y las rutas desconocidas reciben 404.
 
-Este endpoint solo prueba el Worker, su binding y la migración mínima. No comprueba funcionalidades de tickets todavía inexistentes. La tabla de bootstrap no es el esquema de tickets de B3 ni un sistema completo de migraciones de versiones de producto.
+Este endpoint solo prueba el Worker, su binding y el marcador de inicialización. No comprueba por sí mismo los recorridos de tickets, sesiones o MCP; las pruebas de integración verifican esos comportamientos con D1 emulado.
 
 ## Configuración incluida
 
-[wrangler.jsonc](../wrangler.jsonc) usa un nombre neutro y un UUID ficticio para el binding `DB`, con `remote: false`. Todos los comandos de base incluidos usan `--local`; `dev` también fuerza modo local. No hay account ID, secreto o recurso del equipo que sustituir para empezar. No hace falta crear `.env` o `.dev.vars` en B1.
+[wrangler.jsonc](../wrangler.jsonc) usa un nombre neutro y un UUID ficticio para el binding `DB`, con `remote: false`. Todos los comandos de base incluidos usan `--local`; `dev` también fuerza modo local. No hay account ID, secreto o recurso del equipo que sustituir para comprobar `/health`. Para usar tickets o MCP, configura el código local en `.dev.vars` según [acceso](access.md).
 
-Para una futura instalación remota se creará su propia base/configuración en B11. No utilices este UUID de ejemplo como si fuera una base real, ni cambies a modo remoto para resolver un problema local. La configuración personalizable del producto se añade en B2.
+Para una futura instalación remota se creará su propia base/configuración en B11. No utilices este UUID de ejemplo como si fuera una base real, ni cambies a modo remoto para resolver un problema local. La [configuración de B2](configuration.md) selecciona el preset demo con datos ficticios.
 
 ## Verificación antes de contribuir
 

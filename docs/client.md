@@ -31,4 +31,4 @@ await client.updateTicket(ticket.ticket.key, {
 
 No hay reintentos automáticos ni incremento ciego de versiones. TaskiClientError conserva code/status; ante VERSION_CONFLICT relee y reconcilia. Ante pérdida de transporte conserva la misma clave y parámetros para consultar/reintentar el resultado, según [garantías de reintento](retries.md). [OpenAPI](api/openapi.json) describe entradas, salidas y seguridad; el servidor valida los datos y no se confía en los tipos del consumidor.
 
-Las pruebas ejecutan el recorrido real contra Worker/D1 emulado, incluida asignación, comentario, PR y revisión; también comprueban que un error no dispara escrituras repetidas. La API comparte casos de uso con el MCP que se incorpora en B6.
+Las pruebas ejecutan el recorrido real contra Worker/D1 emulado, incluida asignación, comentario, PR y revisión; también comprueban que un error no dispara escrituras repetidas. La API comparte casos de uso con el [MCP de B6-01](mcp.md).

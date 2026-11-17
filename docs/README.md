@@ -1,6 +1,6 @@
 # Documentación de Taski
 
-Estado: B0 completado y base TypeScript/Worker local de B1. Aún no hay gestión funcional de tickets o servidor MCP.
+Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponibles localmente. B6-01 añade MCP probado con SDK; faltan su validación en Claude Code/Codex, el benchmark comparativo, la web conectada y el despliegue.
 
 ## Disponible ahora
 
@@ -14,6 +14,7 @@ Estado: B0 completado y base TypeScript/Worker local de B1. Aún no hay gestión
 - [Código de equipo y sesiones](access.md)
 - [API HTTP versionada y contrato OpenAPI](api.md)
 - [Cliente TypeScript y ejemplos independientes](client.md)
+- [MCP autenticado: herramientas, conexión SDK y medición reproducible](mcp.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
 - [Solución de problemas de arranque](troubleshooting.md)

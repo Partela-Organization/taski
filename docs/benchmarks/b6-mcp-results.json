@@ -1,0 +1,71 @@
+{
+  "kind": "proxy_not_agent_usage",
+  "encoding": "o200k_base",
+  "tiktoken": "0.14.0",
+  "sdk": {
+    "server": "2.4.0",
+    "client": "2.4.0"
+  },
+  "protocol": "legacy stateless Streamable HTTP",
+  "serialization": "json.dumps ensure_ascii=False sort_keys=True separators=(',', ':')",
+  "representation": "SDK results including content and structuredContent plus server instructions; no RPC ids/headers",
+  "fixtures": "20 create-and-assign calls; fixed epoch in isolated D1 only; no production data",
+  "measured": {
+    "catalog_with_instructions": {
+      "tokensProxy": 3094,
+      "utf8Bytes": 12363
+    },
+    "list_20": {
+      "tokensProxy": 805,
+      "utf8Bytes": 2604
+    },
+    "create_receipt": {
+      "tokensProxy": 63,
+      "utf8Bytes": 200
+    }
+  },
+  "budgets": {
+    "catalog_with_instructions": 4000,
+    "list_20": 1600,
+    "create_receipt": 200
+  },
+  "per_tool": {
+    "get_project": {
+      "tokensProxy": 506,
+      "utf8Bytes": 2080
+    },
+    "list_tickets": {
+      "tokensProxy": 377,
+      "utf8Bytes": 1501
+    },
+    "get_ticket": {
+      "tokensProxy": 591,
+      "utf8Bytes": 2320
+    },
+    "create_ticket": {
+      "tokensProxy": 293,
+      "utf8Bytes": 1126
+    },
+    "update_ticket": {
+      "tokensProxy": 428,
+      "utf8Bytes": 1693
+    },
+    "add_comment": {
+      "tokensProxy": 235,
+      "utf8Bytes": 933
+    },
+    "list_activity": {
+      "tokensProxy": 371,
+      "utf8Bytes": 1499
+    },
+    "link_pull_request": {
+      "tokensProxy": 235,
+      "utf8Bytes": 913
+    }
+  },
+  "deferred_loading": "per-tool sizes only; actual host-loaded definitions are measured separately in B6-03",
+  "realUsage": null,
+  "latency": null,
+  "superiorityOverLinear": "NOT_DEMONSTRATED",
+  "passed": true
+}

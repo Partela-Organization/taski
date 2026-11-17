@@ -25,10 +25,12 @@
     "build:worker": "wrangler deploy --dry-run --outdir dist/worker",
     "test:ui": "playwright test",
     "api:generate": "node scripts/generate-api-schema.mjs",
-    "api:check": "node scripts/generate-api-schema.mjs --check"
+    "api:check": "node scripts/generate-api-schema.mjs --check",
+    "mcp:measure": "node scripts/measure-mcp.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261113.1",
+    "@modelcontextprotocol/client": "2.4.0",
     "@playwright/test": "1.65.0",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
@@ -37,6 +39,8 @@
     "wrangler": "4.161.0"
   },
   "dependencies": {
+    "@cfworker/json-schema": "4.1.6",
+    "@modelcontextprotocol/server": "2.4.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   }

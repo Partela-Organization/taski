@@ -29,5 +29,14 @@ jobs:
         run: |
           .venv/bin/python -m unittest discover -s experiments/b0 -v
           .venv/bin/python experiments/b0/measure.py --check
+      - name: Set up Node for the actual MCP catalog
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install locked application dependencies
+        run: npm ci
+      - name: Verify reproducible MCP SDK report and proxy budgets
+        run: npm run mcp:measure -- --check
       - name: Check patch formatting
         run: git show --format= --check HEAD
