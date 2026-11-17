@@ -37,6 +37,6 @@ jobs:
       - name: Install locked application dependencies
         run: npm ci
       - name: Verify reproducible MCP SDK report and proxy budgets
-        run: npm run mcp:measure -- --check
+        run: npm run mcp:measure -- --intent --check
       - name: Check patch formatting
         run: git show --format= --check HEAD

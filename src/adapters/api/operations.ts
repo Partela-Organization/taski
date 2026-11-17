@@ -115,7 +115,8 @@ export class Operations {
     return { ticket, comments: comments.slice().reverse().map(({ ticketId: _id, ...c }) => c),
       nextCommentsCursor: all.length > (limit as number) ? encode({ kind: "comments", epoch: position.epoch, ticketId: t.id,
         version: t.version, before: comments.at(-1)!.ticketVersion }) : null,
-      omitted: ["history", ...(view === "summary" ? ["description", "areaId", "type", "prUrl", "createdAt", "updatedAt"] : []),
+      omitted: ["history", ...(view === "summary" ? ["url", "description", "areaId", "type", "prUrl"] : []),
+        ...(view !== "full" ? ["id", "createdBy", "createdAt", "updatedAt"] : []),
         ...(limit === 0 ? ["comments"] : all.length > (limit as number) ? ["olderComments"] : [])] };
   }
   async activity(input: unknown) {

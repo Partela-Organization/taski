@@ -1,0 +1,165 @@
+{
+  "kind": "SDK_INTENT_PROXY",
+  "sdk": {
+    "server": "2.4.0",
+    "client": "2.4.0"
+  },
+  "tokenizer": "tiktoken==0.14.0/o200k_base",
+  "protocol": "legacy stateless Streamable HTTP",
+  "samplesPerArtifact": 1,
+  "serialization": "json.dumps ensure_ascii=False sort_keys=True separators=(',', ':')",
+  "scope": "Isolated local Worker/D1 and SDK; fixture preparation, handshake and discovery excluded from scenario calls/rounds",
+  "representation": "Actual SDK results with content/structuredContent; long inputs are arguments; no JSON-RPC ids/HTTP headers",
+  "measured": {
+    "project_full": {
+      "tokensProxy": 268,
+      "utf8Bytes": 833
+    },
+    "project_not_modified": {
+      "tokensProxy": 88,
+      "utf8Bytes": 191
+    },
+    "summary_read": {
+      "tokensProxy": 82,
+      "utf8Bytes": 325
+    },
+    "full_read": {
+      "tokensProxy": 353,
+      "utf8Bytes": 1047
+    },
+    "work_read": {
+      "tokensProxy": 295,
+      "utf8Bytes": 947
+    },
+    "ordinary_update_receipt": {
+      "tokensProxy": 73,
+      "utf8Bytes": 193
+    },
+    "pr_state_receipt": {
+      "tokensProxy": 47,
+      "utf8Bytes": 135
+    },
+    "patch_progress_receipt": {
+      "tokensProxy": 73,
+      "utf8Bytes": 198
+    },
+    "activity_pages": {
+      "tokensProxy": 523,
+      "utf8Bytes": 1491
+    },
+    "recovery_full_read": {
+      "tokensProxy": 483,
+      "utf8Bytes": 1275
+    },
+    "older_comments": {
+      "tokensProxy": 264,
+      "utf8Bytes": 852
+    },
+    "long_create_input": {
+      "tokensProxy": 10020,
+      "utf8Bytes": 46091
+    },
+    "long_work_read": {
+      "tokensProxy": 10107,
+      "utf8Bytes": 46372
+    },
+    "long_patch_input": {
+      "tokensProxy": 36,
+      "utf8Bytes": 131
+    },
+    "long_patch_activity": {
+      "tokensProxy": 174,
+      "utf8Bytes": 472
+    },
+    "long_full_read": {
+      "tokensProxy": 10170,
+      "utf8Bytes": 46474
+    }
+  },
+  "budgetsProxy": {
+    "ordinary_update_receipt": 200,
+    "pr_state_receipt": 200,
+    "patch_progress_receipt": 200
+  },
+  "flows": {
+    "read_context": {
+      "calls": 1,
+      "rounds": [
+        [
+          "get_ticket"
+        ]
+      ]
+    },
+    "status_and_progress": {
+      "calls": 1,
+      "rounds": [
+        [
+          "update_ticket"
+        ]
+      ]
+    },
+    "pr_and_review": {
+      "calls": 1,
+      "rounds": [
+        [
+          "update_ticket"
+        ]
+      ]
+    },
+    "patch_and_progress": {
+      "calls": 1,
+      "rounds": [
+        [
+          "update_ticket"
+        ]
+      ]
+    },
+    "resume_known_context": {
+      "calls": 3,
+      "rounds": [
+        [
+          "get_project",
+          "list_activity"
+        ],
+        [
+          "list_activity"
+        ]
+      ]
+    },
+    "recover_full_context": {
+      "calls": 2,
+      "rounds": [
+        [
+          "get_ticket"
+        ],
+        [
+          "get_ticket"
+        ]
+      ]
+    }
+  },
+  "integrity": {
+    "longDescriptionCharacters": 46006,
+    "patchedDescriptionCharacters": 46008,
+    "recentComments": 2,
+    "recoveredComments": 4,
+    "incrementalEvents": 3
+  },
+  "variableTokenMetrics": [
+    "work_read",
+    "full_read",
+    "ordinary_update_receipt",
+    "patch_progress_receipt",
+    "activity_pages",
+    "recovery_full_read",
+    "older_comments",
+    "long_patch_activity",
+    "long_full_read"
+  ],
+  "checkPolicy": "Exact bytes/metadata/flows and deterministic token counts; variable token samples may differ due to real UUIDs/timestamps; live budgets always enforced",
+  "realUsage": null,
+  "latency": null,
+  "linearExecution": "NOT_MEASURED",
+  "superiorityOverLinear": "NOT_DEMONSTRATED",
+  "passed": true
+}

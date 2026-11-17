@@ -15,6 +15,7 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [API HTTP versionada y contrato OpenAPI](api.md)
 - [Cliente TypeScript y ejemplos independientes](client.md)
 - [MCP autenticado: herramientas, conexión SDK y medición reproducible](mcp.md)
+- [Vistas MCP, operaciones compuestas y recuperación incremental](mcp-intent.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
 - [Solución de problemas de arranque](troubleshooting.md)
