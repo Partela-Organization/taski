@@ -6,6 +6,7 @@ import { TeamAccess } from "../access/team-access.ts";
 import type { AccessEnvironment } from "../access/team-access.ts";
 import { errorResponse } from "../http/body.ts";
 import { api } from "../http/api.ts";
+import { mcp } from "../mcp/server.ts";
 
 interface Env extends AccessEnvironment {
   DB: D1Database;
@@ -15,6 +16,7 @@ interface Env extends AccessEnvironment {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const path = new URL(request.url).pathname;
+    if (path === "/mcp") return mcp(request, env, installation);
     if (path === "/api/v1/session") {
       try { return await new TeamAccess(env, installation).handle(request); }
       catch (error) { return errorResponse(error); }

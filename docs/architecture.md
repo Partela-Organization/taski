@@ -2,6 +2,8 @@
 
 TypeScript para servidor y primera web. Un Worker atiende HTTP/MCP; D1 mantiene tickets y actividad. El primer frontend se plantea en React, con contrato independiente para poder sustituirlo o añadir SwiftUI después.
 
+HTTP y [MCP](mcp.md) están implementados y comprobados sobre Worker/D1 local. El diagrama incluye también la web conectada y los hosts IA previstos: su integración se valida en B7 y B6-03 respectivamente.
+
 ```mermaid
 flowchart TB
   WEB[Personas en la web] -->|HTTPS y sesión| HTTP[API /api/v1]

@@ -29,7 +29,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. La API de tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md) y [cliente TypeScript](client.md). La UI conectada y el MCP siguen pendientes. Detener con Ctrl+C.
+Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. Los tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md), [cliente TypeScript](client.md) y [MCP](mcp.md). La UI conectada y las pruebas con hosts IA siguen pendientes. Detener con Ctrl+C.
 
 ## Comprobaciones
 
@@ -42,3 +42,5 @@ git diff --check
 `check` ejecuta tipos, fronteras, pruebas y bundle. `typecheck` verifica el núcleo sin tipos de DOM/Cloudflare; `check:boundaries` inspecciona imports estáticos, exports e imports dinámicos literales. Es una regla de arquitectura, no un sandbox de seguridad. `npm test` prueba fallos de disponibilidad y Worker/D1 reales emulados mediante el harness de Wrangler, con almacenamiento efímero aislado. `build` usa `wrangler deploy --dry-run` para generar `dist` sin desplegar ni requerir credenciales. `dev` y los scripts de D1 usan modo local, sin `--remote`.
 
 CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instalación o Cloudflare. La documentación y el spike de B0 conservan su workflow independiente. No se añade un comando de despliegue remoto hasta B11.
+
+El workflow documental también ejecuta `npm run mcp:measure -- --check`, con las dependencias Python fijadas de B0, para comprobar el informe de catálogo/respuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) para actualizarlo y distinguir tokens proxy de uso real.

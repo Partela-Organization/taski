@@ -1,8 +1,8 @@
 # Roadmap
 
-Estado: B0 completado. B1 ya tiene TypeScript, CI y [Worker/D1 locales](getting-started.md); conserva pendiente la revisión independiente de onboarding de [B1-03](verification/b1-onboarding.md). B2 continúa con configuración y sistema visual. Ver [decisiones y criterios de entrega](decisions/b0.md), [issues](https://github.com/danirssx/taski/issues) y [milestones](https://github.com/danirssx/taski/milestones).
+Estado: B0 completado; B1 tiene TypeScript, CI y [Worker/D1 locales](getting-started.md), con revisión independiente de onboarding pendiente en [B1-03](verification/b1-onboarding.md). B2 aporta configuración/sistema visual; B3, núcleo persistente y auditoría; B4, acceso de equipo; B5, API documentada y cliente independiente. Ver [decisiones y criterios de entrega](decisions/b0.md), [issues](https://github.com/danirssx/taski/issues) y [milestones](https://github.com/danirssx/taski/milestones).
 
-B2 añade [presets validados](configuration.md) y [componentes/temas](ui.md) con una vista de datos ficticios. B3 continúa con el núcleo persistente de tickets; B1-03 mantiene su comprobación humana independiente.
+B6-01 expone el [MCP autenticado](mcp.md) y comprueba las ocho herramientas con SDK. B6 continúa con respuestas/operaciones compuestas, validación en Claude Code/Codex y comparación frente a Linear optimizado; el informe proxy no completa ese gate. La [UI de componentes](ui.md) usa datos ficticios hasta la web conectada de B7.
 
 | Bloque | Entregable |
 | --- | --- |

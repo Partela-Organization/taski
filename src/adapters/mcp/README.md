@@ -1,3 +1,3 @@
 # Adaptador MCP
 
-Se implementará en B6 con las ocho herramientas y semántica acordadas en B0. Compartirá casos de uso con HTTP; el spike Python no es el servidor de producción.
+`server.ts` expone las ocho herramientas por Streamable HTTP en `/mcp`, con acceso de agente, esquemas compartidos con HTTP y persistencia/auditoría D1 a través del mismo núcleo. El SDK y el validador compatibles con Worker viven solo en el adaptador; no se importa el spike Python. Ver [configuración, herramientas y evidencia](../../../docs/mcp.md). La comprobación de Claude Code y Codex sigue pendiente en B6-03.

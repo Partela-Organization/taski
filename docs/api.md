@@ -1,8 +1,8 @@
 # API HTTP v1
 
-Rutas implementadas sobre el mismo `TicketService` y repositorio D1 auditado, sin endpoints de SQL. Todos los tickets/actividad/proyecto exigen cookie de sesión o código Bearer y X-Taski-Member; ver [acceso](access.md). La UI conectada y MCP se añaden después.
+Rutas implementadas sobre el mismo `TicketService` y repositorio D1 auditado, sin endpoints de SQL. Todos los tickets/actividad/proyecto exigen cookie de sesión o código Bearer y X-Taski-Member; ver [acceso](access.md). El [MCP](mcp.md) ya comparte este núcleo; la UI conectada se añade en B7.
 
-El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos que compartirán HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
+El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
 
 | Método/ruta | Operación |
 | --- | --- |
