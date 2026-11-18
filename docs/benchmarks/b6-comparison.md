@@ -6,7 +6,7 @@ La [comprobación fechada de acceso](b6-prerequisites.json) conserva solo versio
 
 ## Diseño registrado antes de medir
 
-El [diseño ejecutable](../../scripts/benchmark-design.mjs) fija las condiciones y su SHA-256. Modificarlo cambia `designDigest`; el evaluador rechaza mezclar muestras de otra revisión del diseño.
+El [diseño ejecutable](../../scripts/benchmark-design.mjs) fija las condiciones, el hash de los 20 fixtures neutros y su propio SHA-256. Modificarlo cambia `designDigest`; el evaluador rechaza mezclar muestras de otra revisión del diseño o dataset. El hash de fixtures identifica el archivo fuente original, antes de mapear IDs a cada proveedor; la equivalencia del contenido importado exige comprobación real del colector.
 
 - Codex con descubrimiento predeterminado; Claude con carga anticipada y diferida.
 - Contexto nuevo y previo, separados en seis cohortes; caché no controlada, con contadores observados.

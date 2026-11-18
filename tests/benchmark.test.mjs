@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { design, designDigest, schedule } from "../scripts/benchmark-design.mjs";
 import { distribution, evaluate, realTokens } from "../scripts/benchmark-evaluate.mjs";
 
@@ -10,7 +12,7 @@ function synthetic() {
     const factor = row.provider === "taski" ? 0.5 : 1;
     const latencyMs = 1000 * factor;
     const startedAt = new Date(Date.UTC(2026, 0, 1) + i * 10000).toISOString();
-    return { ...row, kind: "LIVE_COMPARATIVE_RUN", runId: `synthetic-${i}`, commit: "b".repeat(40), fixtureSha256: digest,
+    return { ...row, kind: "LIVE_COMPARATIVE_RUN", runId: `synthetic-${i}`, commit: "b".repeat(40), fixtureSha256: design.fixtureSha256,
       promptSha256: digest, traceSha256: digest, model: `same-${row.host}`, hostVersion: "test-1", connectorVersion: "test-1",
       server: { identity: row.provider, environment: "remote-test", version: "test-1", region: "test" },
       cache: design.cache, comparator: "optimized", correct: true, failure: null, latencyMs, startedAt,
@@ -31,6 +33,7 @@ test("benchmark registers balanced paired order and equal scenario-family weight
   assert.equal(new Set(rows.map((r) => `${r.pairId}/${r.provider}`)).size, rows.length);
   assert.equal(design.scenarios.reduce((sum, s) => sum + s.weight, 0), 8);
   assert(rows.every((r) => r.designDigest === designDigest));
+  assert.equal(createHash("sha256").update(readFileSync(new URL("../experiments/b0/fixtures/tickets.json", import.meta.url))).digest("hex"), design.fixtureSha256);
   for (let i = 0; i < rows.length; i += 2) {
     assert.equal(rows[i].pairId, rows[i + 1].pairId);
     assert.notEqual(rows[i].provider, rows[i + 1].provider);
@@ -69,6 +72,7 @@ test("benchmark rejects duplicates, changed ordering and unregistered or proxy e
   for (const mutate of [
     (r) => { r.kind = "PAYLOAD_PROXY"; },
     (r) => { r.designDigest = "c".repeat(64); },
+    (r) => { r.fixtureSha256 = "c".repeat(64); },
     (r) => { r.position = 1; },
     (r) => { r.repetition = 31; },
     (r) => { r.payloadProxy.resultTokens = -1; },
@@ -81,6 +85,12 @@ test("benchmark rejects duplicates, changed ordering and unregistered or proxy e
   reversed[0].startedAt = reversed[1].confirmedAt;
   reversed[0].confirmedAt = new Date(Date.parse(reversed[0].startedAt) + reversed[0].latencyMs).toISOString();
   assert.throws(() => evaluate(reversed), /ordering/);
+  const reordered = structuredClone(records);
+  for (const r of reordered.slice(2, 4)) {
+    r.startedAt = new Date(Date.parse(r.startedAt) - 20000).toISOString();
+    r.confirmedAt = new Date(Date.parse(r.startedAt) + r.latencyMs).toISOString();
+  }
+  assert.throws(() => evaluate(reordered), /alternating sequence/);
 });
 
 test("benchmark retains failures and exposes p95 regressions despite passing token/p50 targets", () => {

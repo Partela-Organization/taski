@@ -35,6 +35,7 @@ function validate(record, expected) {
   assert(typeof record.runId === "string" && record.runId.length, "Missing runId");
   assert(/^[a-f0-9]{40}$/.test(record.commit), "Missing full source commit");
   assert(hash(record.fixtureSha256) && hash(record.promptSha256) && hash(record.traceSha256), "Missing fixture/prompt/trace hashes");
+  assert.equal(record.fixtureSha256, design.fixtureSha256, "Fixtures differ from the registered neutral dataset");
   for (const key of ["model", "hostVersion", "connectorVersion"]) assert(typeof record[key] === "string" && record[key].length, `Missing ${key}`);
   assert(record.server && ["local", "remote-test"].includes(record.server.environment), "Missing server environment");
   for (const key of ["identity", "version", "region"]) assert(typeof record.server[key] === "string" && record.server[key].length, `Missing server ${key}`);
@@ -87,6 +88,11 @@ export function evaluate(records) {
     const first = found.get(`${row.pairId}/${row.provider}`);
     const second = found.get(`${row.pairId}/${row.provider === "taski" ? "linear" : "taski"}`);
     if (first && second) assert(Date.parse(first.confirmedAt) <= Date.parse(second.startedAt), "Observed pair ordering differs from registration");
+    if (row.repetition > 1 && first) {
+      const previousId = row.pairId.replace(/\/\d+$/, `/${row.repetition - 1}`);
+      const previous = design.providers.map((p) => found.get(`${previousId}/${p}`)).filter(Boolean);
+      assert(previous.every((r) => Date.parse(r.confirmedAt) <= Date.parse(first.startedAt)), "Repetitions must follow the registered alternating sequence");
+    }
   }
   const cohorts = [];
   for (const condition of design.conditions) for (const context of design.contexts) {

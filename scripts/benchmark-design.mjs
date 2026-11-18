@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 export const design = {
   version: 1,
   kind: "COMPARATIVE_BENCHMARK_DESIGN",
+  fixtureSha256: "f587e2d13d9fe35eeaf4c73013c2cc40b9b7e43eecfa6ecaa79a21a424dd3f06",
   minimumPairs: 30,
   providers: ["taski", "linear"],
   contexts: ["new", "prior"],
