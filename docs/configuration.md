@@ -17,7 +17,7 @@ Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos 
 | Campo | Tipo / límites | Cambio y efecto |
 | --- | --- | --- |
 | schemaVersion | Literal `1` | Versión del formato. Otro valor exige actualizar el parser, no se interpreta automáticamente. |
-| configVersion | Entero seguro positivo | Incrementar cada vez que cambien miembros, áreas, rótulos, política o marca. Permitirá invalidar contexto conocido en B5/B6; todavía no hay un endpoint de configuración. |
+| configVersion | Entero seguro positivo | Incrementar cada vez que cambien miembros, áreas, rótulos, política o marca. HTTP/MCP permiten enviar knownVersion para omitir el catálogo de configuración que no cambió. No sustituye el cursor de actividad procesado. |
 | project.id | ID estable de 1–48 caracteres | Minúscula inicial, luego letras minúsculas, dígitos, `_` o `-`. Con datos existentes, cambiarlo exige plan de migración/otra instalación. |
 | project.name | Texto de 1–100 caracteres | Rótulo visible; cambiarlo no cambia identidad. |
 | project.prefix | 2–8 letras mayúsculas/dígitos, letra inicial | Prefijo inicial de códigos. No se cambia libremente después de crear tickets. |
@@ -28,7 +28,7 @@ Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos 
 | defaultAreaId | ID de una de las áreas | Referencia validada; no puede apuntar a un área inexistente. |
 | statusLabels | Claves exactas todo/in_progress/in_review/done | Rótulos de 1–64 caracteres; cambiar texto conserva el ID de estado. |
 | typeLabels | Claves exactas task/feedback | Rótulos de 1–64 caracteres; tipos separados de estados. |
-| policy.agentsCanComplete | Booleano; demo/studio usan false | La configuración describe la política. Su ejecución/auditoría en mutaciones se implementa en B3/B4. |
+| policy.agentsCanComplete | Booleano; demo/studio usan false | El núcleo aplica la política y audita las mutaciones de HTTP/MCP. La delegación de cierre de tickets concretos se configura en servidor según la guía de acceso. |
 | brand.name | Texto de 1–100 caracteres | Identidad de presentación, independiente del proyecto. |
 | brand.accentLight / accentDark | Color hex de seis dígitos | Acento para cada tema. El parser valida formato; revisar contraste visual al crear un tema. |
 
