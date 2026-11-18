@@ -1,0 +1,159 @@
+{
+  "kind": "LIVE_MCP_CLIENT_VALIDATION",
+  "executedAt": "2026-11-18T16:18:05.061Z",
+  "client": "claude",
+  "version": "2.1.327 (Claude Code)",
+  "loading": "deferred",
+  "environment": {
+    "node": "v26.3.0",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "server": {
+    "sdk": "2.4.0",
+    "sourceSha256": {
+      "src/adapters/mcp/server.ts": "ba212ef5c5d9ffe02e84807dfdee8f2cf239390229b7416c37e28fe54c405f7c",
+      "src/adapters/api/contract.ts": "30ec3a1d312b85ec645e8200890f69a6a2acd525458d1aa76e3d0d3f4cd5d375",
+      "src/adapters/api/operations.ts": "1785364117c56352e222ec950565fbe5ec0117cb4fff56c57dc8a0f30f1f5f46"
+    }
+  },
+  "models": [
+    "claude-sonnet-5-5"
+  ],
+  "protocolClients": [
+    {
+      "name": "claude-code",
+      "version": "2.1.327",
+      "protocol": "2026-07-28"
+    }
+  ],
+  "tools": [
+    "get_project",
+    "list_tickets",
+    "get_ticket",
+    "create_ticket",
+    "update_ticket",
+    "add_comment",
+    "list_activity",
+    "link_pull_request"
+  ],
+  "discovery": {
+    "requested": "deferred",
+    "advertisedToolNames": [
+      "mcp__taski__add_comment",
+      "mcp__taski__create_ticket",
+      "mcp__taski__get_project",
+      "mcp__taski__get_ticket",
+      "mcp__taski__link_pull_request",
+      "mcp__taski__list_activity",
+      "mcp__taski__list_tickets",
+      "mcp__taski__update_ticket"
+    ],
+    "toolSearchCalls": [
+      {
+        "query": "select:mcp__taski__add_comment,mcp__taski__create_ticket,mcp__taski__get_project,mcp__taski__get_ticket,mcp__taski__link_pull_request,mcp__taski__list_activity,mcp__taski__list_tickets,mcp__taski__update_ticket",
+        "max_results": 10
+      }
+    ],
+    "loadedToolNamesFromSearch": [
+      "mcp__taski__add_comment",
+      "mcp__taski__create_ticket",
+      "mcp__taski__get_project",
+      "mcp__taski__get_ticket",
+      "mcp__taski__link_pull_request",
+      "mcp__taski__list_activity",
+      "mcp__taski__list_tickets",
+      "mcp__taski__update_ticket"
+    ],
+    "modelVisibleDefinitionTokens": null,
+    "interpretation": "init.tools is the available catalog; ToolSearch calls record requested on-demand loading; exact model-visible definitions not exposed"
+  },
+  "phases": {
+    "new": {
+      "calls": [
+        "list_tickets",
+        "get_project",
+        "list_activity",
+        "get_ticket",
+        "create_ticket",
+        "add_comment",
+        "link_pull_request",
+        "update_ticket",
+        "get_ticket",
+        "list_activity"
+      ],
+      "errors": [],
+      "usage": {
+        "values": {
+          "input_tokens": 18,
+          "output_tokens": 1585,
+          "cache_creation_input_tokens": 10626,
+          "cache_read_input_tokens": 59438
+        },
+        "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
+      }
+    },
+    "resumed": {
+      "calls": [
+        "get_project",
+        "list_activity",
+        "get_ticket"
+      ],
+      "errors": [],
+      "discovery": {
+        "requested": "deferred",
+        "advertisedToolNames": [
+          "mcp__taski__add_comment",
+          "mcp__taski__create_ticket",
+          "mcp__taski__get_project",
+          "mcp__taski__get_ticket",
+          "mcp__taski__link_pull_request",
+          "mcp__taski__list_activity",
+          "mcp__taski__list_tickets",
+          "mcp__taski__update_ticket"
+        ],
+        "toolSearchCalls": [],
+        "loadedToolNamesFromSearch": [],
+        "modelVisibleDefinitionTokens": null,
+        "interpretation": "init.tools is the available catalog; ToolSearch calls record requested on-demand loading; exact model-visible definitions not exposed"
+      },
+      "usage": {
+        "values": {
+          "input_tokens": 6,
+          "output_tokens": 576,
+          "cache_creation_input_tokens": 1948,
+          "cache_read_input_tokens": 24677
+        },
+        "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
+      }
+    }
+  },
+  "payloadProxy": {
+    "catalog": {
+      "utf8Bytes": 12269,
+      "tokensProxy": 3086
+    },
+    "new_tool_results": {
+      "utf8Bytes": 11677,
+      "tokensProxy": 3093
+    },
+    "resumed_tool_results": {
+      "utf8Bytes": 2409,
+      "tokensProxy": 819
+    }
+  },
+  "tokenizer": "tiktoken==0.14.0/o200k_base; canonical JSON; all tool results including errors; not model-visible schemas",
+  "assertions": {
+    "allEightToolsUsed": true,
+    "createdAndAssigned": true,
+    "atomicProgressAndReview": true,
+    "manualPr": true,
+    "fullContentVisible": true,
+    "knownConfigurationReused": true,
+    "incrementalCursorReused": true,
+    "resumedExternalChangeConfirmed": true
+  },
+  "context": "New temporary workspace, explicit Taski-only MCP config; same persisted session resumed after external fixture change",
+  "scope": "One workflow and one resumed turn; no comparative benchmark, no p50/p95; raw logs stay outside the repository",
+  "passed": true
+}

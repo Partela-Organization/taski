@@ -329,7 +329,7 @@
       },
       "patch": {
         "operationId": "update_ticket",
-        "description": "Atomically change fields/patch and add progress. Supply expectedVersion; stale writes fail.",
+        "description": "Put editable fields inside changes. Atomically apply changes/descriptionPatch and add comment. Supply expectedVersion; stale writes fail.",
         "parameters": [
           {
             "name": "key",

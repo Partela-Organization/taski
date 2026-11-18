@@ -2,7 +2,7 @@
 
 Estado: B0 completado; B1 tiene TypeScript, CI y [Worker/D1 locales](getting-started.md), con revisión independiente de onboarding pendiente en [B1-03](verification/b1-onboarding.md). B2 aporta configuración/sistema visual; B3, núcleo persistente y auditoría; B4, acceso de equipo; B5, API documentada y cliente independiente. Ver [decisiones y criterios de entrega](decisions/b0.md), [issues](https://github.com/danirssx/taski/issues) y [milestones](https://github.com/danirssx/taski/milestones).
 
-B6-01 expone el [MCP autenticado](mcp.md) y comprueba las ocho herramientas con SDK. B6-02 verifica [vistas, operaciones compuestas y contexto incremental](mcp-intent.md), con recibos compactos y llamadas/rondas registradas. B6 continúa con validación en Claude Code/Codex y comparación frente a Linear optimizado; los informes proxy no completan ese gate. La [UI de componentes](ui.md) usa datos ficticios hasta la web conectada de B7.
+B6-01 expone el [MCP autenticado](mcp.md) y comprueba las ocho herramientas con SDK. B6-02 verifica [vistas, operaciones compuestas y contexto incremental](mcp-intent.md), con recibos compactos y llamadas/rondas registradas. B6-03 añade [recorridos locales en Claude Code/Codex](verification/b6-agents.md), con sesiones nuevas y retomadas. La comparación frente a Linear optimizado sigue en B6-04; estas muestras no completan ese gate. La [UI de componentes](ui.md) usa datos ficticios hasta la web conectada de B7.
 
 | Bloque | Entregable |
 | --- | --- |

@@ -16,6 +16,8 @@ B6-01 añade [medición del MCP con SDK sobre Worker/D1 local](../mcp.md) y un [
 
 B6-02 registra [vistas, recibos compuestos, llamadas/rondas y recuperación incremental](../mcp-intent.md) en su [informe de fixtures](b6-intent-results.json). Conserva UUIDs/timestamps reales y comprueba los presupuestos en vivo. La comparación de operaciones de Linear es un plan de contrato que permite paralelización, no una muestra de su latencia o consumo.
 
+B6-03 incorpora [sesiones reales de Codex y Claude Code](../verification/b6-agents.md), con uso expuesto por cada cliente, referencias de búsqueda y muestras nuevas/retomadas. Se distingue catálogo recibido de esquemas visibles para el modelo, cuyo tamaño exacto no expone esta salida. Los modelos difieren entre clientes y no se controla caché fría; las muestras funcionales no sustituyen el diseño comparativo de B6-04.
+
 ## Presupuestos del spike
 
 Serialización canónica: `json.dumps(..., ensure_ascii=False, sort_keys=True, separators=(',', ':'))`. Tokenizer: `tiktoken==0.14.0`, `o200k_base`. Es una convención proxy común, no el tokenizer garantizado de los modelos.

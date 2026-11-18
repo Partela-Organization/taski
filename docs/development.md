@@ -29,7 +29,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. Los tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md), [cliente TypeScript](client.md) y [MCP](mcp.md). La UI conectada y las pruebas con hosts IA siguen pendientes. Detener con Ctrl+C.
+Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. Los tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md), [cliente TypeScript](client.md) y [MCP](mcp.md), con [recorridos locales en hosts IA](verification/b6-agents.md). La UI conectada sigue pendiente. Detener con Ctrl+C.
 
 ## Comprobaciones
 
@@ -44,3 +44,5 @@ git diff --check
 CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instalación o Cloudflare. La documentación y el spike de B0 conservan su workflow independiente. No se añade un comando de despliegue remoto hasta B11.
 
 El workflow documental también ejecuta `npm run mcp:measure -- --intent --check`, con las dependencias Python fijadas de B0, para comprobar los informes de catálogo, vistas y operaciones compuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) y [recorridos por intención](mcp-intent.md) para actualizarlos y distinguir tokens proxy de uso real.
+
+La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).

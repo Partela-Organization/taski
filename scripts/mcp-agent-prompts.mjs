@@ -1,0 +1,10 @@
+export function workflow(title) {
+  return `This is a Taski MCP integration test on an isolated database containing only fictitious data. Use only the taski MCP; do not use shell, files, web, other connectors, or delegate work.
+Read the project configuration and list tickets. Read the full ticket titled Context seed; retain and quote its terminal marker from the description (the marker is not given in this prompt).
+Create one task titled ${JSON.stringify(title)}, assigned to Sam (use the configured member ID). Add the comment Initial investigation using add_comment. Attach https://github.com/example/demo/pull/42 using link_pull_request. Then use update_ticket to set in_review and add Ready for review atomically. Keep the same idempotency key and arguments if a call needs retrying; never guess versions.
+Read the new ticket with view full to confirm state, assignment, both comments and PR. Consume activity from the initial project cursor. Keep the last consumed activity cursor and configVersion for the next turn. Never mark the task done.
+Return only a JSON object with key, version, status, assigneeId, prUrl, seedMarker, configVersion and activityCursor. Use values from the actual responses; report failure instead of inventing success.`;
+}
+export const resumed = `Continue the same Taski fixture session. Another client has made a change since the activity cursor you last consumed. Reuse your known configVersion and that consumed cursor: request only unchanged configuration metadata and the new activity, without repeating the ticket list. Do not replace your consumed cursor with the current cursor returned by get_project before reading the changes.
+Retrieve full detail of the task you created to verify the new version, highlight and latest comment. Do not write anything, use other connectors, access files, run shell or delegate.
+Return only a JSON object with key, version, highlighted, latestComment, configVersion and activityCursor. Quote the actual new comment and use the last consumed cursor.`;
