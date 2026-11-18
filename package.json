@@ -26,7 +26,10 @@
     "test:ui": "playwright test",
     "api:generate": "node scripts/generate-api-schema.mjs",
     "api:check": "node scripts/generate-api-schema.mjs --check",
-    "mcp:measure": "node scripts/measure-mcp.mjs"
+    "mcp:measure": "node scripts/measure-mcp.mjs",
+    "benchmark:plan": "node scripts/benchmark.mjs plan",
+    "benchmark:report": "node scripts/benchmark.mjs report",
+    "benchmark:preflight": "node scripts/benchmark-preflight.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261113.1",

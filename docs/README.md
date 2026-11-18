@@ -19,6 +19,7 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [Conectar y verificar Codex CLI](mcp/codex.md)
 - [Conectar y verificar Claude Code](mcp/claude-code.md)
 - [Evidencia de sesiones nuevas y retomadas con agentes reales](verification/b6-agents.md)
+- [Preparar y evaluar la comparación B6-04, todavía sin muestras de rendimiento](benchmarks/b6-comparison.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
 - [Solución de problemas de arranque](troubleshooting.md)

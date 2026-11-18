@@ -18,6 +18,8 @@ B6-02 registra [vistas, recibos compuestos, llamadas/rondas y recuperación incr
 
 B6-03 incorpora [sesiones reales de Codex y Claude Code](../verification/b6-agents.md), con uso expuesto por cada cliente, referencias de búsqueda y muestras nuevas/retomadas. Se distingue catálogo recibido de esquemas visibles para el modelo, cuyo tamaño exacto no expone esta salida. Los modelos difieren entre clientes y no se controla caché fría; las muestras funcionales no sustituyen el diseño comparativo de B6-04.
 
+B6-04 dispone de [diseño registrado, preflight y evaluador](b6-comparison.md). El colector y las muestras comparativas siguen pendientes; no hay ventaja demostrada. El evaluador mantiene cohortes separadas y exige treinta pares, uso real y revisión de evidencia; los umbrales numéricos no aceptan automáticamente el gate.
+
 ## Presupuestos del spike
 
 Serialización canónica: `json.dumps(..., ensure_ascii=False, sort_keys=True, separators=(',', ':'))`. Tokenizer: `tiktoken==0.14.0`, `o200k_base`. Es una convención proxy común, no el tokenizer garantizado de los modelos.
