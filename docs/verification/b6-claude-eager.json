@@ -1,6 +1,6 @@
 {
   "kind": "LIVE_MCP_CLIENT_VALIDATION",
-  "executedAt": "2026-11-18T00:56:52.217Z",
+  "executedAt": "2026-11-18T16:17:51.158Z",
   "client": "claude",
   "version": "2.1.327 (Claude Code)",
   "loading": "eager",
@@ -14,7 +14,7 @@
     "sourceSha256": {
       "src/adapters/mcp/server.ts": "ba212ef5c5d9ffe02e84807dfdee8f2cf239390229b7416c37e28fe54c405f7c",
       "src/adapters/api/contract.ts": "30ec3a1d312b85ec645e8200890f69a6a2acd525458d1aa76e3d0d3f4cd5d375",
-      "src/adapters/api/operations.ts": "b8dbd85cf258701eb09a2202ecadaaa8c8ac8b93a80b7a9a952657ab49b2f273"
+      "src/adapters/api/operations.ts": "1785364117c56352e222ec950565fbe5ec0117cb4fff56c57dc8a0f30f1f5f46"
     }
   },
   "models": [
@@ -72,9 +72,9 @@
       "usage": {
         "values": {
           "input_tokens": 14,
-          "output_tokens": 1340,
-          "cache_creation_input_tokens": 11062,
-          "cache_read_input_tokens": 48085
+          "output_tokens": 1343,
+          "cache_creation_input_tokens": 11114,
+          "cache_read_input_tokens": 48336
         },
         "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
       }
@@ -106,9 +106,9 @@
       "usage": {
         "values": {
           "input_tokens": 6,
-          "output_tokens": 535,
-          "cache_creation_input_tokens": 1947,
-          "cache_read_input_tokens": 22569
+          "output_tokens": 490,
+          "cache_creation_input_tokens": 1952,
+          "cache_read_input_tokens": 22675
         },
         "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
       }
@@ -121,11 +121,11 @@
     },
     "new_tool_results": {
       "utf8Bytes": 11653,
-      "tokensProxy": 3083
+      "tokensProxy": 3096
     },
     "resumed_tool_results": {
       "utf8Bytes": 2400,
-      "tokensProxy": 835
+      "tokensProxy": 834
     }
   },
   "tokenizer": "tiktoken==0.14.0/o200k_base; canonical JSON; all tool results including errors; not model-visible schemas",

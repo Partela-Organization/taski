@@ -1,8 +1,8 @@
 {
   "kind": "LIVE_MCP_CLIENT_VALIDATION",
-  "executedAt": "2026-11-18T00:54:33.826Z",
+  "executedAt": "2026-11-18T16:18:21.445Z",
   "client": "codex",
-  "version": "codex-cli 0.167.2",
+  "version": "codex-cli 0.170.0",
   "loading": "default",
   "environment": {
     "node": "v26.3.0",
@@ -14,7 +14,7 @@
     "sourceSha256": {
       "src/adapters/mcp/server.ts": "ba212ef5c5d9ffe02e84807dfdee8f2cf239390229b7416c37e28fe54c405f7c",
       "src/adapters/api/contract.ts": "30ec3a1d312b85ec645e8200890f69a6a2acd525458d1aa76e3d0d3f4cd5d375",
-      "src/adapters/api/operations.ts": "b8dbd85cf258701eb09a2202ecadaaa8c8ac8b93a80b7a9a952657ab49b2f273"
+      "src/adapters/api/operations.ts": "1785364117c56352e222ec950565fbe5ec0117cb4fff56c57dc8a0f30f1f5f46"
     }
   },
   "models": [
@@ -23,7 +23,7 @@
   "protocolClients": [
     {
       "name": "codex-mcp-client",
-      "version": "0.167.2",
+      "version": "0.170.0",
       "protocol": "2025-06-18"
     }
   ],
@@ -55,16 +55,16 @@
         "add_comment",
         "link_pull_request",
         "update_ticket",
-        "get_ticket",
-        "list_activity"
+        "list_activity",
+        "get_ticket"
       ],
       "errors": [],
       "usage": {
         "values": {
-          "input_tokens": 153273,
-          "cached_input_tokens": 129408,
+          "input_tokens": 119153,
+          "cached_input_tokens": 100608,
           "cache_write_input_tokens": 0,
-          "output_tokens": 1029,
+          "output_tokens": 967,
           "reasoning_output_tokens": 0
         },
         "scope": "Observed session-cumulative CLI counters; resumed delta is derived by subtraction; input already includes cached input; do not sum raw resumed totals"
@@ -72,8 +72,8 @@
     },
     "resumed": {
       "calls": [
-        "list_activity",
         "get_project",
+        "list_activity",
         "get_ticket"
       ],
       "errors": [],
@@ -87,17 +87,17 @@
       },
       "usage": {
         "values": {
-          "input_tokens": 206484,
-          "cached_input_tokens": 179200,
+          "input_tokens": 173152,
+          "cached_input_tokens": 151552,
           "cache_write_input_tokens": 0,
-          "output_tokens": 1651,
+          "output_tokens": 1503,
           "reasoning_output_tokens": 0
         },
         "deltaFromPreviousInvocation": {
-          "input_tokens": 53211,
-          "cached_input_tokens": 49792,
+          "input_tokens": 53999,
+          "cached_input_tokens": 50944,
           "cache_write_input_tokens": 0,
-          "output_tokens": 622,
+          "output_tokens": 536,
           "reasoning_output_tokens": 0
         },
         "scope": "Observed session-cumulative CLI counters; resumed delta is derived by subtraction; input already includes cached input; do not sum raw resumed totals"
@@ -111,11 +111,11 @@
     },
     "new_tool_results": {
       "utf8Bytes": 7519,
-      "tokensProxy": 2160
+      "tokensProxy": 2169
     },
     "resumed_tool_results": {
       "utf8Bytes": 2085,
-      "tokensProxy": 747
+      "tokensProxy": 743
     }
   },
   "tokenizer": "tiktoken==0.14.0/o200k_base; canonical JSON; all tool results including errors; not model-visible schemas",

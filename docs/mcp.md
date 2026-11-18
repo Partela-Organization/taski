@@ -2,6 +2,8 @@
 
 B6-01 expone `/mcp` mediante Streamable HTTP autenticado. Usa los mismos contratos, `Operations`, `TicketService` y transacciones D1 que la [API HTTP](api.md). No importa el spike Python ni guarda tickets en memoria. Está comprobado localmente con el SDK MCP 2.4.0 y con [recorridos reales de Claude Code y Codex](verification/b6-agents.md); el despliegue corresponde a B11.
 
+B6-02 añade [vistas, operaciones compuestas y recuperación incremental verificadas](mcp-intent.md), con llamadas/rondas observadas y recibos de estado + avance dentro del presupuesto proxy.
+
 ## Configuración mínima
 
 1. Instala las dependencias con `npm ci` y aplica las migraciones con `npm run db:migrate`.
@@ -105,4 +107,4 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 Se usa JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`, incluyendo los envelopes `content`/`structuredContent` del resultado SDK. Se excluyen IDs JSON-RPC y cabeceras HTTP. El catálogo es el recibido de `tools/list`, con anotaciones y esquemas de salida, no una proyección del contrato B0. El informe incluye tamaños por herramienta; eso no demuestra qué definiciones carga un host con descubrimiento diferido.
 
-Comprobado con Node 26.3.0, npm 11.16.0 y Python 3.14.8 en macOS ARM64. CI reproduce el informe con el Node fijado del proyecto. Las cifras son proxy de estos fixtures en legacy, no consumo del modelo, latencia o comparación con Linear. Los [informes de B6-03](verification/b6-agents.md) registran uso y descubrimiento expuestos por cada cliente, con sus límites; el gate comparativo de B6-04 conserva su evaluación propia según el [protocolo de benchmark](benchmarks/protocol.md).
+Comprobado con Node 26.3.0, npm 11.16.0 y Python 3.14.8 en macOS ARM64. CI reproduce el informe con el Node fijado del proyecto. Las cifras son proxy de estos fixtures en legacy, no consumo del modelo, latencia o comparación con Linear. Consulta también las [mediciones de B6-02](mcp-intent.md). Los [informes de B6-03](verification/b6-agents.md) registran uso y descubrimiento expuestos por cada cliente, con sus límites; el gate comparativo de B6-04 conserva su evaluación propia según el [protocolo de benchmark](benchmarks/protocol.md).

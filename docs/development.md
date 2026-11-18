@@ -43,6 +43,6 @@ git diff --check
 
 CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instalación o Cloudflare. La documentación y el spike de B0 conservan su workflow independiente. No se añade un comando de despliegue remoto hasta B11.
 
-El workflow documental también ejecuta `npm run mcp:measure -- --check`, con las dependencias Python fijadas de B0, para comprobar el informe de catálogo/respuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) para actualizarlo y distinguir tokens proxy de uso real.
+El workflow documental también ejecuta `npm run mcp:measure -- --intent --check`, con las dependencias Python fijadas de B0, para comprobar los informes de catálogo, vistas y operaciones compuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) y [recorridos por intención](mcp-intent.md) para actualizarlos y distinguir tokens proxy de uso real.
 
 La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).

@@ -4,9 +4,11 @@ import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { installation } from "../src/config/index.ts";
+import { measureIntent } from "./mcp-intent-scenarios.mjs";
 
 const args = process.argv.slice(2);
-assert(args.length <= 1 && args.every((arg) => ["--check", "--write"].includes(arg)), "Use --check or --write, or no arguments");
+assert(args.every((arg) => ["--intent", "--check", "--write"].includes(arg)) && new Set(args).size === args.length
+  && !(args.includes("--check") && args.includes("--write")), "Use optional --intent and either --check or --write");
 const manifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 // Only isolated, fictitious fixtures. Never connects to a configured installation.
@@ -34,10 +36,11 @@ try {
   assert.equal(list.structuredContent.items.length, 20);
   assert.equal(list.structuredContent.nextCursor, null);
   assert.deepEqual(list.content, []); assert.deepEqual(receipt.content, []);
+  const intent = args.includes("--intent") ? await measureIntent(client) : undefined;
   const python = process.env.TASKI_PROXY_PYTHON ?? ".venv/bin/python";
   const measured = spawnSync(python, ["scripts/measure-mcp.py", ...args], {
     input: JSON.stringify({ instructions: client.getInstructions(), catalog, list, receipt,
-      sdk: { server: manifest.dependencies["@modelcontextprotocol/server"], client: manifest.devDependencies["@modelcontextprotocol/client"] } }), encoding: "utf8",
+      sdk: { server: manifest.dependencies["@modelcontextprotocol/server"], client: manifest.devDependencies["@modelcontextprotocol/client"] }, intent }), encoding: "utf8",
   });
   if (measured.error) throw measured.error;
   process.stdout.write(measured.stdout); process.stderr.write(measured.stderr);

@@ -1,6 +1,6 @@
 {
   "kind": "LIVE_MCP_CLIENT_VALIDATION",
-  "executedAt": "2026-11-18T00:56:58.114Z",
+  "executedAt": "2026-11-18T16:18:05.061Z",
   "client": "claude",
   "version": "2.1.327 (Claude Code)",
   "loading": "deferred",
@@ -14,7 +14,7 @@
     "sourceSha256": {
       "src/adapters/mcp/server.ts": "ba212ef5c5d9ffe02e84807dfdee8f2cf239390229b7416c37e28fe54c405f7c",
       "src/adapters/api/contract.ts": "30ec3a1d312b85ec645e8200890f69a6a2acd525458d1aa76e3d0d3f4cd5d375",
-      "src/adapters/api/operations.ts": "b8dbd85cf258701eb09a2202ecadaaa8c8ac8b93a80b7a9a952657ab49b2f273"
+      "src/adapters/api/operations.ts": "1785364117c56352e222ec950565fbe5ec0117cb4fff56c57dc8a0f30f1f5f46"
     }
   },
   "models": [
@@ -71,8 +71,8 @@
   "phases": {
     "new": {
       "calls": [
-        "get_project",
         "list_tickets",
+        "get_project",
         "list_activity",
         "get_ticket",
         "create_ticket",
@@ -86,9 +86,9 @@
       "usage": {
         "values": {
           "input_tokens": 18,
-          "output_tokens": 1492,
-          "cache_creation_input_tokens": 8840,
-          "cache_read_input_tokens": 60523
+          "output_tokens": 1585,
+          "cache_creation_input_tokens": 10626,
+          "cache_read_input_tokens": 59438
         },
         "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
       }
@@ -120,9 +120,9 @@
       "usage": {
         "values": {
           "input_tokens": 6,
-          "output_tokens": 499,
-          "cache_creation_input_tokens": 1917,
-          "cache_read_input_tokens": 24353
+          "output_tokens": 576,
+          "cache_creation_input_tokens": 1948,
+          "cache_read_input_tokens": 24677
         },
         "scope": "Claude result usage as exposed; resumed totals are kept separate and never summed"
       }
@@ -135,11 +135,11 @@
     },
     "new_tool_results": {
       "utf8Bytes": 11677,
-      "tokensProxy": 3059
+      "tokensProxy": 3093
     },
     "resumed_tool_results": {
       "utf8Bytes": 2409,
-      "tokensProxy": 806
+      "tokensProxy": 819
     }
   },
   "tokenizer": "tiktoken==0.14.0/o200k_base; canonical JSON; all tool results including errors; not model-visible schemas",
