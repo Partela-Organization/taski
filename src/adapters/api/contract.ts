@@ -50,7 +50,7 @@ export const definitions = [
       ["id", "ticketVersion", "body", "actor", "createdAt"])), nextCommentsCursor: nullableString, omitted: array(string) }, ["ticket", "comments", "nextCommentsCursor", "omitted"]) },
   { name: "create_ticket", description: "Create and optionally assign in one call. Reuse the same idempotencyKey on retries.",
     inputSchema: object({ ...editable, idempotencyKey: mutation.idempotencyKey }, ["title", "idempotencyKey"]), outputSchema: receipt },
-  { name: "update_ticket", description: "Atomically change fields/patch and add progress. Supply expectedVersion; stale writes fail.",
+  { name: "update_ticket", description: "Put editable fields inside changes. Atomically apply changes/descriptionPatch and add comment. Supply expectedVersion; stale writes fail.",
     inputSchema: { ...object({ ...mutation, changes: object(editable), descriptionPatch: patch, comment: { ...string, maxLength: 20000 } }, Object.keys(mutation)),
       anyOf: [{ required: ["changes"] }, { required: ["descriptionPatch"] }, { required: ["comment"] }] }, outputSchema: receipt },
   { name: "add_comment", description: "Add one comment with version and retry protection. Combine field changes using update_ticket.",

@@ -4,7 +4,7 @@ Taski acepta pull requests de colaboradores externos mediante forks. Las contrib
 
 ## Qué se puede aportar hoy
 
-Documentación, recorridos de usuario, UI, arquitectura y cambios enfocados en la base TypeScript/Worker local. Consulta [desarrollo y estructura](docs/development.md) y el [roadmap](docs/roadmap.md) antes de implementar una funcionalidad grande. Los tickets y el acceso de equipo ya están disponibles mediante la API HTTP, el cliente TypeScript y el [MCP probado con SDK](docs/mcp.md). La UI conectada y la validación del MCP con Claude Code/Codex siguen pendientes.
+Documentación, recorridos de usuario, UI, arquitectura y cambios enfocados en la base TypeScript/Worker local. Consulta [desarrollo y estructura](docs/development.md) y el [roadmap](docs/roadmap.md) antes de implementar una funcionalidad grande. Los tickets y el acceso de equipo ya están disponibles mediante la API HTTP, el cliente TypeScript y el [MCP](docs/mcp.md), con [recorridos locales en Claude Code/Codex](docs/verification/b6-agents.md). La UI conectada y el benchmark comparativo siguen pendientes.
 
 También puedes ejecutar y mejorar el [spike del contrato B0](experiments/b0/README.md), con datos ficticios y sin credenciales. Al cambiar contrato, fixtures o presupuestos, ejecuta sus pruebas y el check del informe reproducible además de los checks documentales. El código del spike es experimental, separado del runtime TypeScript que comienza en B1.
 

@@ -14,6 +14,8 @@ No mezclar resultados de niveles diferentes en una cifra de ahorro. No publicar 
 
 B6-01 añade [medición del MCP con SDK sobre Worker/D1 local](../mcp.md) y un [informe reproducible](b6-mcp-results.json) con el catálogo recibido, instrucciones y envelopes de resultados. Continúa siendo conteo proxy: no completa la validación de hosts o el benchmark equivalente de B6-03/B6-04. Las cifras históricas de B0 se conservan a continuación con su representación original.
 
+B6-03 incorpora [sesiones reales de Codex y Claude Code](../verification/b6-agents.md), con uso expuesto por cada cliente, referencias de búsqueda y muestras nuevas/retomadas. Se distingue catálogo recibido de esquemas visibles para el modelo, cuyo tamaño exacto no expone esta salida. Los modelos difieren entre clientes y no se controla caché fría; las muestras funcionales no sustituyen el diseño comparativo de B6-04.
+
 ## Presupuestos del spike
 
 Serialización canónica: `json.dumps(..., ensure_ascii=False, sort_keys=True, separators=(',', ':'))`. Tokenizer: `tiktoken==0.14.0`, `o200k_base`. Es una convención proxy común, no el tokenizer garantizado de los modelos.

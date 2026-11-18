@@ -21,7 +21,7 @@ report = {"kind": "proxy_not_agent_usage", "encoding": "o200k_base", "tiktoken":
           "representation": "SDK results including content and structuredContent plus server instructions; no RPC ids/headers",
           "fixtures": "20 create-and-assign calls; fixed epoch in isolated D1 only; no production data",
           "measured": measurements, "budgets": budgets, "per_tool": per_tool,
-          "deferred_loading": "per-tool sizes only; actual host-loaded definitions are measured separately in B6-03",
+          "deferred_loading": "per-tool sizes only; see B6-03 client discovery reports; exact model-visible schemas are not exposed",
           "realUsage": None, "latency": None, "superiorityOverLinear": "NOT_DEMONSTRATED",
           "passed": all(measurements[k]["tokensProxy"] <= limit for k, limit in budgets.items())}
 serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"

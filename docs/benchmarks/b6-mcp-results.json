@@ -12,8 +12,8 @@
   "fixtures": "20 create-and-assign calls; fixed epoch in isolated D1 only; no production data",
   "measured": {
     "catalog_with_instructions": {
-      "tokensProxy": 3094,
-      "utf8Bytes": 12363
+      "tokensProxy": 3101,
+      "utf8Bytes": 12409
     },
     "list_20": {
       "tokensProxy": 805,
@@ -47,8 +47,8 @@
       "utf8Bytes": 1126
     },
     "update_ticket": {
-      "tokensProxy": 428,
-      "utf8Bytes": 1693
+      "tokensProxy": 435,
+      "utf8Bytes": 1739
     },
     "add_comment": {
       "tokensProxy": 235,
@@ -63,7 +63,7 @@
       "utf8Bytes": 913
     }
   },
-  "deferred_loading": "per-tool sizes only; actual host-loaded definitions are measured separately in B6-03",
+  "deferred_loading": "per-tool sizes only; see B6-03 client discovery reports; exact model-visible schemas are not exposed",
   "realUsage": null,
   "latency": null,
   "superiorityOverLinear": "NOT_DEMONSTRATED",

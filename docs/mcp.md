@@ -1,6 +1,6 @@
 # MCP sobre Worker/D1
 
-B6-01 expone `/mcp` mediante Streamable HTTP autenticado. Usa los mismos contratos, `Operations`, `TicketService` y transacciones D1 que la [API HTTP](api.md). No importa el spike Python ni guarda tickets en memoria. Está comprobado localmente con el SDK MCP 2.4.0; la validación de Claude Code y Codex corresponde a B6-03 y el despliegue a B11.
+B6-01 expone `/mcp` mediante Streamable HTTP autenticado. Usa los mismos contratos, `Operations`, `TicketService` y transacciones D1 que la [API HTTP](api.md). No importa el spike Python ni guarda tickets en memoria. Está comprobado localmente con el SDK MCP 2.4.0 y con [recorridos reales de Claude Code y Codex](verification/b6-agents.md); el despliegue corresponde a B11.
 
 ## Configuración mínima
 
@@ -79,7 +79,7 @@ Consulta en la [API](api.md) las vistas, cursores, campos omitidos y recuperaci�
 
 ## Resultados y errores
 
-Una operación correcta devuelve `{content: [], structuredContent: resultado}`: el JSON completo se transporta una sola vez. El cliente debe consumir `structuredContent`. La [especificación MCP](https://modelcontextprotocol.io/specification/2026-07-28/server/tools#structured-content) recomienda duplicarlo en texto para compatibilidad con clientes antiguos; esta implementación evita esa duplicación explícitamente. Un host que solo muestre `content` no es compatible con esta representación. Su visibilidad para el agente y la carga diferida real se comprobarán por cliente en B6-03; el éxito del SDK no certifica esos hosts.
+Una operación correcta devuelve `{content: [], structuredContent: resultado}`: el JSON completo se transporta una sola vez. El cliente debe consumir `structuredContent`. La [especificación MCP](https://modelcontextprotocol.io/specification/2026-07-28/server/tools#structured-content) recomienda duplicarlo en texto para compatibilidad con clientes antiguos; esta implementación evita esa duplicación explícitamente. Codex CLI 0.167.2 y Claude Code 2.1.327 hicieron visible el resultado al agente en los [recorridos comprobados](verification/b6-agents.md). Un host que solo muestre `content` no es compatible; otras versiones requieren su propia verificación.
 
 Un fallo de negocio devuelve `isError: true` y un bloque de texto JSON con `{error:{code,message}}`, sin recibo de éxito. `VERSION_CONFLICT` exige releer y reconciliar; `IDEMPOTENCY_CONFLICT` indica reutilización de clave con otros parámetros; `REVIEW_REQUIRED` impide cerrar sin autorización. Los fallos internos devuelven `INTERNAL_ERROR` sin SQL o trazas. Consulta las [garantías de reintento](retries.md): ante transporte incierto conserva clave y argumentos, sin incrementar ciegamente la versión.
 
@@ -99,10 +99,10 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3094 | 12363 | 4000 |
+| `tools/list` completo + instrucciones | 3101 | 12409 | 4000 |
 | Resultado de listar 20 resúmenes | 805 | 2604 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 
 Se usa JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`, incluyendo los envelopes `content`/`structuredContent` del resultado SDK. Se excluyen IDs JSON-RPC y cabeceras HTTP. El catálogo es el recibido de `tools/list`, con anotaciones y esquemas de salida, no una proyección del contrato B0. El informe incluye tamaños por herramienta; eso no demuestra qué definiciones carga un host con descubrimiento diferido.
 
-Comprobado con Node 26.3.0, npm 11.16.0 y Python 3.14.8 en macOS ARM64. CI reproduce el informe con el Node fijado del proyecto. Las cifras son proxy de estos fixtures en legacy, no consumo del modelo, latencia o comparación con Linear. Los recorridos y presupuestos adicionales de B6-02, la carga real de B6-03 y el gate comparativo de B6-04 conservan su evaluación propia según el [protocolo de benchmark](benchmarks/protocol.md).
+Comprobado con Node 26.3.0, npm 11.16.0 y Python 3.14.8 en macOS ARM64. CI reproduce el informe con el Node fijado del proyecto. Las cifras son proxy de estos fixtures en legacy, no consumo del modelo, latencia o comparación con Linear. Los [informes de B6-03](verification/b6-agents.md) registran uso y descubrimiento expuestos por cada cliente, con sus límites; el gate comparativo de B6-04 conserva su evaluación propia según el [protocolo de benchmark](benchmarks/protocol.md).

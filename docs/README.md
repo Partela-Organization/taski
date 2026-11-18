@@ -1,6 +1,6 @@
 # Documentación de Taski
 
-Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponibles localmente. B6-01 añade MCP probado con SDK; faltan su validación en Claude Code/Codex, el benchmark comparativo, la web conectada y el despliegue.
+Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponibles localmente. El MCP tiene recorridos verificados con SDK, Claude Code y Codex en las versiones registradas. Faltan el benchmark comparativo, la web conectada y el despliegue.
 
 ## Disponible ahora
 
@@ -15,6 +15,9 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [API HTTP versionada y contrato OpenAPI](api.md)
 - [Cliente TypeScript y ejemplos independientes](client.md)
 - [MCP autenticado: herramientas, conexión SDK y medición reproducible](mcp.md)
+- [Conectar y verificar Codex CLI](mcp/codex.md)
+- [Conectar y verificar Claude Code](mcp/claude-code.md)
+- [Evidencia de sesiones nuevas y retomadas con agentes reales](verification/b6-agents.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
 - [Solución de problemas de arranque](troubleshooting.md)
