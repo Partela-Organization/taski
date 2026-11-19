@@ -40,3 +40,5 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 ## Se entrega con cada bloque funcional
 
 Instalación local de la app, referencia de configuración, API/OpenAPI, configuración de Claude Code/Codex, despliegue Cloudflare, otra instalación independiente, rebranding, UI alternativa, actualización de versión y recuperación de datos. Sus instrucciones se probarán contra la implementación antes de presentarlas como disponibles.
+
+- [Lista y captura conectadas B7-01, en revisión](web.md)
