@@ -1,3 +1,4 @@
+import { mutationKey } from "./mutation-key.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { TaskiClient, TaskiClientError } from "../../client/index.ts";
@@ -114,7 +115,7 @@ function App() {
         const value = (feedback ? feedbackTitle : title).trim();
         if (!value && !attempt) { setCaptureError("Escribe un título para continuar."); return; }
         const input: CreateTicket = attempt ?? { title: value, type: feedback ? "feedback" : "task",
-          ...(feedback ? { description: context.trim() } : area ? { areaId: area } : {}), idempotencyKey: crypto.randomUUID() };
+          ...(feedback ? { description: context.trim() } : area ? { areaId: area } : {}), idempotencyKey: mutationKey() };
         setAttempt(input); setBusy(true); setCaptureError("");
         void client.createTicket(input).then((receipt) => {
           setAttempt(undefined);
