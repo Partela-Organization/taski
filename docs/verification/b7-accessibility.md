@@ -18,7 +18,18 @@ El dispositivo enumerado por las herramientas locales es un iPad sin túnel disp
 
 ## Registro físico pendiente
 
-Cuando exista acceso al entorno de prueba desde un iPhone, registrar modelo, versión de iOS/Safari, URL de prueba sin credenciales, fecha y resultado. Usar datos ficticios: entrar, abrir enlace /t/:código, editar con el teclado virtual visible, cambiar Claro/Oscuro/Sistema, desplazar el panel, comentar, cerrar detalle y volver atrás. Comprobar orientación, barra del navegador, ausencia de scroll horizontal y que botones/errores sigan visibles con zoom. Adjuntar capturas sin credenciales ni datos reales y describir cualquier fallo. No marcar el criterio físico como aprobado hasta ejecutar estos pasos en el dispositivo.
+En la misma red Wi-Fi, arranca el entorno de prueba con la IP privada de tu Mac. En macOS puedes consultar la IP en Ajustes del Sistema → Wi-Fi → Detalles → TCP/IP. Sustituye la IP de ejemplo por la que aparezca allí.
+
+```sh
+npm run qa:device -- 192.168.1.20
+```
+
+Abre en el iPhone la dirección que imprime el comando. Usa el código ficticio `browser-fixture-only` y elige Alex. El servidor escucha en esa IP y sirve una compilación de la web con Worker/D1 temporal y 24 tareas ficticias. Úsalo en una red de confianza y detenlo con Ctrl+C al terminar. Sirve por HTTP local, por lo que **Copiar enlace** muestra el campo seleccionable cuando Safari no ofrece portapapeles. Cada arranque vuelve a cargar los datos de prueba.
+
+1. Abre **Todo el equipo**, entra a una tarea y abre su enlace en otra pestaña. Tras recargar debes ver la misma tarea.
+2. Cambia el título o la descripción con el teclado abierto. Desplázate hasta **Guardar cambios**, guarda y verifica que el texto siga ahí al recargar.
+3. Prueba Claro/Oscuro/Sistema, retrato y horizontal. Comprueba que el panel se desplace verticalmente sin desbordar a los lados y que el teclado, zoom o barra de Safari permitan llegar a guardar y cerrar.
+4. En el issue #25, registra modelo, iOS, fecha, pasos que pasaron, fallos y una captura si ayuda. Usa datos ficticios y omite credenciales de las capturas. Si activas VoiceOver, registra también si anuncia los campos, botones y errores en orden.
 
 ## Evidencia automática
 

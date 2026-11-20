@@ -51,6 +51,7 @@ La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas compar
 
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
 
+Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#registro-físico-pendiente) y sigue el [recorrido de feedback](verification/b8-feedback.md).
 
 ## Enlace manual a un PR B9-01
 

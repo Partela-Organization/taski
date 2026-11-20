@@ -1,3 +1,4 @@
+import { mutationKey } from "./mutation-key.ts";
 import { useState } from "react";
 import { TaskiClient, TaskiClientError } from "../../client/index.ts";
 import type { Edits, ProjectResult, TicketResult, UpdateTicket } from "../../client/index.ts";
@@ -17,6 +18,7 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
   const [draft, setDraft] = useState<Draft>(() => drafts.get(key) ?? { edits: editable(initial), changes: {}, version: initial.ticket.version });
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [notice, setNotice] = useState("");
   const [conflict, setConflict] = useState(false);
+  const [showLink, setShowLink] = useState(false);
   function change(edits: Edits) {
     const updated = { ...draft, edits: { ...draft.edits, ...edits }, changes: { ...draft.changes, ...edits } }; drafts.set(key, updated); setDraft(updated); setNotice("");
   }
@@ -32,7 +34,7 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
   }
   function save(changes: Edits) {
     if (busy || conflict) return;
-    const pending = draft.pending ?? { changes, expectedVersion: draft.version, idempotencyKey: crypto.randomUUID() };
+    const pending = draft.pending ?? { changes, expectedVersion: draft.version, idempotencyKey: mutationKey() };
     const updated = { ...draft, changes, pending }; setDraft(updated); drafts.set(key, updated); setBusy(true); setError(""); setNotice("");
     void client.updateTicket(key, pending).then(async (receipt) => {
       drafts.delete(key); setDraft({ edits: draft.edits, changes: {}, version: receipt.version }); onSaved(); setNotice("Cambios guardados.");
@@ -55,11 +57,12 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
   const ticketUrl = `${location.origin}/t/${encodeURIComponent(key)}`;
   async function copyLink() {
     try { await navigator.clipboard.writeText(ticketUrl); setNotice("Enlace copiado."); }
-    catch { setNotice(`Enlace: ${ticketUrl}`); }
+    catch { setShowLink(true); }
   }
   return <>
     <p>{key} · Versión {server.ticket.version}</p>
     <Button onClick={() => void copyLink()}>Copiar enlace</Button>
+    {showLink && <Field label="Enlace del ticket" value={ticketUrl} readOnly onFocus={(event) => event.target.select()} />}
     {server.ticket.prUrl && <p><a href={server.ticket.prUrl} target="_blank" rel="noreferrer">Abrir PR vinculado</a></p>}
     {feedback ? <>
       <p>{project?.typeLabels.feedback ?? "Feedback"} · {author}</p>

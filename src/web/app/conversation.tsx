@@ -1,3 +1,4 @@
+import { mutationKey } from "./mutation-key.ts";
 import { useEffect, useState } from "react";
 import { TaskiClient, TaskiClientError } from "../../client/index.ts";
 import type { Activity, TicketResult, UpdateTicket } from "../../client/index.ts";
@@ -28,7 +29,7 @@ export function Conversation({ result, client, cache, disabled, onUpdated }: {
   }, [key, revision]);
   async function mutate(highlight?: boolean) {
     if (busy || disabled) return;
-    const pending = draft.pending ?? { expectedVersion: result.ticket.version, idempotencyKey: crypto.randomUUID(),
+    const pending = draft.pending ?? { expectedVersion: result.ticket.version, idempotencyKey: mutationKey(),
       ...(highlight !== undefined ? { changes: { highlighted: highlight } } : { comment: draft.body }) };
     const next = { ...draft, pending, ...(highlight !== undefined ? { highlight } : {}) };
     setDraft(next); cache.set(key, next); setBusy(true); setError("");
