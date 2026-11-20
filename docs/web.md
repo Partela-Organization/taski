@@ -50,3 +50,10 @@ En móvil se abre Feedback al entrar. También es la vista inicial de quienes ti
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
+
+
+## Enlace manual a un PR B9-01
+
+Pega un enlace HTTPS en **Enlace al PR** y pulsa **Guardar cambios**. Puedes cambiar de estado en la misma edición. La fila y el detalle muestran el enlace confirmado. Para sustituirlo, edita el campo. Para retirarlo, déjalo vacío y guarda. La actividad muestra el valor anterior, el nuevo y el autor.
+
+Taski almacena una referencia manual. El estado de la tarea se edita desde Taski y los checks y el merge se consultan desde el enlace en GitHub.

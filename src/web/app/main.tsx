@@ -131,7 +131,8 @@ function App() {
       <Field label="Buscar entre los tickets cargados" type="search" value={search} onChange={(e) => setSearch(e.target.value)} />
       <ul className="tickets">{rows.filter((r) => `${r.key} ${r.title}`.toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))).map((r) => <li key={r.key}><Button className={r.highlighted ? "ticket-highlighted" : ""} onClick={() => void open(r.key)}>{r.title}</Button>{r.highlighted && <span>Resaltada</span>}
         {feedback ? <small>{project?.typeLabels.feedback ?? "Feedback"} · {project?.members.find((m) => m.id === r.createdBy)?.name ?? r.createdBy}</small>
-          : <small>{r.key} · {project?.statusLabels[r.status]} · {project?.members.find((m) => m.id === r.assigneeId)?.name ?? "Sin asignar"}</small>}</li>)}</ul>
+          : <small>{r.key} · {project?.statusLabels[r.status]} · {project?.members.find((m) => m.id === r.assigneeId)?.name ?? "Sin asignar"}
+            {r.prUrl && <> · <a href={r.prUrl} target="_blank" rel="noreferrer" aria-label={`Abrir PR de ${r.key}`}>PR</a></>}</small>}</li>)}</ul>
       {loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
       {!loading && !rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
       {cursor && <Button disabled={loading} onClick={() => void more()}>Cargar más</Button>}

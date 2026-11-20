@@ -65,7 +65,7 @@ Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato c
 | `update_ticket` | `key`, versión, clave y `changes`, `descriptionPatch` y/o `comment`; escritura atómica y recibo. |
 | `add_comment` | `key`, versión, clave y `body`; recibo con `commentId`. |
 | `list_activity` | Cursor, límite y `ticketKey` opcional; cambios concretos, `nextCursor` y `hasMore`. |
-| `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada, sin consultar GitHub. |
+| `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada. Para retirar o combinar con estado usa `update_ticket` con `changes.prUrl`. Ver [regla compartida](api.md#referencia-manual-a-un-pr). |
 
 Ejemplos de argumentos ficticios, para un ticket cuya versión actual sea 1:
 

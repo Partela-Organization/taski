@@ -74,9 +74,16 @@ export class TicketService {
       changes.highlighted = source.highlighted;
     }
     if ("prUrl" in source) {
-      if (source.prUrl !== null && (typeof source.prUrl !== "string" || source.prUrl.length > 1000
-          || !/^https:\/\/[a-z0-9.-]+(?::[0-9]{1,5})?(?:\/[^\s?#]*)?$/i.test(source.prUrl))) throw new TaskiError("INVALID_INPUT", "Invalid HTTPS PR URL");
-      changes.prUrl = source.prUrl as string | null;
+      changes.prUrl = null;
+      if (source.prUrl !== null) {
+        const value = text(source.prUrl, "prUrl", 1000).trim();
+        const match = /^https:\/\/([a-z0-9](?:[a-z0-9.-]*[a-z0-9])?)(?::([0-9]{1,5}))?(\/[^\s?#\\]*)?$/i.exec(value);
+        if (!match || (match[2] && (+match[2] < 1 || +match[2] > 65535))) {
+          throw new TaskiError("INVALID_INPUT", "Invalid HTTPS PR URL");
+        }
+        const port = match[2] ? Number(match[2]) : 443;
+        changes.prUrl = `https://${match[1]!.toLowerCase()}${port === 443 ? "" : `:${port}`}${match[3] ?? ""}`;
+      }
     }
     return changes;
   }

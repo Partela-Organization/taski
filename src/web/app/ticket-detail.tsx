@@ -7,7 +7,7 @@ import { Button, Field, StatusMessage } from "../components.tsx";
 
 export interface Draft { edits: Edits; changes: Edits; version: number; pending?: UpdateTicket }
 const editable = (result: TicketResult<"full">): Edits => {
-  const t = result.ticket; return { title: t.title, description: t.description, status: t.status, assigneeId: t.assigneeId, areaId: t.areaId };
+  const t = result.ticket; return { title: t.title, description: t.description, status: t.status, assigneeId: t.assigneeId, areaId: t.areaId, prUrl: t.prUrl };
 };
 export function TicketDetail({ initial, project, client, drafts, conversations, onSaved }: {
   initial: TicketResult<"full">; project: ProjectResult["project"]; client: TaskiClient; drafts: Map<string, Draft>; conversations: Map<string, ConversationDraft>; onSaved: () => void;
@@ -43,7 +43,11 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
         const corrected = { edits: draft.edits, changes, version: draft.version }; drafts.set(key, corrected); setDraft(corrected);
         if (e.status === 409) setConflict(true);
       }
-      setError(e instanceof TaskiClientError && e.status === 409 ? "Otra persona modificó esta tarea. Tu borrador se conserva." : "No se pudo guardar. Tu borrador se conserva.");
+      if (e instanceof TaskiClientError && e.message === "Invalid HTTPS PR URL") {
+        setError("Escribe un enlace HTTPS al PR, sin parámetros ni fragmentos. Tu borrador se conserva.");
+      } else {
+        setError(e instanceof TaskiClientError && e.status === 409 ? "Otra persona modificó esta tarea. Tu borrador se conserva." : "No se pudo guardar. Tu borrador se conserva.");
+      }
     }).finally(() => setBusy(false));
   }
   const feedback = server.ticket.type === "feedback";
@@ -56,6 +60,7 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
   return <>
     <p>{key} · Versión {server.ticket.version}</p>
     <Button onClick={() => void copyLink()}>Copiar enlace</Button>
+    {server.ticket.prUrl && <p><a href={server.ticket.prUrl} target="_blank" rel="noreferrer">Abrir PR vinculado</a></p>}
     {feedback ? <>
       <p>{project?.typeLabels.feedback ?? "Feedback"} · {author}</p>
       <p className="description">{server.ticket.description || "Sin contexto adicional"}</p>
@@ -69,6 +74,8 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
         <label htmlFor="status">Estado</label><select id="status" value={draft.edits.status} onChange={(e) => change({ status: e.target.value as NonNullable<Edits["status"]> })}>{Object.entries(project?.statusLabels ?? {}).map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select>
         <label htmlFor="assignee">Responsable</label><select id="assignee" value={draft.edits.assigneeId ?? ""} onChange={(e) => change({ assigneeId: e.target.value || null })}><option value="">Sin asignar</option>{project?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
         <label htmlFor="ticket-area">Área de la tarea</label><select id="ticket-area" value={draft.edits.areaId} onChange={(e) => change({ areaId: e.target.value })}>{project?.areas.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</select>
+        <Field label="Enlace al PR" type="url" inputMode="url" maxLength={1000} placeholder="https://github.com/equipo/proyecto/pull/42"
+          value={draft.edits.prUrl ?? ""} onChange={(e) => change({ prUrl: e.target.value.trim() || null })} />
       </fieldset>
       <Button type="submit" variant="primary" disabled={busy || conflict || (!draft.pending && !Object.keys(draft.changes).length)}>{busy ? "Guardando…" : draft.pending ? "Reintentar guardado" : "Guardar cambios"}</Button>
     </form>}
