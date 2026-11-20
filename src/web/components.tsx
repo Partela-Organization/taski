@@ -72,20 +72,22 @@ export function StatusMessage({ tone = "empty", title, children }:
   </div>;
 }
 
-export function DetailPanel({ open, title, onClose, children }:
-  { open: boolean; title: string; onClose: () => void; children: ReactNode }) {
+export function DetailPanel({ open, title, onClose, children, caption = "Detalle", actions, hideTitle = false, compactAt = 640 }:
+  { open: boolean; title: string; onClose: () => void; children: ReactNode;
+    caption?: string; actions?: ReactNode; hideTitle?: boolean; compactAt?: number }) {
   const id = useId();
   const panel = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
-  const [compact, setCompact] = useState(() => matchMedia("(max-width: 640px)").matches);
+  const compactQuery = `(max-width: ${compactAt}px)`;
+  const [compact, setCompact] = useState(() => matchMedia(compactQuery).matches);
   useEffect(() => {
-    const media = matchMedia("(max-width: 640px)");
+    const media = matchMedia(compactQuery);
     const update = () => setCompact(media.matches);
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
-  }, []);
+  }, [compactQuery]);
   useEffect(() => {
     if (!open || !compact) return;
     const previous = document.body.style.overflow;
@@ -99,7 +101,7 @@ export function DetailPanel({ open, title, onClose, children }:
     const keyboard = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return;
       if (event.key === "Escape") { event.preventDefault(); close.current(); }
-      if (event.key === "Tab" && matchMedia("(max-width: 640px)").matches) {
+      if (event.key === "Tab" && matchMedia(compactQuery).matches) {
         const controls = Array.from(panel.current?.querySelectorAll<HTMLElement>(
           "button, input, select, textarea, a[href], [tabindex]",
         ) ?? []).filter((element) => element.tabIndex >= 0 && !element.matches(":disabled") && element.getClientRects().length > 0);
@@ -117,12 +119,14 @@ export function DetailPanel({ open, title, onClose, children }:
       document.removeEventListener("keydown", keyboard);
       if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
-  }, [open]);
+  }, [open, compactQuery]);
   if (!open) return null;
   return <aside ref={panel} className="detail-panel" role={compact ? "dialog" : "region"}
     aria-modal={compact ? true : undefined} aria-labelledby={id}>
-    <div className="detail-panel__top"><span>Detalle</span><Button aria-label="Cerrar detalle" onClick={onClose}>Cerrar <span aria-hidden="true">×</span></Button></div>
-    <h2 id={id} ref={heading} tabIndex={-1}>{title}</h2>
+    <div className="detail-panel__top"><span>{caption}</span><div className="detail-panel__actions">
+      {actions}<Button aria-label="Cerrar detalle" title="Cerrar detalle" onClick={onClose}><span aria-hidden="true">×</span></Button>
+    </div></div>
+    <h2 id={id} ref={heading} tabIndex={-1} className={hideTitle ? "visually-hidden" : undefined}>{title}</h2>
     {children}
   </aside>;
 }

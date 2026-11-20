@@ -10,15 +10,16 @@ import { demoPreset } from "../src/config/presets/demo.ts";
 
 assert.deepEqual(installation, demoPreset, "Browser fixture requires the fictional demo configuration");
 const args = process.argv.slice(2);
-const lan = args[0] === "--lan" && args.length === 2;
-assert(!args.length || lan, "Use --lan followed by the computer's private IPv4 address");
+const lan = args[0] === "--lan" && (args.length === 2 || args.length === 3);
+assert(!args.length || lan, "Use --lan followed by the computer's private IPv4 address and optional port");
 const address = lan ? args[1] : "127.0.0.1";
 if (lan) {
   const privateIp = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/;
   assert(privateIp.test(address) && Object.values(networkInterfaces()).flat().some((entry) => entry.address === address && entry.family === "IPv4"),
     "Choose a private IPv4 address assigned to this computer");
 }
-const port = lan ? 5175 : 8787;
+const port = lan ? Number(args[2] ?? 5175) : 8787;
+assert(Number.isInteger(port) && port >= 1024 && port <= 65535, "Choose an unprivileged port from 1024 to 65535");
 const origin = `http://${address}:${port}`;
 const built = new URL("../dist/app/", import.meta.url);
 const assets = new Map();
@@ -34,14 +35,38 @@ if (lan) {
   }
 }
 const worker = createTestHarness({ workers: [{ configPath: "./wrangler.jsonc", vars: { TASKI_TEAM_ACCESS_CODE: "browser-fixture-only" } }] });
+const demoTickets = [
+  { title: "Probar la recuperación al guardar una tarea", description: "Revisar qué ocurre si se pierde la conexión durante el guardado.", areaId: "web", assigneeId: "alex", status: "in_progress", highlighted: true },
+  { title: "Revisar el mensaje de confirmación", description: "Acordar el texto de confirmación y comprobar que se vea al guardar.", areaId: "web", assigneeId: "sam", status: "in_progress", prUrl: "https://github.com/example/demo/pull/42" },
+  { title: "Validar enlaces compartidos desde el teléfono", areaId: "web", assigneeId: "alex" },
+  { title: "Preparar los textos de bienvenida", areaId: "general", assigneeId: "taylor" },
+  { title: "Simplificar el formulario de contacto", areaId: "general", highlighted: true },
+  { title: "Ajustar el tamaño del panel de detalle", areaId: "web", assigneeId: "sam", status: "in_review" },
+  { title: "Verificar el acceso con el código del equipo", areaId: "general", assigneeId: "alex", status: "done" },
+  { title: "Hacer más claro el mensaje de error", type: "feedback", description: "Sería útil explicar cuál es el siguiente paso cuando falta información." },
+  { title: "Mostrar ejemplos antes de rellenar el formulario", type: "feedback", highlighted: true },
+];
 let http;
 try {
   await worker.listen(); await worker.getWorker().applyD1Migrations("DB");
-  for (let i = 1; i <= 24; i++) {
-    const result = await worker.fetch("/api/v1/tickets", { method: "POST", headers: {
-      authorization: "Bearer browser-fixture-only", "x-taski-member": "alex", "content-type": "application/json",
-    }, body: JSON.stringify({ title: `Fixture ${String(i).padStart(2, "0")}`, assigneeId: i === 24 ? "sam" : "alex",
-      status: i === 24 ? "in_review" : "todo", areaId: i === 24 ? "web" : "general", idempotencyKey: `browser-seed-${i}` }) });
+  const headers = { authorization: "Bearer browser-fixture-only", "x-taski-member": "alex", "content-type": "application/json" };
+  let demoHeaders;
+  if (lan) {
+    const session = await worker.fetch("/api/v1/session", { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ code: "browser-fixture-only", memberId: "alex" }) });
+    assert.equal(session.status, 200);
+    const cookie = session.headers.get("set-cookie");
+    assert(cookie, "Demo seed session needs a cookie");
+    demoHeaders = { "content-type": "application/json", cookie: cookie.split(";", 1)[0] };
+  }
+  const tickets = lan ? demoTickets : Array.from({ length: 24 }, (_, offset) => {
+    const i = offset + 1;
+    return { title: `Fixture ${String(i).padStart(2, "0")}`, assigneeId: i === 24 ? "sam" : "alex",
+      status: i === 24 ? "in_review" : "todo", areaId: i === 24 ? "web" : "general" };
+  });
+  for (const [offset, ticket] of tickets.entries()) {
+    const result = await worker.fetch("/api/v1/tickets", { method: "POST", headers: demoHeaders ?? headers,
+      body: JSON.stringify({ ...ticket, idempotencyKey: `browser-seed-${offset + 1}` }) });
     assert.equal(result.status, 201);
   }
   http = createServer(async (request, response) => {

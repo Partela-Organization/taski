@@ -1,34 +1,42 @@
-.app { max-width: 1120px; margin: auto; padding: 24px; }
-.app header { display: flex; gap: 20px; align-items: center; margin-bottom: 48px; }
-.app header strong { margin-right: auto; }
-.app h1 { font-size: 28px; font-weight: 500; margin-bottom: 24px; }
-.app nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-.app nav [aria-pressed=true] { border-bottom: 2px solid var(--accent); }
-.app label { display: block; margin: 12px 0; }
-.app select { display: block; background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 8px; max-width: 100%; }
-.login { max-width: 380px; margin: 48px auto; }
-.workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
-.workspace:has(.detail-panel) { grid-template-columns: minmax(0, 1fr) 340px; }
-.workspace section { min-width: 0; }
-.capture { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
-.capture .field { flex: 1; min-width: 0; }
-.tickets { list-style: none; padding: 0; margin: 24px 0; }
-.tickets li { border-bottom: 1px solid var(--border); padding: 12px 0; }
-.tickets li button { text-align: left; overflow-wrap: anywhere; }
-.tickets small { display: block; color: var(--muted); }
-.description { white-space: pre-wrap; overflow-wrap: anywhere; }
-.hint { color: var(--muted); font-size: 12px; margin-top: 16px; }
-@media (max-width: 640px) { .workspace:has(.detail-panel) { display: block; } .app { padding: 20px; } .app input, .app select { font-size: 16px; } }
+@import "./workspace/workspace.css";
+@import "./tickets/ticket-panel.css";
+@import "./access/sign-in.css";
 
-.app fieldset { border: 0; padding: 0; min-width: 0; }
-.app textarea { display: block; width: 100%; min-height: 140px; background: var(--surface); color: var(--text); border: 1px solid var(--border); font: inherit; padding: 8px; }
-@media (max-width: 640px) { .app textarea { font-size: 16px; } .app select, .app button { min-height: 44px; } }
+:root {
+  --canvas: light-dark(#fff, #191b18);
+  --surface: light-dark(#fff, #1d201a);
+  --sidebar: light-dark(#f7f7f5, #151713);
+  --text: light-dark(#272823, #e4e7de);
+  --muted: light-dark(#65695d, #a4ac98);
+  --border: light-dark(#ebebe6, #2d3128);
+  --line-strong: light-dark(#d9dad2, #414738);
+  --hover: light-dark(#f6f6f3, #24271f);
+  --selected: light-dark(#f2f2ee, #2a2e25);
+  --highlight: light-dark(#f8e5a2, #6a5624);
+  --button-bg: light-dark(#2b2d25, #e0e5d9);
+  --button-ink: light-dark(#fff, #23271d);
+  --success: light-dark(#52805e, #8bb393);
+  --progress: light-dark(#9b722d, #d4af6b);
+  --panel-width: 480px;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
 
-.ticket-highlighted { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-.app dd { overflow-wrap: anywhere; margin-left: 0; font-size: 13px; }
+body { font-size: 13px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 
-.app header { flex-wrap: wrap; }
-.app .detail-panel { overflow-wrap: anywhere; }
-.app .detail-panel button, .app .detail-panel input, .app .detail-panel select, .app .detail-panel textarea { max-width: 100%; }
-.feedback-capture { margin: 24px 0; }
-.feedback-capture textarea { min-height: 88px; margin-bottom: 12px; }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wordmark { font-size: 23px; font-weight: 750; letter-spacing: -.055em; line-height: 1; text-transform: lowercase; }
+.wordmark span { display: inline-block; margin-left: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.workspace-icon { display: inline-block; width: 15px; height: 15px; flex: none; }
+.theme-control { display: flex; align-items: center; gap: 6px; }
+.theme-control label { font-size: 11px; color: var(--muted); }
+.theme-control select { border: 0; background: transparent; color: var(--muted); font-size: 12px; min-height: 36px; }

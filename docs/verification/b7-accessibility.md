@@ -24,7 +24,7 @@ En la misma red Wi-Fi, arranca el entorno de prueba con la IP privada de tu Mac.
 npm run qa:device -- 192.168.1.20
 ```
 
-Abre en el iPhone la dirección que imprime el comando. Usa el código ficticio `browser-fixture-only` y elige Alex. El servidor escucha en esa IP y sirve una compilación de la web con Worker/D1 temporal y 24 tareas ficticias. Úsalo en una red de confianza y detenlo con Ctrl+C al terminar. Sirve por HTTP local, por lo que **Copiar enlace** muestra el campo seleccionable cuando Safari no ofrece portapapeles. Cada arranque vuelve a cargar los datos de prueba.
+Abre en el iPhone la dirección que imprime el comando. Usa el código ficticio `browser-fixture-only` y elige Alex. El servidor escucha en esa IP y sirve una compilación de la web con Worker/D1 temporal con tareas y feedback ficticios. Úsalo en una red de confianza y detenlo con Ctrl+C al terminar. Sirve por HTTP local, por lo que **Copiar enlace** muestra el campo seleccionable cuando Safari no ofrece portapapeles. Cada arranque vuelve a cargar los datos de prueba. Para abrir una segunda demo aislada usa un puerto distinto, por ejemplo `npm run qa:device -- 192.168.1.20 5176`.
 
 1. Abre **Todo el equipo**, entra a una tarea y abre su enlace en otra pestaña. Tras recargar debes ver la misma tarea.
 2. Cambia el título o la descripción con el teclado abierto. Desplázate hasta **Guardar cambios**, guarda y verifica que el texto siga ahí al recargar.

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("browser uses real cookie sessions, D1 pagination and idempotent recovery after a committed response is lost", async ({ page, context }) => {
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("http://127.0.0.1:5174");
-  await page.getByLabel("Persona", { exact: true }).selectOption("alex");
+  await page.getByRole("radio", { name: "Alex", exact: true }).check();
   await page.getByLabel("Código del equipo").fill("incorrect-fictional-code");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("No se pudo entrar");
