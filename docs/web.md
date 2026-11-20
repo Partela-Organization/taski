@@ -12,7 +12,7 @@ El servidor Vite local reenvía `/api` al Worker de 8787. Reescribe únicamente 
 
 Todo el equipo, Mis tickets y Por revisar consultan la API en páginas de 20 tareas, con filtro por área. Cargar más consume el cursor del servidor; cambiar filtros descarta páginas anteriores. La búsqueda por código/título se limita a las páginas cargadas y se anuncia así. Actualizar lista consulta de nuevo el servidor; todavía no hay actualización automática.
 
-Escribe un título y pulsa Enter para crear. La lista se actualiza y se abre el detalle recuperado del servidor después del recibo de creación. El detalle inicial es de lectura, con descripción completa y cinco comentarios recientes; la edición y navegación ampliada corresponden a B7-02. No se representa una escritura como guardada antes de confirmar la respuesta.
+Escribe un título y pulsa Enter para crear. La lista se actualiza y se abre el detalle recuperado del servidor después del recibo de creación. El panel permite editar los campos principales, con descripción completa y cinco comentarios recientes. No se representa una escritura como guardada antes de confirmar la respuesta.
 
 Ante una respuesta perdida, se conserva texto y solicitud, bloqueando la modificación del título hasta reintentar con la misma clave de idempotencia. Un error HTTP explícito de validación permite corregir el texto. Una sesión vencida vuelve al acceso. Salir revoca la cookie en servidor. Los datos compartidos proceden de la API, sin base de tickets en localStorage. La selección de persona sigue siendo identidad declarada, según B4.
 

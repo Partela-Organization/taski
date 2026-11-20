@@ -20,7 +20,7 @@ test("stable routes preserve drafts across tasks and resolve real version confli
   await page.getByRole("button", { name: "Consultar versión actual y conservar borrador" }).click();
   await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Cambio externo que debe conservarse");
   await page.getByRole("button", { name: "Guardar cambios", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("Cambios guardados");
+  await expect(page.getByRole("region").getByRole("status")).toContainText("Cambios guardados");
   await page.reload();
   await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Borrador de la tercera tarea");
   await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Cambio externo que debe conservarse");
