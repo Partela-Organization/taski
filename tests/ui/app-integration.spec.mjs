@@ -1,0 +1,61 @@
+import { test, expect } from "@playwright/test";
+
+test("browser uses real cookie sessions, D1 pagination and idempotent recovery after a committed response is lost", async ({ page, context }) => {
+  const errors = []; page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("http://127.0.0.1:5174");
+  await page.getByLabel("Persona", { exact: true }).selectOption("alex");
+  await page.getByLabel("Código del equipo").fill("incorrect-fictional-code");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("No se pudo entrar");
+  await page.getByLabel("Código del equipo").fill("browser-fixture-only");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.locator(".tickets li")).toHaveCount(20);
+  await page.getByRole("button", { name: "Cargar más" }).click();
+  await expect(page.locator(".tickets li")).toHaveCount(24);
+  await page.getByRole("button", { name: "Mis tickets", exact: true }).click();
+  await expect(page.locator(".tickets li")).toHaveCount(20);
+  await expect(page.getByRole("button", { name: "Fixture 24", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Por revisar", exact: true }).click();
+  await expect(page.locator(".tickets li")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Fixture 24", exact: true })).toBeVisible();
+  await page.getByLabel("Área", { exact: true }).selectOption("general");
+  await expect(page.getByText("No hay tickets en esta vista", { exact: true })).toBeVisible();
+  await page.getByLabel("Área", { exact: true }).selectOption("");
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
+  let committed = false; const writes = [];
+  await page.route("**/api/v1/tickets", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    writes.push(route.request().postDataJSON());
+    if (!committed) {
+      const response = await route.fetch(); expect(response.status()).toBe(201);
+      committed = true; return route.abort("failed");
+    }
+    return route.continue();
+  });
+  await page.getByLabel("Nueva tarea", { exact: true }).fill("Persistida desde el navegador");
+  await page.getByLabel("Nueva tarea", { exact: true }).press("Enter");
+  await expect(page.getByRole("button", { name: "Confirmar reintento" })).toBeVisible();
+  await page.getByRole("button", { name: "Confirmar reintento" }).click();
+  await expect(page.getByRole("region", { name: "Persistida desde el navegador" })).toBeVisible();
+  expect(writes).toHaveLength(2); expect(writes[1]).toEqual(writes[0]);
+  await page.reload();
+  await expect(page.locator(".tickets li")).toHaveCount(20);
+  await page.getByRole("button", { name: "Cargar más" }).click();
+  await expect(page.locator(".tickets li")).toHaveCount(25);
+  await expect(page.getByRole("button", { name: "Persistida desde el navegador", exact: true })).toHaveCount(1);
+  let cursor, items = [];
+  do {
+    const response = await context.request.get(`http://127.0.0.1:5174/api/v1/tickets?limit=20${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`);
+    expect(response.ok()).toBe(true); const body = await response.json(); items.push(...body.items); cursor = body.nextCursor;
+  } while (cursor);
+  expect(items.filter((item) => item.title === "Persistida desde el navegador")).toHaveLength(1);
+  const cookie = (await context.cookies()).find((item) => item.httpOnly);
+  expect(cookie).toBeTruthy(); expect(cookie.sameSite).toBe("Strict");
+  const oldCookie = `${cookie.name}=${cookie.value}`;
+  await page.getByRole("button", { name: "Salir", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Entrar", exact: true })).toBeVisible();
+  const revoked = await context.request.get("http://127.0.0.1:8787/api/v1/session", { headers: { cookie: oldCookie } });
+  expect(revoked.status()).toBe(401);
+  expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain("browser-fixture-only");
+  expect(errors).toEqual([]);
+});

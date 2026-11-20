@@ -69,7 +69,7 @@ function App() {
       e.preventDefault(); if (busy) return; setBusy(true); setError("");
       void client.login(code, person).then((s) => { setCode(""); setMember(s.member); }).catch(() => setError("No se pudo entrar. Revisa el código y la persona e inténtalo de nuevo.")).finally(() => setBusy(false));
     }}><h1>{access?.projectName ?? "Entrar al equipo"}</h1><Field label="Código del equipo" type="password" value={code} autoComplete="current-password" required onChange={(e) => setCode(e.target.value)} />
-      <label>Persona<select value={person} onChange={(e) => setPerson(e.target.value)}>{access?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select></label>
+      <label htmlFor="person">Persona</label><select id="person" value={person} onChange={(e) => setPerson(e.target.value)}>{access?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
       <Button type="submit" variant="primary" disabled={busy || !access}>{busy ? "Entrando…" : "Entrar"}</Button>
       {!access && <Button onClick={() => location.reload()}>Reintentar conexión</Button>}
     </form> : <div className="workspace"><section><h1>{project?.name ?? access?.projectName}</h1>
