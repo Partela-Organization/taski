@@ -52,3 +52,9 @@ La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas compar
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
 
 Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#registro-físico-pendiente) y sigue el [recorrido de feedback](verification/b8-feedback.md).
+
+## Enlace manual a un PR B9-01
+
+Pega un enlace HTTPS en **Enlace al PR** y pulsa **Guardar cambios**. Puedes cambiar de estado en la misma edición. La fila y el detalle muestran el enlace confirmado. Para sustituirlo, edita el campo. Para retirarlo, déjalo vacío y guarda. La actividad muestra el valor anterior, el nuevo y el autor.
+
+Taski almacena una referencia manual. El estado de la tarea se edita desde Taski y los checks y el merge se consultan desde el enlace en GitHub.

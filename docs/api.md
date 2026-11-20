@@ -19,7 +19,7 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 
 Las listas normales solo contienen key/title/status/assigneeId/highlighted/version. `view=work` añade areaId/type/prUrl/createdBy para una UI que necesite esos metadatos, sin descripción o discusión. La consulta SQL tampoco lee las descripciones completas al listar. `omitted` indica el contenido que requiere otra lectura.
 
-El detalle `work` devuelve campos de trabajo, descripción completa y comentarios recientes. `full` añade identidad y fechas/creador; no significa conversación sin límite. `commentsLimit` admite 0–50 y nextCommentsCursor recupera páginas anteriores. No se corta texto silenciosamente. Descripciones largas tienen un coste real que no desaparece cambiando de herramienta.
+El detalle `work` devuelve campos de trabajo, descripción completa y comentarios recientes. `full` añade ID y fechas; no significa conversación sin límite. `commentsLimit` admite 0–50 y nextCommentsCursor recupera páginas anteriores. No se corta texto silenciosamente. Descripciones largas tienen un coste real que no desaparece cambiando de herramienta.
 
 `omitted` enumera también los campos de ticket excluidos por cada vista: `work` señala id, createdAt y updatedAt. `summary` añade url, description, areaId, type, prUrl y createdBy. Un `commentsLimit` positivo permite recuperar comentarios incluso con `summary`, útil para páginas antiguas sin repetir una descripción conocida. El historial se consulta mediante actividad con ticketKey. Ver [semántica y costes verificados](mcp-intent.md), compartidos con MCP.
 
@@ -46,3 +46,16 @@ Ejemplo de actualización (en un cliente que ya configuró su acceso):
 ```
 
 Un conflicto 409 exige releer/reconciliar; un reintento de transporte usa la misma clave y los mismos parámetros. No hacer reintentos ciegos con otra versión o clave. Las rutas no tienen CORS abierto; una UI futura usará el mismo origen o un proxy de desarrollo acotado.
+
+
+## Referencia manual a un PR
+
+Envía `changes.prUrl` en `PATCH /api/v1/tickets/{key}` para vincular o sustituir. Usa `null` para retirar. Puedes enviar `changes.status` en la misma operación. La ruta PUT de PR también vincula o sustituye. Ambas rutas usan la misma regla y registran el antes y después.
+
+Ejemplo de `changes` con datos ficticios:
+
+```json
+{"prUrl":"https://github.com/example/demo/pull/42","status":"in_review"}
+```
+
+La regla admite HTTPS sin credenciales, parámetros ni fragmentos. Recorta espacios exteriores, normaliza esquema y host a minúsculas y omite el puerto 443. Conserva la ruta y los puertos HTTPS explícitos distintos de 443. La validación es local y se aplica también a `update_ticket` y `link_pull_request` por MCP. Los enlaces ya guardados se leen tal como están hasta que se edita el campo.
