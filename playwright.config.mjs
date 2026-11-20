@@ -2,6 +2,10 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/ui",
+  projects: [
+    { name: "chromium", testIgnore: "**/webkit.spec.mjs", use: { browserName: "chromium" } },
+    { name: "webkit", testMatch: "**/webkit.spec.mjs", use: { browserName: "webkit" } },
+  ],
   fullyParallel: true,
   workers: 2,
   timeout: 60_000,

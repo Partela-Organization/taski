@@ -33,3 +33,7 @@ Título, descripción, responsable, estado y área se guardan con la versión co
 El panel permite comentar y consultar comentarios anteriores de cinco en cinco. La actividad se pagina de diez en diez e identifica persona/agente, canal, fecha y valores antes/después. Actualizar actividad vuelve a consultar el historial; no hay push. Resaltar/quitar resaltado guarda un cambio auditado y no altera el estado de la tarea. La lista muestra también una etiqueta textual y subrayado, sin depender solo del color.
 
 Los comentarios no enviados se conservan al cambiar de tarea dentro de la pestaña y se avisa al salir de la página. Los reintentos inciertos conservan la solicitud. Si otra persona cambió la versión, se consulta la actual sin enviar automáticamente el comentario: el texto permanece para revisar y reenviar. Las ediciones pendientes conservan por separado sus campos y versiones.
+
+## Temas y dispositivos B7-04
+
+El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico, todavía pendiente. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
