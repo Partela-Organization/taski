@@ -28,7 +28,8 @@
     "api:check": "node scripts/generate-api-schema.mjs --check",
     "mcp:measure": "node scripts/measure-mcp.mjs",
     "app": "vite --config vite.app.config.mjs",
-    "build:app": "vite build --config vite.app.config.mjs"
+    "build:app": "vite build --config vite.app.config.mjs",
+    "qa:device": "npm run build:app && node scripts/serve-browser-fixture.mjs --lan"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261113.1",

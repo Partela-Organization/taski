@@ -50,3 +50,5 @@ En móvil se abre Feedback al entrar. También es la vista inicial de quienes ti
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
+
+Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#registro-físico-pendiente) y sigue el [recorrido de feedback](verification/b8-feedback.md).
