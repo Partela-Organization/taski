@@ -23,3 +23,6 @@
 .app fieldset { border: 0; padding: 0; min-width: 0; }
 .app textarea { display: block; width: 100%; min-height: 140px; background: var(--surface); color: var(--text); border: 1px solid var(--border); font: inherit; padding: 8px; }
 @media (max-width: 640px) { .app textarea { font-size: 16px; } .app select, .app button { min-height: 44px; } }
+
+.ticket-highlighted { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.app dd { overflow-wrap: anywhere; margin-left: 0; font-size: 13px; }
