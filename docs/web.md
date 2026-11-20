@@ -1,6 +1,6 @@
 # Lista conectada B7-01
 
-Implementación en revisión: lista y captura conectadas al cliente HTTP, con sesión por cookie. El PR permanece en borrador mientras B6-04 siga pendiente. No se presenta como una entrega integrada de B7.
+B7-01 está integrado: lista y captura conectadas al cliente HTTP, con sesión por cookie. B6-04 conserva por separado su benchmark pendiente; la web no afirma ventajas comparativas. B7-02 incorpora panel editable y navegación por enlaces.
 
 ## Arranque local
 
@@ -21,3 +21,9 @@ Ante una respuesta perdida, se conserva texto y solicitud, bloqueando la modific
 `npm run check` comprueba cliente, tipos y bundles de preview y aplicación. `npm run test:ui` incluye pruebas de filtros y recuperación de una respuesta de creación perdida usando respuestas HTTP controladas en navegador; además ejecuta un recorrido real navegador → proxy Vite → Worker/D1 efímero con 24 tareas ficticias. Verifica código incorrecto/correcto, cookie HttpOnly, paginación, filtros, recarga, revocación de sesión y una respuesta perdida después de confirmar una creación en D1: el reintento y la lectura paginada posterior confirman una sola tarea. No se ha validado despliegue remoto.
 
 Playwright inicia el [servidor de fixtures](../scripts/serve-browser-fixture.mjs) en 8787 y ambos Vite; esos puertos deben estar libres. El harness usa almacenamiento temporal y exige el preset demo; no abre la D1 de desarrollo ni modifica `.dev.vars`. Al terminar se cierran los servidores.
+
+## Panel y enlaces B7-02
+
+El enlace `/t/DEMO-003` es un ejemplo ficticio: abre el detalle después de entrar y funciona al recargar con Vite. Copiar enlace usa el origen de la web. Abrir otra tarea y Atrás recupera el borrador de cada tarea; Escape cierra y vuelve a la lista. Los borradores viven solo en memoria de la pestaña, se eliminan al salir y la recarga avisa si quedan cambios. Confirmar salir de la página descarta esos borradores.
+
+Título, descripción, responsable, estado y área se guardan con la versión consultada; solo se envían los campos editados. Los errores conservan el texto y los reintentos inciertos mantienen la misma solicitud. Un conflicto exige consultar la versión actual y revisar antes de volver a guardar; los campos que no editaste reciben los cambios del servidor. Actualizar detalle pide confirmación antes de descartar un borrador. En escritorio el panel permite seguir usando la lista; en móvil conserva el diálogo completo con Escape y control del foco.

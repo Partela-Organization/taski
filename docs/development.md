@@ -29,7 +29,7 @@ npm run db:migrate
 npm run dev
 ```
 
-Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. Los tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md), [cliente TypeScript](client.md) y [MCP](mcp.md), con [recorridos locales en hosts IA](verification/b6-agents.md). La UI conectada sigue pendiente. Detener con Ctrl+C.
+Wrangler muestra el servidor local en `http://127.0.0.1:8787`. `GET /health` verifica una lectura real del bootstrap D1: HTTP 200 si está preparado y 503 en caso contrario. Consulta el [arranque local](getting-started.md) para respuesta esperada, persistencia y configuración de ejemplo. Los tickets y el acceso de equipo se documentan en [API HTTP](api.md), [acceso](access.md), [cliente TypeScript](client.md) y [MCP](mcp.md), con [recorridos locales en hosts IA](verification/b6-agents.md). La lista conectada arranca por separado con `npm run app`. Detener con Ctrl+C.
 
 ## Comprobaciones
 
@@ -47,4 +47,4 @@ El workflow documental también ejecuta `npm run mcp:measure -- --intent --check
 
 La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).
 
-La [aplicación B7-01 en revisión](web.md) arranca con `npm run app` en 5174 y usa el Worker local en 8787. `build:web` genera tanto el preview en `dist/web` como la aplicación en `dist/app`. La integración depende todavía del benchmark B6-04.
+La [aplicación B7-01](web.md) arranca con `npm run app` en 5174 y usa el Worker local en 8787. `build:web` genera tanto el preview en `dist/web` como la aplicación en `dist/app`. El benchmark B6-04 sigue pendiente, sin afirmaciones comparativas de rendimiento.

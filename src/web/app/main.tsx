@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { TaskiClient, TaskiClientError } from "../../client/index.ts";
 import type { CreateTicket, ProjectResult, TicketResult, WorkSummary } from "../../client/index.ts";
+import { TicketDetail } from "./ticket-detail.tsx";
+import type { Draft } from "./ticket-detail.tsx";
 import { Button, DetailPanel, Field, StatusMessage } from "../components.tsx";
 import { applyTheme, readTheme } from "../theme.ts";
 import licenses from "../assets/THIRD_PARTY_NOTICES.txt?url";
@@ -24,8 +26,9 @@ function App() {
   const [title, setTitle] = useState(""), [attempt, setAttempt] = useState<CreateTicket>();
   const [selected, setSelected] = useState<string>(), [detail, setDetail] = useState<TicketResult<"full">>();
   const [detailError, setDetailError] = useState(""); const [refresh, setRefresh] = useState(0);
+  const drafts = useRef(new Map<string, Draft>());
   const generation = useRef(0), detailGeneration = useRef(0);
-  const close = useCallback(() => { detailGeneration.current++; setSelected(undefined); setDetail(undefined); }, []);
+  const close = useCallback(() => { detailGeneration.current++; setSelected(undefined); setDetail(undefined); if (location.pathname !== "/") history.pushState(null, "", "/"); }, []);
   const fail = (e: unknown) => {
     if (e instanceof TaskiClientError && e.status === 401) { generation.current++; setMember(undefined); setRows([]); setProject(undefined); close(); }
     return e instanceof TaskiClientError && e.status === 401 ? "La sesión terminó. Vuelve a entrar." : "No se pudo confirmar la operación. Puedes volver a intentarlo.";
@@ -49,7 +52,16 @@ function App() {
       .finally(() => { if (id === generation.current) setLoading(false); });
     return () => { generation.current++; };
   }, [member, view, area, refresh]);
-  async function open(key: string) {
+  useEffect(() => {
+    if (!member) return;
+    const route = () => { const match = /^\/t\/([^/]+)$/.exec(location.pathname); if (match) void open(decodeURIComponent(match[1]!), false); else { detailGeneration.current++; setSelected(undefined); setDetail(undefined); } };
+    route(); window.addEventListener("popstate", route);
+    const unload = (e: BeforeUnloadEvent) => { if (drafts.current.size) { e.preventDefault(); e.returnValue = ""; } };
+    window.addEventListener("beforeunload", unload);
+    return () => { window.removeEventListener("popstate", route); window.removeEventListener("beforeunload", unload); };
+  }, [member]);
+  async function open(key: string, navigate = true) {
+    if (navigate && location.pathname !== `/t/${encodeURIComponent(key)}`) history.pushState(null, "", `/t/${encodeURIComponent(key)}`);
     const id = ++detailGeneration.current; setSelected(key); setDetail(undefined); setDetailError("");
     try { const result = await client.getTicket(key, { view: "full", commentsLimit: 5 }); if (id === detailGeneration.current) setDetail(result); }
     catch (e) { if (id === detailGeneration.current) setDetailError(fail(e)); }
@@ -63,7 +75,7 @@ function App() {
     finally { if (id === generation.current) setLoading(false); }
   }
   return <main className="app"><header><strong>{access?.brandName ?? "Taski"}</strong>{member && <><span>{member.name}</span><Button disabled={busy} onClick={() => {
-    setBusy(true); void client.logout().then(() => { setMember(undefined); setRows([]); setProject(undefined); close(); setAttempt(undefined); setTitle(""); }).catch((e: unknown) => setError(fail(e))).finally(() => setBusy(false));
+    setBusy(true); void client.logout().then(() => { setMember(undefined); setRows([]); setProject(undefined); close(); setAttempt(undefined); setTitle(""); drafts.current.clear(); }).catch((e: unknown) => setError(fail(e))).finally(() => setBusy(false));
   }}>Salir</Button></>}</header>
     {!ready ? <StatusMessage tone="loading" title="Conectando…" /> : !member ? <form className="login" onSubmit={(e) => {
       e.preventDefault(); if (busy) return; setBusy(true); setError("");
@@ -93,7 +105,7 @@ function App() {
       <p className="hint">20 tickets por página. La búsqueda usa las páginas cargadas. Actualiza para ver cambios de otras personas.</p>
     </section><DetailPanel open={!!selected} title={detail?.ticket.title ?? selected ?? "Detalle"} onClose={close}>
       {!detail && !detailError && <StatusMessage tone="loading" title="Cargando detalle…" />}{detailError && <StatusMessage tone="error" title={detailError}><Button onClick={() => selected && void open(selected)}>Reintentar detalle</Button></StatusMessage>}
-      {detail && <><p>{detail.ticket.key} · {project?.statusLabels[detail.ticket.status]}</p><p className="description">{detail.ticket.description || "Sin descripción"}</p>{detail.comments.map((c) => <p key={c.id}>{c.actor.name}: {c.body}</p>)}{detail.nextCommentsCursor && <p>Se muestran los cinco comentarios más recientes.</p>}</>}
+      {detail && <TicketDetail key={detail.ticket.key} initial={detail} project={project} client={client} drafts={drafts.current} onSaved={() => setRefresh((n) => n + 1)} />}
     </DetailPanel></div>}{error && <StatusMessage tone="error" title={error}><Button onClick={() => setRefresh((n) => n + 1)}>Reintentar</Button></StatusMessage>}
     <footer><a href={licenses}>Licencias</a></footer>
   </main>;

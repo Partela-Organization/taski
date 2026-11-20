@@ -19,3 +19,7 @@
 .description { white-space: pre-wrap; overflow-wrap: anywhere; }
 .hint { color: var(--muted); font-size: 12px; margin-top: 16px; }
 @media (max-width: 640px) { .workspace:has(.detail-panel) { display: block; } .app { padding: 20px; } .app input, .app select { font-size: 16px; } }
+
+.app fieldset { border: 0; padding: 0; min-width: 0; }
+.app textarea { display: block; width: 100%; min-height: 140px; background: var(--surface); color: var(--text); border: 1px solid var(--border); font: inherit; padding: 8px; }
+@media (max-width: 640px) { .app textarea { font-size: 16px; } .app select, .app button { min-height: 44px; } }
