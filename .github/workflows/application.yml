@@ -61,6 +61,6 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Install Chromium and WebKit
-        run: npm exec playwright install --with-deps chromium webkit
+        run: npm exec -- playwright install --with-deps chromium webkit
       - name: Verify keyboard, themes and responsive components
         run: npm run test:ui
