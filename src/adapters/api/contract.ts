@@ -22,9 +22,9 @@ const actor = object({ memberId: string, name: string, kind: { enum: ["person", 
   client: string, identityAssurance: { const: "self_selected" }, authorizationRef: string },
   ["memberId", "name", "kind", "channel", "client", "identityAssurance"]);
 const summaryFields = { key: string, title: string, status, assigneeId: nullableString, highlighted: boolean, version: integer };
-const summary = object({ ...summaryFields, areaId: string, type, prUrl: nullableString }, Object.keys(summaryFields));
+const summary = object({ ...summaryFields, areaId: string, type, prUrl: nullableString, createdBy: string }, Object.keys(summaryFields));
 const ticket = object({ ...summary.properties, id: string, url: string, description: { type: "string" },
-  createdBy: string, createdAt: string, updatedAt: string }, Object.keys(summaryFields));
+  createdAt: string, updatedAt: string }, Object.keys(summaryFields));
 const receipt = object({ key: string, url: string, version: integer, changed: array(string), commentId: string }, ["key", "url", "version", "changed"]);
 const position = { cursor: string, limit: page };
 const mutation = { key: string, expectedVersion: integer, idempotencyKey: { ...string, maxLength: 128 } };

@@ -45,11 +45,12 @@ export class D1TicketRepository implements TicketRepository {
     for (const [key, column] of [["status", "status"], ["assigneeId", "assignee_id"], ["areaId", "area_id"], ["type", "type"]] as const) {
       if (query[key] !== undefined) { where.push(`${column} IS ?`); values.push(query[key]!); }
     }
-    const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version FROM tickets WHERE ${where.join(" AND ")} ORDER BY number LIMIT ?`)
+    const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by FROM tickets WHERE ${where.join(" AND ")} ORDER BY number LIMIT ?`)
       .bind(...values, query.limit).all<Row>();
     return results.map((row) => ({ number: row.number as number, key: row.key as string, title: row.title as string,
       status: row.status as Ticket["status"], assigneeId: row.assignee_id as string | null, areaId: row.area_id as string,
-      type: row.type as Ticket["type"], highlighted: Number(row.highlighted) === 1, prUrl: row.pr_url as string | null, version: row.version as number }));
+      type: row.type as Ticket["type"], highlighted: Number(row.highlighted) === 1, prUrl: row.pr_url as string | null, version: row.version as number,
+      createdBy: row.created_by as string }));
   }
 
   async replay(actorId: string, operation: string, key: string, fingerprint: string): Promise<Receipt | null> {

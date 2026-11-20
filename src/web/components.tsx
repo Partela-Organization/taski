@@ -101,15 +101,15 @@ export function DetailPanel({ open, title, onClose, children }:
       if (event.key === "Escape") { event.preventDefault(); close.current(); }
       if (event.key === "Tab" && matchMedia("(max-width: 640px)").matches) {
         const controls = Array.from(panel.current?.querySelectorAll<HTMLElement>(
-          "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]",
-        ) ?? []).filter((element) => element.getClientRects().length > 0);
-        const first = controls[0], last = controls.at(-1);
-        if (!first || !last) { event.preventDefault(); heading.current?.focus(); return; }
-        if (event.shiftKey && (document.activeElement === first || document.activeElement === heading.current)) {
-          event.preventDefault(); last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault(); first.focus();
-        }
+          "button, input, select, textarea, a[href], [tabindex]",
+        ) ?? []).filter((element) => element.tabIndex >= 0 && !element.matches(":disabled") && element.getClientRects().length > 0);
+        // WebKit can skip buttons in native Tab order depending on keyboard settings.
+        // Move focus explicitly so the mobile dialog wraps in either direction.
+        event.preventDefault();
+        const current = controls.findIndex((control) => control === document.activeElement);
+        const next = current === -1 ? (event.shiftKey ? controls.at(-1) : controls[0])
+          : controls[(current + (event.shiftKey ? -1 : 1) + controls.length) % controls.length];
+        (next ?? heading.current)?.focus();
       }
     };
     document.addEventListener("keydown", keyboard);

@@ -30,3 +30,5 @@
 .app header { flex-wrap: wrap; }
 .app .detail-panel { overflow-wrap: anywhere; }
 .app .detail-panel button, .app .detail-panel input, .app .detail-panel select, .app .detail-panel textarea { max-width: 100%; }
+.feedback-capture { margin: 24px 0; }
+.feedback-capture textarea { min-height: 88px; margin-bottom: 12px; }

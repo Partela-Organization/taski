@@ -6,7 +6,7 @@ B6-02 comprueba estos recorridos sobre el [MCP autenticado](mcp.md), el núcleo 
 
 | Lectura | Comportamiento |
 | --- | --- |
-| `list_tickets` | 20 resúmenes por defecto, máximo 50: key, title, status, assigneeId, highlighted y version. `view: "work"` añade areaId, type y prUrl. |
+| `list_tickets` | 20 resúmenes por defecto, máximo 50: key, title, status, assigneeId, highlighted y version. `view: "work"` añade areaId, type, prUrl y createdBy. |
 | `get_ticket`, `summary` | Los seis campos de resumen y ningún comentario por defecto. `omitted` enumera descripción, metadatos y conversación excluidos. |
 | `get_ticket`, `work` | Campos de trabajo, URL y descripción íntegra con cinco comentarios recientes por defecto. `omitted` señala también id, createdBy, createdAt y updatedAt, disponibles en `full`. |
 | `get_ticket`, `full` | Todos los campos públicos del ticket, incluida identidad y fechas. La conversación mantiene su límite y paginación. |
@@ -71,13 +71,13 @@ Muestras proxy del informe B6-02; summary/work/full leen el mismo estado del tic
 | Configuración completa | 268 | 833 |
 | Configuración conocida | 88 | 191 |
 | Ticket summary, sin comentarios | 82 | 325 |
-| Ticket work y dos comentarios | 295 | 947 |
-| Ticket full y dos comentarios | 353 | 1047 |
-| Recibo de estado + avance | 73 | 193 |
+| Ticket work y dos comentarios | 296 | 954 |
+| Ticket full y dos comentarios | 352 | 1047 |
+| Recibo de estado + avance | 74 | 193 |
 | Recibo de PR + estado | 47 | 135 |
-| Recibo de patch + avance | 73 | 198 |
+| Recibo de patch + avance | 72 | 198 |
 
-La lista normal de 20 resúmenes ocupa 805 tokens proxy, dentro de 1600. Los tres recibos compuestos se comprueban en cada ejecución contra el límite de 200. Son resultados SDK, con `content` y `structuredContent`, serializados como JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`; no incluyen cabeceras ni IDs JSON-RPC.
+La lista normal de 20 resúmenes ocupa 808 tokens proxy, dentro de 1600. Los tres recibos compuestos se comprueban en cada ejecución contra el límite de 200. Son resultados SDK, con `content` y `structuredContent`, serializados como JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`; no incluyen cabeceras ni IDs JSON-RPC.
 
 Los UUID y timestamps reales hacen variar algunos conteos de tokens. `--check` compara exactamente los bytes, la estructura del informe, las rondas y los conteos deterministas; permite variación solo en los conteos nombrados en `variableTokenMetrics` y exige que los presupuestos de la ejecución actual pasen. No sustituye IDs o fechas en el payload para lograr un resultado fijo. Cada artefacto representa una muestra, sin estadística de latencia o consumo del modelo.
 
