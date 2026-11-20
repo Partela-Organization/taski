@@ -1,8 +1,10 @@
-import { mutationKey } from "./mutation-key.ts";
+import { mutationKey } from "../shared/mutation-key.ts";
 import { useEffect, useState } from "react";
-import { TaskiClient, TaskiClientError } from "../../client/index.ts";
-import type { Activity, TicketResult, UpdateTicket } from "../../client/index.ts";
-import { Button, StatusMessage } from "../components.tsx";
+import { TaskiClient, TaskiClientError } from "../../../client/index.ts";
+import type { Activity, TicketResult, UpdateTicket } from "../../../client/index.ts";
+import { Button, StatusMessage } from "../../components.tsx";
+
+const timeLabel = new Intl.DateTimeFormat("es", { dateStyle: "medium", timeStyle: "short" });
 
 export interface ConversationDraft { body: string; pending?: UpdateTicket; highlight?: boolean }
 export function Conversation({ result, client, cache, disabled, onUpdated }: {
@@ -51,26 +53,25 @@ export function Conversation({ result, client, cache, disabled, onUpdated }: {
       setError(e instanceof TaskiClientError && e.status === 409 ? "La tarea cambió. Revisa la versión actual y vuelve a enviar; tu comentario se conserva." : "No se pudo confirmar el cambio. El texto se conserva; actualiza el detalle si la escritura ya se confirmó.");
     } finally { setBusy(false); }
   }
-  return <section aria-label="Conversación y actividad">
-    <h3>Conversación</h3>
-    <Button disabled={busy || disabled || !!draft.pending} aria-pressed={result.ticket.highlighted} onClick={() => void mutate(!result.ticket.highlighted)}>{result.ticket.highlighted ? "Quitar resaltado" : "Resaltar tarea"}</Button>
-    <p>{result.ticket.highlighted ? "Tarea resaltada" : "Sin resaltado"} · El estado no cambia al resaltar.</p>
-    {comments.map((c) => <article key={c.id}><p>{c.actor.name} · {c.actor.kind} · {c.actor.channel}</p><p className="description">{c.body}</p><time dateTime={c.createdAt}>{c.createdAt}</time></article>)}
+  return <section className="conversation" aria-label="Conversación y actividad">
+    <div className="conversation-heading"><h3>Conversación</h3>
+    <Button disabled={busy || disabled || !!draft.pending} aria-pressed={result.ticket.highlighted} onClick={() => void mutate(!result.ticket.highlighted)}>{result.ticket.highlighted ? "Quitar resaltado" : "Resaltar tarea"}</Button></div>
+    {comments.map((c) => <article key={c.id}><p>{c.actor.name} · {c.actor.kind} · {c.actor.channel}</p><p className="description">{c.body}</p><time dateTime={c.createdAt}>{timeLabel.format(new Date(c.createdAt))}</time></article>)}
     {commentCursor && <Button disabled={busy} onClick={() => {
       setBusy(true); void client.getTicket(key, { view: "full", commentsLimit: 5, commentsCursor: commentCursor }).then((page) => {
         setComments((old) => [...old, ...page.comments.filter((c) => !old.some((v) => v.id === c.id))]); setCommentCursor(page.nextCommentsCursor);
       }).catch(() => setError("No se pudieron cargar comentarios anteriores.")).finally(() => setBusy(false));
     }}>Comentarios anteriores</Button>}
-    <form onSubmit={(e) => { e.preventDefault(); if (draft.body.trim() || draft.pending) void mutate(draft.highlight); }}>
-      <label htmlFor="comment">Comentario</label><textarea id="comment" value={draft.body} disabled={busy || !!draft.pending} onChange={(e) => {
+    <form className="comment-composer" onSubmit={(e) => { e.preventDefault(); if (draft.body.trim() || draft.pending) void mutate(draft.highlight); }}>
+      <label htmlFor="comment">Comentario</label><textarea id="comment" placeholder="Deja una nota para el equipo…" rows={2} value={draft.body} disabled={busy || !!draft.pending} onChange={(e) => {
         const next = { body: e.target.value }; setDraft(next); if (next.body) cache.set(key, next); else cache.delete(key);
       }} />
       <Button type="submit" disabled={busy || disabled || (!draft.body.trim() && !draft.pending)}>{draft.pending ? "Reintentar cambio" : "Enviar comentario"}</Button>
     </form>
     {error && <StatusMessage tone="error" title={error} />}
     <h3>Actividad</h3>
-    <ol>{activity.map((event) => <li key={event.seq}><p>{event.actor.name} · {event.actor.kind} · {event.actor.channel} · v{event.ticketVersion}</p>
-      <time dateTime={event.createdAt}>{event.createdAt}</time>
+    <ol className="activity-timeline">{activity.map((event) => <li key={event.seq}><p>{event.actor.name} · {event.actor.kind} · {event.actor.channel} · v{event.ticketVersion}</p>
+      <time dateTime={event.createdAt}>{timeLabel.format(new Date(event.createdAt))}</time>
       <dl>{Object.entries(event.changes).map(([field, value]) => <div key={field}><dt>{labels[field] ?? field}</dt><dd className="description">{changeText(value)}</dd></div>)}</dl>
     </li>)}</ol>
     {hasMore && <Button disabled={busy} onClick={() => {

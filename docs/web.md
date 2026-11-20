@@ -8,6 +8,10 @@ Configura `.dev.vars` siguiendo [acceso](access.md), aplica `npm run db:migrate`
 
 El servidor Vite local reenvía `/api` al Worker de 8787. Reescribe únicamente el Origin exacto de su interfaz local; conserva otros orígenes para que el Worker los rechace. Es una composición de desarrollo: no configura CORS público ni despliega assets. El Worker sigue sirviendo API/MCP y salud; `dist/app` contiene el nuevo bundle y `dist/web` conserva el preview de componentes.
 
+## Espacio de trabajo
+
+La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Las filas se agrupan por estado dentro de las páginas cargadas, con Terminado plegado al inicio y muestran el área, el responsable y el enlace al PR cuando corresponde. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.
+
 ## Uso y límites
 
 Todo el equipo, Mis tickets y Por revisar consultan la API en páginas de 20 tareas, con filtro por área. Cargar más consume el cursor del servidor; cambiar filtros descarta páginas anteriores. La búsqueda por código/título se limita a las páginas cargadas y se anuncia así. Actualizar lista consulta de nuevo el servidor; todavía no hay actualización automática.
@@ -30,7 +34,7 @@ Título, descripción, responsable, estado y área se guardan con la versión co
 
 ## Conversación y auditoría B7-03
 
-El panel permite comentar y consultar comentarios anteriores de cinco en cinco. La actividad se pagina de diez en diez e identifica persona/agente, canal, fecha y valores antes/después. Actualizar actividad vuelve a consultar el historial; no hay push. Resaltar/quitar resaltado guarda un cambio auditado y no altera el estado de la tarea. La lista muestra también una etiqueta textual y subrayado, sin depender solo del color.
+El panel permite comentar y consultar comentarios anteriores de cinco en cinco. La actividad se pagina de diez en diez e identifica persona/agente, canal, fecha y valores antes/después. Actualizar actividad vuelve a consultar el historial; no hay push. Resaltar/quitar resaltado guarda un cambio auditado y no altera el estado de la tarea. La lista muestra subrayado e icono de resaltado con etiqueta accesible.
 
 Los comentarios no enviados se conservan al cambiar de tarea dentro de la pestaña y se avisa al salir de la página. Los reintentos inciertos conservan la solicitud. Si otra persona cambió la versión, se consulta la actual sin enviar automáticamente el comentario: el texto permanece para revisar y reenviar. Las ediciones pendientes conservan por separado sus campos y versiones.
 
@@ -43,7 +47,7 @@ El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz
 
 En móvil se abre Feedback al entrar. También es la vista inicial de quienes tienen esa preferencia en la configuración, incluso desde escritorio. Las demás vistas siguen disponibles para todo el equipo.
 
-1. En **Feedback**, escribe un título y, si quieres, añade contexto. Pulsa **Compartir feedback**. El detalle se abre cuando el servidor guarda el aporte.
+1. En **Feedback**, escribe un título y pulsa Enter o el botón de envío. Usa **Añadir contexto** si quieres ampliar la idea. El detalle se abre cuando el servidor guarda el aporte.
 2. Usa **Copiar enlace** para compartir el mismo detalle con otra persona del equipo. El autor y la conversación aparecen en el panel. La lista resume título, tipo y autor.
 3. Pulsa **Convertir en tarea** para llevar el aporte a la lista de trabajo. El enlace, autor, conversación e historial se conservan. En el mismo panel puedes asignar responsable y área después de la conversión.
 

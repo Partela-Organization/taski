@@ -48,3 +48,17 @@ El workflow documental también ejecuta `npm run mcp:measure -- --intent --check
 La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).
 
 La [aplicación B7-01](web.md) arranca con `npm run app` en 5174 y usa el Worker local en 8787. `build:web` genera tanto el preview en `dist/web` como la aplicación en `dist/app`. El benchmark B6-04 sigue pendiente, sin afirmaciones comparativas de rendimiento.
+
+
+## Componentes de la web conectada
+
+`src/web/app/main.tsx` crea el cliente y monta la composición de `app.tsx`. El código de la interfaz se organiza por recorrido:
+
+| Carpeta | Responsabilidad |
+| --- | --- |
+| `app/access` | Acceso por código, selector de persona y ciclo de sesión. |
+| `app/workspace` | Navegación, filtros, paginación, grupos por estado y captura. |
+| `app/tickets` | Rutas de ticket, panel, borradores, conversación y actividad. |
+| `app/shared` | Controles y utilidades que usan varios recorridos. |
+
+Los estilos de cada recorrido están junto a sus componentes. La biblioteca de UI en `src/web/components.tsx` y los tokens se comparten con el preview de componentes. El frontend recibe la marca y los miembros de la API y usa el cliente TypeScript para leer y guardar tickets.

@@ -42,6 +42,6 @@ test("capture preserves uncertain writes and retries the identical operation bef
   await expect(page.getByLabel("Nueva tarea", { exact: true })).toHaveValue("Nueva tarea");
   await page.getByRole("button", { name: "Confirmar reintento" }).click();
   await expect(page.getByRole("region", { name: "Nueva tarea" })).toBeVisible();
-  await expect(page.getByText("Contenido guardado")).toBeVisible();
+  await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Contenido guardado");
   expect(writes).toHaveLength(2); expect(writes[1]).toEqual(writes[0]);
 });

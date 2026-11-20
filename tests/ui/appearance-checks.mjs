@@ -9,6 +9,10 @@ export function appearanceChecks() {
     const panel = page.getByRole("region", { name: "Fixture 06", exact: true });
     await expect(panel).toBeVisible();
     await expect(panel).not.toHaveAttribute("aria-modal");
+    await expect(page.locator(".app-sidebar")).toHaveCSS("width", "196px");
+    const desktopPanel = await panel.boundingBox();
+    expect(desktopPanel.width).toBe(480);
+    expect(desktopPanel.x + desktopPanel.width).toBe(1440);
     await page.getByLabel("Tema", { exact: true }).selectOption("light");
     const color = await page.locator("html").evaluate((e) => getComputedStyle(e).backgroundColor);
     await page.getByLabel("Tema", { exact: true }).selectOption("dark");

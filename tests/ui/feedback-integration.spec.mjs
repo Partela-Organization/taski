@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 const app = "http://127.0.0.1:5174";
 const title = "Una idea para simplificar el formulario";
 async function enter(page, member) {
-  await page.getByLabel("Persona", { exact: true }).selectOption(member);
+  await page.getByRole("radio", { name: member, exact: true }).check();
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
 }
@@ -11,10 +11,11 @@ async function enter(page, member) {
 test("mobile feedback works without technical fields and conversion preserves identity, author and conversation", async ({ page, browser }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(app);
-  await enter(page, "alex");
+  await enter(page, "Alex");
   await expect(page.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByLabel("Área", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".feedback-capture").getByLabel("Área", { exact: true })).toHaveCount(0);
   await page.getByLabel("Título del feedback").fill(title);
+  await page.getByRole("button", { name: "Añadir contexto", exact: true }).click();
   await page.getByLabel("Contexto (opcional)").fill("Sería útil explicar qué datos hacen falta.");
   const creation = page.waitForResponse((r) => r.request().method() === "POST" && r.url().endsWith("/tickets"));
   await page.getByRole("button", { name: "Compartir feedback" }).click();
@@ -31,10 +32,10 @@ test("mobile feedback works without technical fields and conversion preserves id
   try {
     const desktop = await recipient.newPage();
     await desktop.goto(link);
-    await enter(desktop, "taylor");
+    await enter(desktop, "Taylor");
     await expect(desktop.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
     const panel = desktop.getByRole("region", { name: title, exact: true });
-    await expect(panel.getByText("Feedback · Alex")).toBeVisible();
+    await expect(panel.getByText("Compartido por Alex")).toBeVisible();
     await panel.getByLabel("Comentario", { exact: true }).fill("Puedo revisar el texto.");
     await panel.getByRole("button", { name: "Enviar comentario" }).click();
     await expect(panel.getByText("Puedo revisar el texto.", { exact: true })).toBeVisible();
