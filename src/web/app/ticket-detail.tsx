@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { TaskiClient, TaskiClientError } from "../../client/index.ts";
 import type { Edits, ProjectResult, TicketResult, UpdateTicket } from "../../client/index.ts";
+import { Conversation } from "./conversation.tsx";
+import type { ConversationDraft } from "./conversation.tsx";
 import { Button, Field, StatusMessage } from "../components.tsx";
 
 export interface Draft { edits: Edits; changes: Edits; version: number; pending?: UpdateTicket }
 const editable = (result: TicketResult<"full">): Edits => {
   const t = result.ticket; return { title: t.title, description: t.description, status: t.status, assigneeId: t.assigneeId, areaId: t.areaId };
 };
-export function TicketDetail({ initial, project, client, drafts, onSaved }: {
-  initial: TicketResult<"full">; project: ProjectResult["project"]; client: TaskiClient; drafts: Map<string, Draft>; onSaved: () => void;
+export function TicketDetail({ initial, project, client, drafts, conversations, onSaved }: {
+  initial: TicketResult<"full">; project: ProjectResult["project"]; client: TaskiClient; drafts: Map<string, Draft>; conversations: Map<string, ConversationDraft>; onSaved: () => void;
 }) {
   const key = initial.ticket.key;
   const [server, setServer] = useState(initial);
@@ -54,13 +56,20 @@ export function TicketDetail({ initial, project, client, drafts, onSaved }: {
         <label htmlFor="assignee">Responsable</label><select id="assignee" value={draft.edits.assigneeId ?? ""} onChange={(e) => change({ assigneeId: e.target.value || null })}><option value="">Sin asignar</option>{project?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}</select>
         <label htmlFor="ticket-area">Área de la tarea</label><select id="ticket-area" value={draft.edits.areaId} onChange={(e) => change({ areaId: e.target.value })}>{project?.areas.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</select>
       </fieldset>
-      <Button type="submit" variant="primary" disabled={busy || conflict}>{busy ? "Guardando…" : draft.pending ? "Reintentar guardado" : "Guardar cambios"}</Button>
+      <Button type="submit" variant="primary" disabled={busy || conflict || (!draft.pending && !Object.keys(draft.changes).length)}>{busy ? "Guardando…" : draft.pending ? "Reintentar guardado" : "Guardar cambios"}</Button>
     </form>
     {drafts.has(key) && <p>Borrador conservado en esta pestaña.</p>}
     {error && <StatusMessage tone="error" title={error} />}
     {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button disabled={busy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}
     <Button disabled={busy || !!draft.pending} onClick={() => { if (!drafts.has(key) || confirm("¿Descartar el borrador y cargar la versión actual?")) void reload(false); }}>Actualizar detalle</Button>
     {notice && <StatusMessage title={notice} />}
-    <section aria-label="Comentarios recientes">{server.comments.map((c) => <p key={c.id}>{c.actor.name}: {c.body}</p>)}</section>
+    <Conversation key={key} result={server} client={client} cache={conversations} disabled={busy || !!draft.pending} onUpdated={(fresh) => {
+      setServer(fresh); onSaved();
+      if (!draft.pending) {
+        const updated = { ...draft, edits: { ...editable(fresh), ...draft.changes }, version: fresh.ticket.version };
+        setDraft(updated); if (drafts.has(key)) drafts.set(key, updated);
+      }
+    }} />
+
   </>;
 }

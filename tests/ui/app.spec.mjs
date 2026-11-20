@@ -10,6 +10,7 @@ async function setup(page, create) {
     if (url.pathname.endsWith("/access")) return reply({ projectName: "Demo", brandName: "Taski Demo", members: [member] });
     if (url.pathname.endsWith("/session")) return reply({ member, identityAssurance: "self_selected" });
     if (url.pathname.endsWith("/project")) return reply({ configVersion: 1, project: { name: "Demo", members: [member], areas: [{ id: "general", label: "General" }], statusLabels: { todo: "Pendiente" } } });
+    if (url.pathname.endsWith("/activity")) return reply({ items: [], nextCursor: "fixture-cursor", hasMore: false });
     if (req.method() === "POST") return create(route);
     if (url.pathname.endsWith("/tickets/DEMO-002")) return reply({ ticket: { ...row, key: "DEMO-002", title: "Nueva tarea", description: "Contenido guardado" }, comments: [], nextCommentsCursor: null });
     return reply({ items: [row], nextCursor: null });
