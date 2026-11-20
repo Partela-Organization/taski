@@ -30,25 +30,39 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
     } catch { setError("No se pudo actualizar el detalle. Tu texto se conserva."); }
     finally { setBusy(false); }
   }
+  function save(changes: Edits) {
+    if (busy || conflict) return;
+    const pending = draft.pending ?? { changes, expectedVersion: draft.version, idempotencyKey: crypto.randomUUID() };
+    const updated = { ...draft, changes, pending }; setDraft(updated); drafts.set(key, updated); setBusy(true); setError(""); setNotice("");
+    void client.updateTicket(key, pending).then(async (receipt) => {
+      drafts.delete(key); setDraft({ edits: draft.edits, changes: {}, version: receipt.version }); onSaved(); setNotice("Cambios guardados.");
+      try { const fresh = await client.getTicket(key, { view: "full", commentsLimit: 5 }); setServer(fresh); setDraft({ edits: editable(fresh), changes: {}, version: fresh.ticket.version }); }
+      catch { setNotice("Cambios guardados. Actualiza el detalle para consultar la versión confirmada."); }
+    }).catch((e: unknown) => {
+      if (e instanceof TaskiClientError && e.status >= 400 && e.status < 500) {
+        const corrected = { edits: draft.edits, changes, version: draft.version }; drafts.set(key, corrected); setDraft(corrected);
+        if (e.status === 409) setConflict(true);
+      }
+      setError(e instanceof TaskiClientError && e.status === 409 ? "Otra persona modificó esta tarea. Tu borrador se conserva." : "No se pudo guardar. Tu borrador se conserva.");
+    }).finally(() => setBusy(false));
+  }
+  const feedback = server.ticket.type === "feedback";
+  const author = project?.members.find((member) => member.id === server.ticket.createdBy)?.name ?? server.ticket.createdBy;
+  const ticketUrl = `${location.origin}/t/${encodeURIComponent(key)}`;
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(ticketUrl); setNotice("Enlace copiado."); }
+    catch { setNotice(`Enlace: ${ticketUrl}`); }
+  }
   return <>
     <p>{key} · Versión {server.ticket.version}</p>
-    <Button onClick={() => { void navigator.clipboard.writeText(`${location.origin}/t/${encodeURIComponent(key)}`).then(() => setNotice("Enlace copiado.")).catch(() => setNotice(`Enlace: ${location.origin}/t/${encodeURIComponent(key)}`)); }}>Copiar enlace</Button>
-    <form onSubmit={(event) => {
-      event.preventDefault(); if (busy || conflict) return;
-      const pending = draft.pending ?? { changes: draft.changes, expectedVersion: draft.version, idempotencyKey: crypto.randomUUID() };
-      const updated = { ...draft, pending }; setDraft(updated); drafts.set(key, updated); setBusy(true); setError(""); setNotice("");
-      void client.updateTicket(key, pending).then(async (receipt) => {
-        drafts.delete(key); setDraft({ edits: draft.edits, changes: {}, version: receipt.version }); onSaved(); setNotice("Cambios guardados.");
-        try { const fresh = await client.getTicket(key, { view: "full", commentsLimit: 5 }); setServer(fresh); setDraft({ edits: editable(fresh), changes: {}, version: fresh.ticket.version }); }
-        catch { setNotice("Cambios guardados. Actualiza el detalle para consultar la versión confirmada."); }
-      }).catch((e: unknown) => {
-        if (e instanceof TaskiClientError && e.status >= 400 && e.status < 500) {
-          const corrected = { edits: draft.edits, changes: draft.changes, version: draft.version }; drafts.set(key, corrected); setDraft(corrected);
-          if (e.status === 409) setConflict(true);
-        }
-        setError(e instanceof TaskiClientError && e.status === 409 ? "Otra persona modificó esta tarea. Tu borrador se conserva." : "No se pudo guardar. Tu borrador se conserva.");
-      }).finally(() => setBusy(false));
-    }}>
+    <Button onClick={() => void copyLink()}>Copiar enlace</Button>
+    {feedback ? <>
+      <p>{project?.typeLabels.feedback ?? "Feedback"} · {author}</p>
+      <p className="description">{server.ticket.description || "Sin contexto adicional"}</p>
+      <Button disabled={busy || conflict} onClick={() => save({ ...draft.changes, type: "task" })}>
+        {busy ? "Guardando…" : draft.pending ? "Reintentar conversión" : "Convertir en tarea"}
+      </Button>
+    </> : <form onSubmit={(event) => { event.preventDefault(); save(draft.changes); }}>
       <fieldset disabled={busy || !!draft.pending}><legend>Editar tarea</legend>
         <Field label="Título" required value={draft.edits.title ?? ""} onChange={(e) => change({ title: e.target.value })} />
         <label htmlFor="description">Descripción</label><textarea id="description" value={draft.edits.description ?? ""} onChange={(e) => change({ description: e.target.value })} />
@@ -57,7 +71,8 @@ export function TicketDetail({ initial, project, client, drafts, conversations, 
         <label htmlFor="ticket-area">Área de la tarea</label><select id="ticket-area" value={draft.edits.areaId} onChange={(e) => change({ areaId: e.target.value })}>{project?.areas.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</select>
       </fieldset>
       <Button type="submit" variant="primary" disabled={busy || conflict || (!draft.pending && !Object.keys(draft.changes).length)}>{busy ? "Guardando…" : draft.pending ? "Reintentar guardado" : "Guardar cambios"}</Button>
-    </form>
+    </form>}
+    {!feedback && <p>Creada por {author}</p>}
     {drafts.has(key) && <p>Borrador conservado en esta pestaña.</p>}
     {error && <StatusMessage tone="error" title={error} />}
     {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button disabled={busy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}

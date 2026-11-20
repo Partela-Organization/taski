@@ -17,11 +17,11 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 
 ## Respuestas adecuadas por defecto
 
-Las listas normales solo contienen key/title/status/assigneeId/highlighted/version. `view=work` añade areaId/type/prUrl para una UI que necesite esos metadatos, sin descripción o discusión. La consulta SQL tampoco lee las descripciones completas al listar. `omitted` indica el contenido que requiere otra lectura.
+Las listas normales solo contienen key/title/status/assigneeId/highlighted/version. `view=work` añade areaId/type/prUrl/createdBy para una UI que necesite esos metadatos, sin descripción o discusión. La consulta SQL tampoco lee las descripciones completas al listar. `omitted` indica el contenido que requiere otra lectura.
 
 El detalle `work` devuelve campos de trabajo, descripción completa y comentarios recientes. `full` añade identidad y fechas/creador; no significa conversación sin límite. `commentsLimit` admite 0–50 y nextCommentsCursor recupera páginas anteriores. No se corta texto silenciosamente. Descripciones largas tienen un coste real que no desaparece cambiando de herramienta.
 
-`omitted` enumera también los campos de ticket excluidos por cada vista: `work` señala id, createdBy, createdAt y updatedAt; `summary` añade url, description, areaId, type y prUrl. Un `commentsLimit` positivo permite recuperar comentarios incluso con `summary`, útil para páginas antiguas sin repetir una descripción conocida. El historial se consulta mediante actividad con ticketKey. Ver [semántica y costes verificados](mcp-intent.md), compartidos con MCP.
+`omitted` enumera también los campos de ticket excluidos por cada vista: `work` señala id, createdAt y updatedAt. `summary` añade url, description, areaId, type, prUrl y createdBy. Un `commentsLimit` positivo permite recuperar comentarios incluso con `summary`, útil para páginas antiguas sin repetir una descripción conocida. El historial se consulta mediante actividad con ticketKey. Ver [semántica y costes verificados](mcp-intent.md), compartidos con MCP.
 
 Las mutaciones devuelven key/URL/versión/campos afectados y commentId opcional, sin retransmitir el ticket entero. Si falta confirmación, no se devuelve un recibo inventado. Los errores tienen `{error:{code,message}}`; SQL, código de acceso y trazas internas no se envían.
 

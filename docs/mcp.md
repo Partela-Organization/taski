@@ -101,8 +101,8 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3101 | 12409 | 4000 |
-| Resultado de listar 20 resúmenes | 805 | 2604 | 1600 |
+| `tools/list` completo + instrucciones | 3114 | 12453 | 4000 |
+| Resultado de listar 20 resúmenes | 808 | 2616 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 
 Se usa JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`, incluyendo los envelopes `content`/`structuredContent` del resultado SDK. Se excluyen IDs JSON-RPC y cabeceras HTTP. El catálogo es el recibido de `tools/list`, con anotaciones y esquemas de salida, no una proyección del contrato B0. El informe incluye tamaños por herramienta; eso no demuestra qué definiciones carga un host con descubrimiento diferido.

@@ -2,9 +2,9 @@ export type Status = "todo" | "in_progress" | "in_review" | "done";
 export interface Summary {
   key: string; title: string; status: Status; assigneeId: string | null; highlighted: boolean; version: number;
 }
-export interface WorkSummary extends Summary { areaId: string; type: "task" | "feedback"; prUrl: string | null }
+export interface WorkSummary extends Summary { areaId: string; type: "task" | "feedback"; prUrl: string | null; createdBy: string }
 export interface WorkTicket extends WorkSummary { url: string; description: string }
-export interface FullTicket extends WorkTicket { id: string; createdBy: string; createdAt: string; updatedAt: string }
+export interface FullTicket extends WorkTicket { id: string; createdAt: string; updatedAt: string }
 export interface Actor {
   memberId: string; name: string; kind: "person" | "agent"; channel: "web" | "http" | "mcp";
   client: string; identityAssurance: "self_selected"; authorizationRef?: string;

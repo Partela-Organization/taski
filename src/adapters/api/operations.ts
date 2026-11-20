@@ -88,11 +88,11 @@ export class Operations {
     const end = await this.position();
     if (end.sequence !== position.sequence) throw new TaskiError("INVALID_CURSOR", "List changed; retry the query");
     const rows = all.slice(0, limit);
-    return { items: rows.map((t) => view === "summary" ? summary(t) : { ...summary(t), areaId: t.areaId, type: t.type, prUrl: t.prUrl }),
+    return { items: rows.map((t) => view === "summary" ? summary(t) : { ...summary(t), areaId: t.areaId, type: t.type, prUrl: t.prUrl, createdBy: t.createdBy }),
       nextCursor: all.length > limit ? encode({ kind: "tickets", epoch: position.epoch, revision: position.sequence,
         afterNumber: rows.at(-1)!.number, filters }) : null,
       activityCursor: encode({ kind: "activity", epoch: position.epoch, after: position.sequence }),
-      omitted: view === "summary" ? ["description", "comments", "history", "areaId", "type", "prUrl"] : ["description", "comments", "history"] };
+      omitted: view === "summary" ? ["description", "comments", "history", "areaId", "type", "prUrl", "createdBy"] : ["description", "comments", "history"] };
   }
   async get(input: unknown) {
     const args = record(input, ["key", "view", "commentsLimit", "commentsCursor"]);
@@ -111,12 +111,12 @@ export class Operations {
     const all = limit === 0 ? [] : await this.service.repository.comments(t.id, before, (limit as number) + 1);
     const comments = all.slice(0, limit as number);
     const ticket = view === "summary" ? summary(t) : view === "work"
-      ? { ...summary(t), url: t.url, description: t.description, areaId: t.areaId, type: t.type, prUrl: t.prUrl } : full(t);
+      ? { ...summary(t), url: t.url, description: t.description, areaId: t.areaId, type: t.type, prUrl: t.prUrl, createdBy: t.createdBy } : full(t);
     return { ticket, comments: comments.slice().reverse().map(({ ticketId: _id, ...c }) => c),
       nextCommentsCursor: all.length > (limit as number) ? encode({ kind: "comments", epoch: position.epoch, ticketId: t.id,
         version: t.version, before: comments.at(-1)!.ticketVersion }) : null,
-      omitted: ["history", ...(view === "summary" ? ["url", "description", "areaId", "type", "prUrl"] : []),
-        ...(view !== "full" ? ["id", "createdBy", "createdAt", "updatedAt"] : []),
+      omitted: ["history", ...(view === "summary" ? ["url", "description", "areaId", "type", "prUrl", "createdBy"] : []),
+        ...(view !== "full" ? ["id", "createdAt", "updatedAt"] : []),
         ...(limit === 0 ? ["comments"] : all.length > (limit as number) ? ["olderComments"] : [])] };
   }
   async activity(input: unknown) {

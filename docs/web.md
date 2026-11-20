@@ -37,3 +37,16 @@ Los comentarios no enviados se conservan al cambiar de tarea dentro de la pesta�
 ## Temas y dispositivos B7-04
 
 El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico, todavía pendiente. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
+
+
+## Compartir feedback B8-01
+
+En móvil se abre Feedback al entrar. También es la vista inicial de quienes tienen esa preferencia en la configuración, incluso desde escritorio. Las demás vistas siguen disponibles para todo el equipo.
+
+1. En **Feedback**, escribe un título y, si quieres, añade contexto. Pulsa **Compartir feedback**. El detalle se abre cuando el servidor guarda el aporte.
+2. Usa **Copiar enlace** para compartir el mismo detalle con otra persona del equipo. El autor y la conversación aparecen en el panel. La lista resume título, tipo y autor.
+3. Pulsa **Convertir en tarea** para llevar el aporte a la lista de trabajo. El enlace, autor, conversación e historial se conservan. En el mismo panel puedes asignar responsable y área después de la conversión.
+
+La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
+
+[Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
