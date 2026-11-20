@@ -1,0 +1,21 @@
+.app { max-width: 1120px; margin: auto; padding: 24px; }
+.app header { display: flex; gap: 20px; align-items: center; margin-bottom: 48px; }
+.app header strong { margin-right: auto; }
+.app h1 { font-size: 28px; font-weight: 500; margin-bottom: 24px; }
+.app nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.app nav [aria-pressed=true] { border-bottom: 2px solid var(--accent); }
+.app label { display: block; margin: 12px 0; }
+.app select { display: block; background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 8px; max-width: 100%; }
+.login { max-width: 380px; margin: 48px auto; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+.workspace:has(.detail-panel) { grid-template-columns: minmax(0, 1fr) 340px; }
+.workspace section { min-width: 0; }
+.capture { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+.capture .field { flex: 1; min-width: 0; }
+.tickets { list-style: none; padding: 0; margin: 24px 0; }
+.tickets li { border-bottom: 1px solid var(--border); padding: 12px 0; }
+.tickets li button { text-align: left; overflow-wrap: anywhere; }
+.tickets small { display: block; color: var(--muted); }
+.description { white-space: pre-wrap; overflow-wrap: anywhere; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 16px; }
+@media (max-width: 640px) { .workspace:has(.detail-panel) { display: block; } .app { padding: 20px; } .app input, .app select { font-size: 16px; } }

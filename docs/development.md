@@ -46,3 +46,5 @@ CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instala
 El workflow documental también ejecuta `npm run mcp:measure -- --intent --check`, con las dependencias Python fijadas de B0, para comprobar los informes de catálogo, vistas y operaciones compuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) y [recorridos por intención](mcp-intent.md) para actualizarlos y distinguir tokens proxy de uso real.
 
 La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).
+
+La [aplicación B7-01 en revisión](web.md) arranca con `npm run app` en 5174 y usa el Worker local en 8787. `build:web` genera tanto el preview en `dist/web` como la aplicación en `dist/app`. La integración depende todavía del benchmark B6-04.

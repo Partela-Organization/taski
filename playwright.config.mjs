@@ -11,10 +11,11 @@ export default defineConfig({
     browserName: "chromium",
     trace: "retain-on-failure",
   },
-  webServer: {
+  webServer: [{
     command: "npm run ui",
     url: "http://127.0.0.1:5173",
     reuseExistingServer: false,
     timeout: 30_000,
-  },
+  }, { command: "npm run app", url: "http://127.0.0.1:5174", reuseExistingServer: false, timeout: 30_000 },
+  { command: "node scripts/serve-browser-fixture.mjs", url: "http://127.0.0.1:8787/health", reuseExistingServer: false, timeout: 30_000 }],
 });
