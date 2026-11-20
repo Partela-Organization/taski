@@ -26,3 +26,7 @@
 
 .ticket-highlighted { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .app dd { overflow-wrap: anywhere; margin-left: 0; font-size: 13px; }
+
+.app header { flex-wrap: wrap; }
+.app .detail-panel { overflow-wrap: anywhere; }
+.app .detail-panel button, .app .detail-panel input, .app .detail-panel select, .app .detail-panel textarea { max-width: 100%; }

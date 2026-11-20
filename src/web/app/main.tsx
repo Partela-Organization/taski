@@ -6,6 +6,7 @@ import { TicketDetail } from "./ticket-detail.tsx";
 import type { ConversationDraft } from "./conversation.tsx";
 import type { Draft } from "./ticket-detail.tsx";
 import { Button, DetailPanel, Field, StatusMessage } from "../components.tsx";
+import type { Theme } from "../theme.ts";
 import { applyTheme, readTheme } from "../theme.ts";
 import licenses from "../assets/THIRD_PARTY_NOTICES.txt?url";
 import "../styles/tokens.css";
@@ -16,6 +17,8 @@ const client = new TaskiClient({ baseUrl: location.origin, clientName: "taski-we
 type Member = { id: string; name: string };
 type Access = Awaited<ReturnType<TaskiClient["accessOptions"]>>;
 function App() {
+  const [theme, setTheme] = useState<Theme>(readTheme);
+  useEffect(() => applyTheme(theme), [theme]);
   const [access, setAccess] = useState<Access>();
   const [member, setMember] = useState<Member>();
   const [person, setPerson] = useState(""); const [code, setCode] = useState("");
@@ -76,7 +79,7 @@ function App() {
     } catch (e) { if (id === generation.current) setError(fail(e)); }
     finally { if (id === generation.current) setLoading(false); }
   }
-  return <main className="app"><header><strong>{access?.brandName ?? "Taski"}</strong>{member && <><span>{member.name}</span><Button disabled={busy} onClick={() => {
+  return <main className="app"><header><strong>{access?.brandName ?? "Taski"}</strong><label htmlFor="theme">Tema</label><select id="theme" value={theme} onChange={(e) => setTheme(e.target.value as Theme)}><option value="system">Sistema</option><option value="light">Claro</option><option value="dark">Oscuro</option></select>{member && <><span>{member.name}</span><Button disabled={busy} onClick={() => {
     setBusy(true); void client.logout().then(() => { setMember(undefined); setRows([]); setProject(undefined); close(); setAttempt(undefined); setTitle(""); drafts.current.clear(); conversations.current.clear(); }).catch((e: unknown) => setError(fail(e))).finally(() => setBusy(false));
   }}>Salir</Button></>}</header>
     {!ready ? <StatusMessage tone="loading" title="Conectando…" /> : !member ? <form className="login" onSubmit={(e) => {
