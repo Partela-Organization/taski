@@ -30,6 +30,8 @@ export function appearanceChecks() {
     const dialog = page.getByRole("dialog", { name: "Fixture 06", exact: true });
     await expect(dialog).toHaveAttribute("aria-modal", "true");
     await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
+    const bounds = await dialog.boundingBox();
+    expect(bounds.x).toBe(0); expect(bounds.y).toBe(0); expect(bounds.width).toBe(390); expect(bounds.height).toBe(844);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     for (let n = 0; n < 16; n++) {
       await page.keyboard.press("Tab");
@@ -39,7 +41,8 @@ export function appearanceChecks() {
       const box = await dialog.getByRole("button", { name: label, exact: true }).boundingBox();
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
-    await page.screenshot({ path: testInfo.outputPath("mobile-dark.png"), fullPage: true });
+    await dialog.evaluate((e) => { e.scrollTop = 0; });
+    await page.screenshot({ path: testInfo.outputPath("mobile-dark.png"), fullPage: false });
     await page.keyboard.press("Escape"); await expect(dialog).toHaveCount(0);
     await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   });
