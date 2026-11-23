@@ -129,6 +129,14 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "const": "recent"
+            }
+          },
+          {
             "name": "view",
             "in": "query",
             "required": false,
@@ -1001,6 +1009,9 @@
               "feedback"
             ]
           },
+          "order": {
+            "const": "recent"
+          },
           "view": {
             "enum": [
               "summary",
@@ -1066,6 +1077,10 @@
                   ]
                 },
                 "createdBy": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "createdAt": {
                   "type": "string",
                   "minLength": 1
                 }

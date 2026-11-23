@@ -9,7 +9,10 @@ export interface ProjectContext {
   readonly policy: { readonly agentsCanComplete: boolean };
 }
 export interface Runtime { id(): string; now(): string; hash(value: string): Promise<string> }
-export interface ListQuery { limit: number; afterNumber: number; status?: string; assigneeId?: string | null; areaId?: string; type?: string }
+export interface ListQuery {
+  limit: number; afterNumber: number; afterCreatedAt?: string; order?: "recent";
+  status?: string; assigneeId?: string | null; areaId?: string; type?: string;
+}
 export interface Mutation {
   create: boolean; operation: string; idempotencyKey: string; fingerprint: string;
   actor: Actor; ticket: TicketDraft; expectedVersion: number | null;
@@ -115,7 +118,12 @@ export class TicketService {
     // One extra internal row detects a continuation; public adapters cap pages at 50.
     integer(query.limit, "limit", 51);
     if (!Number.isSafeInteger(query.afterNumber) || query.afterNumber < 0) throw new TaskiError("INVALID_INPUT", "Invalid position");
-    const filters = Object.fromEntries(Object.entries(query).filter(([key]) => !["limit", "afterNumber"].includes(key)));
+    const { limit: _limit, afterNumber, afterCreatedAt, order, ...filters } = query;
+    if (order !== undefined && order !== "recent") throw new TaskiError("INVALID_INPUT", "Invalid list order");
+    if ((order === "recent" && afterNumber > 0) !== (afterCreatedAt !== undefined)
+        || (afterCreatedAt !== undefined && !Number.isFinite(Date.parse(afterCreatedAt)))) {
+      throw new TaskiError("INVALID_CURSOR", "Invalid position for the selected list order");
+    }
     this.changes(filters);
     await this.repository.initialize(this.context.project);
     return this.repository.list(query);

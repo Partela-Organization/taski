@@ -58,3 +58,27 @@ test("older comments page without loss; invalid cursors and stale writes are exp
   const bad = await send(`tickets/${r.key}`, "PATCH", { key: "another", expectedVersion: 8, idempotencyKey: "inject", changes: { title: "Bad" } });
   assert.equal(bad.status, 400);
 });
+
+test("recent order paginates by creation date, breaking ties by ticket number", async () => {
+  const db = (await server.getWorker().getEnv()).DB;
+  const dates = ["2026-11-03T09:00:00.000Z", "2026-11-01T09:00:00.000Z", "2026-11-03T09:00:00.000Z"];
+  const keys = [];
+  for (const [index, date] of dates.entries()) {
+    const row = await db.prepare(`INSERT INTO tickets(id,prefix,base_url,title,area_id,created_by,created_at)
+      VALUES(?,'DEMO','http://127.0.0.1:8787',?,'web','alex',?) RETURNING key`)
+      .bind(`order-${index}`, `Dated task ${index}`, date).first();
+    keys.push(row.key);
+  }
+  const first = await (await send("tickets?order=recent&view=work&areaId=web&limit=1")).json();
+  assert.equal(first.items[0].key, keys[2]);
+  assert.equal(first.items[0].createdAt, dates[2]);
+  const second = await (await send(`tickets?limit=1&cursor=${encodeURIComponent(first.nextCursor)}`)).json();
+  assert.equal(second.items[0].key, keys[0]);
+  const third = await (await send(`tickets?limit=1&cursor=${encodeURIComponent(second.nextCursor)}`)).json();
+  assert.equal(third.items[0].key, keys[1]);
+  assert.equal(third.nextCursor, null);
+  const originalOrder = await (await send("tickets?view=work&areaId=web")).json();
+  assert.deepEqual(originalOrder.items.map(({ key }) => key), keys);
+  assert(!("createdAt" in originalOrder.items[0]));
+  assert.equal((await send("tickets?order=invalid")).status, 400);
+});

@@ -2,7 +2,9 @@ export type Status = "todo" | "in_progress" | "in_review" | "done";
 export interface Summary {
   key: string; title: string; status: Status; assigneeId: string | null; highlighted: boolean; version: number;
 }
-export interface WorkSummary extends Summary { areaId: string; type: "task" | "feedback"; prUrl: string | null; createdBy: string }
+export interface WorkSummary extends Summary {
+  areaId: string; type: "task" | "feedback"; prUrl: string | null; createdBy: string; createdAt?: string;
+}
 export interface WorkTicket extends WorkSummary { url: string; description: string }
 export interface FullTicket extends WorkTicket { id: string; createdAt: string; updatedAt: string }
 export interface Actor {
@@ -19,7 +21,7 @@ export type TicketResult<V extends TicketView = "work"> = {
 export type ListView = "summary" | "work";
 export interface ListOptions<V extends ListView = "summary"> {
   limit?: number; cursor?: string; status?: Status; assigneeId?: string | null; areaId?: string;
-  type?: "task" | "feedback"; view?: V;
+  type?: "task" | "feedback"; view?: V; order?: "recent";
 }
 export type ListResult<V extends ListView = "summary"> = {
   items: (V extends "work" ? WorkSummary : Summary)[]; nextCursor: string | null; activityCursor: string; omitted: string[];

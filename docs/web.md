@@ -16,7 +16,7 @@ Usa **Lista** o **Tarjetas** en la barra del espacio de trabajo. Por ejemplo, fi
 
 ## Uso y límites
 
-Todo el equipo, Mis tickets y Por revisar consultan la API en páginas de 20 tareas, con filtro por área. Cargar más consume el cursor del servidor; cambiar filtros descarta páginas anteriores. La búsqueda por código/título se limita a las páginas cargadas y se anuncia así. Actualizar lista consulta de nuevo el servidor; todavía no hay actualización automática.
+Las vistas consultan la API en páginas de 20 entradas y muestran las más recientes primero dentro de cada grupo. La fecha es la de creación. **Cargar más** permanece disponible al pie mientras el servidor tenga otra página. Cada área o estado muestra hasta diez entradas al inicio. **Ver más** amplía ese grupo entre los tickets ya cargados. Por ejemplo, filtra por Web, pulsa **Cargar más** para traer otra página y luego **Ver más de Web** para desplegarla. Cambiar filtros descarta páginas anteriores. La búsqueda por código o título se limita a las páginas cargadas y muestra todas sus coincidencias. **Actualizar lista** vuelve a consultar el servidor.
 
 Escribe un título y pulsa **Añadir** o Enter para crear. La lista se actualiza y se abre el detalle recuperado del servidor después del recibo de creación. El panel permite editar los campos principales, con descripción completa y cinco comentarios recientes. No se representa una escritura como guardada antes de confirmar la respuesta.
 

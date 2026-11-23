@@ -42,17 +42,28 @@ export class D1TicketRepository implements TicketRepository {
   }
 
   async list(query: ListQuery): Promise<TicketSummary[]> {
-    const where = ["number > ?"];
-    const values: (string | number | null)[] = [query.afterNumber];
+    const recent = query.order === "recent";
+    const where: string[] = [];
+    const values: (string | number | null)[] = [];
+    if (!recent) {
+      where.push("number > ?");
+      values.push(query.afterNumber);
+    } else if (query.afterCreatedAt !== undefined) {
+      where.push("(created_at, number) < (?, ?)");
+      values.push(query.afterCreatedAt, query.afterNumber);
+    }
     for (const [key, column] of [["status", "status"], ["assigneeId", "assignee_id"], ["areaId", "area_id"], ["type", "type"]] as const) {
       if (query[key] !== undefined) { where.push(`${column} IS ?`); values.push(query[key]!); }
     }
-    const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by FROM tickets WHERE ${where.join(" AND ")} ORDER BY number LIMIT ?`)
+    const filter = where.length ? `WHERE ${where.join(" AND ")}` : "";
+    const order = recent ? "created_at DESC, number DESC" : "number";
+    const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by,created_at
+      FROM tickets ${filter} ORDER BY ${order} LIMIT ?`)
       .bind(...values, query.limit).all<Row>();
     return results.map((row) => ({ number: row.number as number, key: row.key as string, title: row.title as string,
       status: row.status as Ticket["status"], assigneeId: row.assignee_id as string | null, areaId: row.area_id as string,
       type: row.type as Ticket["type"], highlighted: Number(row.highlighted) === 1, prUrl: row.pr_url as string | null, version: row.version as number,
-      createdBy: row.created_by as string }));
+      createdBy: row.created_by as string, createdAt: row.created_at as string }));
   }
 
   async replay(actorId: string, operation: string, key: string, fingerprint: string): Promise<Receipt | null> {
