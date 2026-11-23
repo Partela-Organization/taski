@@ -1,6 +1,7 @@
 import type { ProjectResult, Status, WorkSummary } from "../../../client/index.ts";
 import { Avatar, Button, StatusMessage } from "../../components.tsx";
 import { WorkspaceIcon } from "../shared/marks.tsx";
+import type { Presentation } from "./presentation.ts";
 
 type Project = ProjectResult["project"];
 const stateOrder: Status[] = ["in_progress", "todo", "in_review", "done"];
@@ -8,13 +9,14 @@ const fallbackStatusLabels: Record<Status, string> = {
   in_progress: "En curso", todo: "Pendiente", in_review: "Por revisar", done: "Terminado",
 };
 
-export function TicketList({ rows, feedback, project, selected, search, onOpen }: {
-  rows: WorkSummary[]; feedback: boolean; project: Project; selected?: string | undefined; search: string; onOpen: (key: string) => void;
+export function TicketList({ rows, feedback, project, selected, search, presentation, onOpen }: {
+  rows: WorkSummary[]; feedback: boolean; project: Project; selected?: string | undefined; search: string;
+  presentation: Presentation; onOpen: (key: string) => void;
 }) {
   const query = search.trim().toLocaleLowerCase("es");
   const visible = rows.filter((row) => `${row.key} ${row.title}`.toLocaleLowerCase("es").includes(query));
   if (query && rows.length && !visible.length) return <StatusMessage title="No hay coincidencias en las páginas cargadas" />;
-  return <div className="ticket-groups">
+  return <div className="ticket-groups" data-presentation={presentation}>
     {stateOrder.map((status) => {
       const group = visible.filter((row) => row.status === status);
       if (!group.length) return null;
@@ -43,8 +45,11 @@ export function TicketList({ rows, feedback, project, selected, search, onOpen }
               {area && <span className="ticket-row__area" title={area}>{area}</span>}
               {assignee ? <Avatar name={assignee} /> : <span className="avatar" aria-label="Sin asignar" title="Sin asignar">–</span>}
             </div>}
-            <span className="ticket-row__marked" title={row.highlighted ? "Resaltada" : undefined}>
-              {row.highlighted && <><WorkspaceIcon name="highlight" /><span className="visually-hidden">Resaltada</span></>}
+            <span className="ticket-row__indicators">
+              {row.highlighted && <span className="ticket-row__marked" title="Resaltada">
+                <WorkspaceIcon name="highlight" /><span className="visually-hidden">Resaltada</span>
+              </span>}
+              <WorkspaceIcon name="chevron" />
             </span>
           </li>;
         })}</ul>;

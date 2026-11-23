@@ -32,7 +32,7 @@ Aceptamos contribuciones de documentación, diseño y propuestas técnicas. Pued
 Requisitos actuales: Git y Python 3.10 o superior. No necesitas una cuenta Cloudflare para revisar estos documentos.
 
 ```sh
-git clone https://github.com/danirssx/taski.git
+git clone https://github.com/Partela-Organization/taski.git
 cd taski
 python3 scripts/check_docs.py
 ```

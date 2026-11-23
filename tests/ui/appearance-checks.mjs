@@ -1,6 +1,52 @@
 import { test, expect } from "@playwright/test";
 
 export function appearanceChecks() {
+  test("ticket presentation preserves filters and detail and adapts to mobile", async ({ page }, testInfo) => {
+    await page.goto("http://127.0.0.1:5174");
+    await page.getByLabel("Código del equipo").fill("browser-fixture-only");
+    await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    const list = page.getByRole("button", { name: "Lista", exact: true });
+    const cards = page.getByRole("button", { name: "Tarjetas", exact: true });
+    const area = page.getByLabel("Área", { exact: true });
+    const search = page.getByRole("searchbox");
+    const ticket = page.getByRole("button", { name: "Fixture 06", exact: true });
+    const row = page.locator(".ticket-row").filter({ has: ticket });
+    const group = page.getByRole("list").filter({ has: ticket });
+    const columns = () => group.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+    await expect(list).toHaveAttribute("aria-pressed", "true");
+    await area.selectOption("general");
+    await expect(ticket).toBeVisible();
+    await cards.click();
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await expect(group).toHaveCSS("display", "grid");
+    await expect.poll(columns).toBe(2);
+    await expect(area).toHaveValue("general");
+    await search.fill("Fixture 06");
+    const edge = await row.locator(".ticket-row__indicators").boundingBox();
+    await page.mouse.click(edge.x + edge.width / 2, edge.y + edge.height / 2);
+    await expect(page).toHaveURL(/\/t\/DEMO-006$/);
+    await list.click();
+    await expect(list).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("region", { name: "Fixture 06", exact: true })).toBeVisible();
+    await expect(search).toHaveValue("Fixture 06");
+    await page.setViewportSize({ width: 1280, height: 1000 });
+    await cards.click();
+    await expect.poll(columns).toBe(1);
+    await page.reload();
+    await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Cerrar detalle", exact: true }).click();
+    await expect.poll(columns).toBe(2);
+    await page.getByLabel("Tema", { exact: true }).selectOption("light");
+    await page.screenshot({ path: testInfo.outputPath("desktop-cards.png") });
+    await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect.poll(columns).toBe(1);
+    await expect(cards).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.getByLabel("Tema", { exact: true }).selectOption("dark");
+    await page.screenshot({ path: testInfo.outputPath("mobile-cards.png") });
+  });
+
   test("connected application themes, keyboard focus and mobile detail remain usable", async ({ page }, testInfo) => {
     test.setTimeout(120_000);
     await page.goto("http://127.0.0.1:5174/t/DEMO-006");

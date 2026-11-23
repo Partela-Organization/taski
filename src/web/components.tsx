@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
 export function Button({ variant = "quiet", className = "", type = "button", ...props }:
-  ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "quiet" | "primary" }) {
+  ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "quiet" | "primary" | "secondary" }) {
   return <button {...props} type={type} className={`button button--${variant} ${className}`} />;
 }
 
@@ -72,9 +72,9 @@ export function StatusMessage({ tone = "empty", title, children }:
   </div>;
 }
 
-export function DetailPanel({ open, title, onClose, children, caption = "Detalle", actions, hideTitle = false, compactAt = 640 }:
+export function DetailPanel({ open, title, onClose, children, caption = "Detalle", actions, hideTitle = false, compactAt = 640, showCloseLabel = false }:
   { open: boolean; title: string; onClose: () => void; children: ReactNode;
-    caption?: string; actions?: ReactNode; hideTitle?: boolean; compactAt?: number }) {
+    caption?: string; actions?: ReactNode; hideTitle?: boolean; compactAt?: number; showCloseLabel?: boolean }) {
   const id = useId();
   const panel = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -124,7 +124,9 @@ export function DetailPanel({ open, title, onClose, children, caption = "Detalle
   return <aside ref={panel} className="detail-panel" role={compact ? "dialog" : "region"}
     aria-modal={compact ? true : undefined} aria-labelledby={id}>
     <div className="detail-panel__top"><span>{caption}</span><div className="detail-panel__actions">
-      {actions}<Button aria-label="Cerrar detalle" title="Cerrar detalle" onClick={onClose}><span aria-hidden="true">×</span></Button>
+      {actions}<Button variant={showCloseLabel ? "secondary" : "quiet"} aria-label="Cerrar detalle" title="Cerrar detalle" onClick={onClose}>
+        {showCloseLabel ? "Cerrar" : <span aria-hidden="true">×</span>}
+      </Button>
     </div></div>
     <h2 id={id} ref={heading} tabIndex={-1} className={hideTitle ? "visually-hidden" : undefined}>{title}</h2>
     {children}

@@ -3,6 +3,7 @@ import type { Theme } from "../../theme.ts";
 import type { Member } from "../access/use-team-session.ts";
 import { Wordmark, WorkspaceIcon } from "../shared/marks.tsx";
 import { ThemeControl } from "../shared/theme-control.tsx";
+import type { Presentation } from "./presentation.ts";
 import { views } from "./views.ts";
 import type { View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
@@ -35,28 +36,41 @@ export function WorkspaceTopbar({ project, member, theme, onTheme, busy, onSignO
     <div className="top-actions">
       <ThemeControl theme={theme} onChange={onTheme} />
       <span className="viewer"><Avatar name={member.name} />{member.name}</span>
-      <Button disabled={busy} onClick={onSignOut}>Salir</Button>
+      <Button variant="secondary" disabled={busy} onClick={onSignOut}>Salir</Button>
     </div>
   </header>;
 }
 
-export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefresh }: {
+export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefresh, presentation, onPresentation }: {
   search: string; onSearch: (search: string) => void;
   areas: { id: string; label: string }[]; area: string; onArea: (area: string) => void; onRefresh: () => void;
+  presentation: Presentation; onPresentation: (presentation: Presentation) => void;
 }) {
   return <div className="workspace-toolbar">
-    <div className="workspace-search"><WorkspaceIcon name="search" />
-      <Field label="Buscar entre los tickets cargados" placeholder="Buscar…" type="search" value={search} onChange={(event) => onSearch(event.target.value)} />
+    <div className="workspace-filters">
+      <div className="workspace-search"><WorkspaceIcon name="search" />
+        <Field label="Buscar entre los tickets cargados" placeholder="Buscar…" type="search" value={search} onChange={(event) => onSearch(event.target.value)} />
+      </div>
+      <div className="workspace-area">
+        <label htmlFor="area">Área</label>
+        <select id="area" value={area} onChange={(event) => onArea(event.target.value)}>
+          <option value="">Todas las áreas</option>
+          {areas.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
+        </select>
+      </div>
     </div>
-    <div className="workspace-area">
-      <label htmlFor="area">Área</label>
-      <select id="area" value={area} onChange={(event) => onArea(event.target.value)}>
-        <option value="">Todas las áreas</option>
-        {areas.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}</option>)}
-      </select>
+    <div className="workspace-actions">
+      <div className="presentation-control" role="group" aria-label="Presentación">
+        <Button aria-pressed={presentation === "list"} onClick={() => onPresentation("list")}>
+          <WorkspaceIcon name="list" />Lista
+        </Button>
+        <Button aria-pressed={presentation === "cards"} onClick={() => onPresentation("cards")}>
+          <WorkspaceIcon name="team" />Tarjetas
+        </Button>
+      </div>
+      <Button variant="secondary" className="refresh-list" aria-label="Actualizar lista" onClick={onRefresh}>
+        <WorkspaceIcon name="refresh" />Actualizar
+      </Button>
     </div>
-    <Button className="refresh-list" aria-label="Actualizar lista" title="Actualizar lista" onClick={onRefresh}>
-      <WorkspaceIcon name="refresh" />
-    </Button>
   </div>;
 }

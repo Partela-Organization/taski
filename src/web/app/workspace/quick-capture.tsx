@@ -18,11 +18,11 @@ export function QuickCapture({ model, feedback }: { model: ReturnType<typeof use
         <Field id="capture-title" label={feedback ? "Título del feedback" : "Nueva tarea"}
           placeholder={feedback ? "Escribe una idea o algo que mejorar…" : "Añade una tarea y pulsa Enter…"}
           maxLength={240} value={title} disabled={busy || !!attempt} onChange={(event) => setTitle(event.target.value)} />
-        <Button type="submit" disabled={busy} aria-label={label} title={label}>
-          {busy ? "Guardando…" : attempt ? label : <span aria-hidden="true">↵</span>}
+        <Button variant="secondary" type="submit" disabled={busy} aria-label={label}>
+          {busy ? "Guardando…" : attempt ? label : feedback ? "Compartir" : label}
         </Button>
       </div>
-      {feedback && !showContext && <Button className="context-toggle" onClick={() => setExpanded(true)} disabled={busy || !!attempt}>Añadir contexto</Button>}
+      {feedback && !showContext && <Button variant="secondary" className="context-toggle" onClick={() => setExpanded(true)} disabled={busy || !!attempt}>Añadir contexto</Button>}
       {showContext && <div className="feedback-context">
         <label htmlFor="feedback-context">Contexto (opcional)</label>
         <textarea id="feedback-context" rows={2} maxLength={100000} value={context} disabled={busy || !!attempt}

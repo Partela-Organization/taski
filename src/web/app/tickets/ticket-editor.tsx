@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Edits, ProjectResult, TaskiClient, TicketResult } from "../../../client/index.ts";
 import { Button, Field, StatusMessage } from "../../components.tsx";
 import { Conversation } from "./conversation.tsx";
@@ -12,6 +13,8 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
 }) {
   const { server, draft, busy, conflict, notice, error, change, save, reload, acceptConversationUpdate } =
     useTicketEdit({ initial, client, drafts, onSaved });
+  const [updatingConversation, setUpdatingConversation] = useState(false);
+  const editorBusy = busy || updatingConversation;
   const key = server.ticket.key;
   const feedback = server.ticket.type === "feedback";
   const author = project?.members.find((member) => member.id === server.ticket.createdBy)?.name ?? server.ticket.createdBy;
@@ -21,11 +24,11 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
       <h2 className="editor-title">{server.ticket.title}</h2>
       <p className="detail-origin">Compartido por {author}</p>
       <p className="description">{server.ticket.description || "Sin contexto adicional"}</p>
-      <Button disabled={busy || conflict} onClick={() => save({ ...draft.changes, type: "task" })}>
+      <Button variant="secondary" disabled={editorBusy || conflict} onClick={() => save({ ...draft.changes, type: "task" })}>
         {busy ? "Guardando…" : draft.pending ? "Reintentar conversión" : "Convertir en tarea"}
       </Button>
-    </div> : <form className="ticket-editor" onSubmit={(event) => { event.preventDefault(); save(draft.changes); }}>
-      <fieldset disabled={busy || !!draft.pending}>
+    </div> : <form className="ticket-editor" onSubmit={(event) => { event.preventDefault(); if (!editorBusy) save(draft.changes); }}>
+      <fieldset disabled={editorBusy || !!draft.pending}>
         <div className="editor-title-field">
           <label htmlFor="ticket-title" className="visually-hidden">Título</label>
           <textarea id="ticket-title" className="editor-title" rows={2} maxLength={240} required
@@ -58,17 +61,17 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
       </fieldset>
       <div className="editor-footer">
         <p className="detail-origin">Creada por {author} · v{server.ticket.version}</p>
-        <Button type="submit" variant="primary" disabled={busy || conflict || (!draft.pending && !Object.keys(draft.changes).length)}>
+        <Button type="submit" variant="primary" disabled={editorBusy || conflict || (!draft.pending && !Object.keys(draft.changes).length)}>
           {busy ? "Guardando…" : draft.pending ? "Reintentar guardado" : "Guardar cambios"}
         </Button>
       </div>
     </form>}
     {drafts.has(key) && <p>Borrador conservado en esta pestaña.</p>}
     {error && <StatusMessage tone="error" title={error} />}
-    {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button disabled={busy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}
-    <Button disabled={busy || !!draft.pending} onClick={() => { if (!drafts.has(key) || confirm("¿Descartar el borrador y cargar la versión actual?")) void reload(false); }}>Actualizar detalle</Button>
+    {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button variant="secondary" disabled={editorBusy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}
+    <Button variant="secondary" disabled={editorBusy || !!draft.pending} onClick={() => { if (!drafts.has(key) || confirm("¿Descartar el borrador y cargar la versión actual?")) void reload(false); }}>Actualizar detalle</Button>
     {notice && <StatusMessage title={notice} />}
     <Conversation result={server} client={client} cache={conversations} disabled={busy || !!draft.pending}
-      onUpdated={acceptConversationUpdate} />
+      onUpdated={acceptConversationUpdate} onMutationPending={setUpdatingConversation} />
   </>;
 }

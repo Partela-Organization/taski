@@ -7,6 +7,7 @@ import type { Access, Member } from "../access/use-team-session.ts";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 import { TicketPanel } from "../tickets/ticket-panel.tsx";
 import { useTicketRoute } from "../tickets/use-ticket-route.ts";
+import { readPresentation, savePresentation } from "./presentation.ts";
 import { QuickCapture } from "./quick-capture.tsx";
 import { useQuickCapture } from "./use-quick-capture.ts";
 import { TicketList } from "./ticket-list.tsx";
@@ -22,6 +23,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [selection, setSelection] = useState<{ memberId: string; view: View }>();
   const [area, setArea] = useState("");
   const [search, setSearch] = useState("");
+  const [presentation, setPresentation] = useState(readPresentation);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
@@ -81,17 +83,21 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           </Button>
         </div>
         <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
-          area={area} onArea={setArea} onRefresh={list.refresh} />
+          area={area} onArea={setArea} onRefresh={list.refresh} presentation={presentation} onPresentation={(next) => {
+            setPresentation(next);
+            savePresentation(next);
+          }} />
         <QuickCapture model={capture} feedback={feedback} />
-        <TicketList rows={list.rows} feedback={feedback} project={list.project} selected={route.selected} search={search} onOpen={(key) => void route.open(key)} />
+        <TicketList rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
+          search={search} presentation={presentation} onOpen={(key) => void route.open(key)} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
-          <Button onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
+          <Button variant="secondary" onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
         </StatusMessage>}
         <footer className="workspace-footer">
           <span>{list.rows.length === 1 ? "1 entrada cargada" : `${list.rows.length} entradas cargadas`}</span>
-          {list.hasMore && <Button disabled={list.loading} onClick={() => void list.more()}>Cargar más</Button>}
+          {list.hasMore && <Button variant="secondary" disabled={list.loading} onClick={() => void list.more()}>Cargar más</Button>}
         </footer>
       </main>
     </div>
