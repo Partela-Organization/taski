@@ -44,7 +44,7 @@ Mientras se confirma un comentario o un resaltado, el panel pausa **Guardar camb
 
 ## Temas y dispositivos B7-04
 
-El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico, todavía pendiente. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
+El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico confirmado por el equipo. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
 
 
 ## Compartir feedback B8-01
@@ -59,7 +59,7 @@ La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas compar
 
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
 
-Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#registro-físico-pendiente) y sigue el [recorrido de feedback](verification/b8-feedback.md).
+Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#repetir-en-un-iphone-físico) y sigue el [recorrido de feedback](verification/b8-feedback.md).
 
 ## Enlace manual a un PR B9-01
 
