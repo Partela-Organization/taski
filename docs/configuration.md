@@ -10,6 +10,8 @@ Ambos usan el mismo validador y Worker; no se editan dominio, casos de uso o SQL
 
 La validación ocurre al evaluar el módulo de configuración, antes de que el Worker atienda peticiones. Los errores son `ConfigurationError` y nombran el campo, sin volcar el objeto completo. No hay valores por defecto silenciosos para campos requeridos ni claves desconocidas aceptadas. La configuración validada se copia y congela de forma recursiva.
 
+Para una [instalación alojada](deployment/cloudflare.md), el Worker admite el mismo esquema como JSON en `TASKI_INSTALLATION_JSON`. Valida el contenido al recibir la petición y responde 503 si la web alojada carece de una configuración válida.
+
 ## Campos del esquema 1
 
 Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos están en [types.ts](../src/config/types.ts) y la comprobación de datos desconocidos en [schema.ts](../src/config/schema.ts).
