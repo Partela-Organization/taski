@@ -4,12 +4,9 @@ B6-01 expone `/mcp` mediante Streamable HTTP autenticado. Usa los mismos contrat
 
 B6-02 añade [vistas, operaciones compuestas y recuperación incremental verificadas](mcp-intent.md), con llamadas/rondas observadas y recibos de estado + avance dentro del presupuesto proxy.
 
-## Configuración mínima
+## Conectarse a una instalación
 
-1. Instala las dependencias con `npm ci` y aplica las migraciones con `npm run db:migrate`.
-2. Crea `.dev.vars` desde `.dev.vars.example` y elige un código local, según [acceso de equipo](access.md).
-3. Arranca `npm run dev`. El preset demo utiliza `http://127.0.0.1:8787/mcp`.
-4. Configura las cabeceras siguientes en tu cliente Streamable HTTP, conservando el código fuera de Git:
+Cada persona configura en su cliente Streamable HTTP la URL `/mcp` de la instalación y las siguientes cabeceras. El equipo que aloja la instalación prepara una sola vez el Worker, la base D1 y el acceso. El despliegue de producción de Taski está previsto en B11.
 
 | Cabecera | Valor |
 | --- | --- |
@@ -18,6 +15,13 @@ B6-02 añade [vistas, operaciones compuestas y recuperación incremental verific
 | `X-Taski-Client` | Nombre del cliente, opcional, máximo 80 caracteres. |
 
 El código se exige también para descubrir el catálogo. Las cookies web no autentican MCP. Todas las operaciones construyen un actor `agent/mcp` con identidad declarada; el responsable del ticket puede ser otra persona. La política normal permite dejar el trabajo en `in_review` y rechaza `done` sin delegación de servidor.
+
+## Levantar una instalación local
+
+1. Instala las dependencias con `npm ci` y aplica las migraciones con `npm run db:migrate`.
+2. Crea `.dev.vars` desde `.dev.vars.example` y elige un código local, según [acceso de equipo](access.md).
+3. Arranca `npm run dev`. El preset demo utiliza `http://127.0.0.1:8787/mcp`.
+4. Configura en el cliente la URL local y las cabeceras de la tabla. Conserva el código fuera de Git.
 
 El Host debe coincidir con el hostname de `project.baseUrl`; el puerto no interviene en esa comprobación. Con el preset demo usa `127.0.0.1`, no un alias `localhost`. Se rechaza un Origin presente que no coincida con el origen solicitado. No hay CORS abierto, OAuth ni servidor stdio. Un dominio distinto requiere configurar su instalación; no basta con cambiar la URL del cliente.
 
