@@ -61,6 +61,7 @@ export class TaskiClient {
   listActivity(options: { cursor?: string; limit?: number; ticketKey?: string } = {}): Promise<ActivityResult> { return this.request(`activity${this.query(options)}`); }
   accessOptions(): Promise<{ projectName: string; brandName: string; members: { id: string; name: string; defaultView: "work" | "feedback" }[] }> { return this.request("access"); }
   login(code: string, memberId: string): Promise<{ member: { id: string; name: string }; identityAssurance: "self_selected" }> { return this.request("session", "POST", { code, memberId }); }
+  session(): Promise<{ member: { id: string; name: string }; identityAssurance: "self_selected" }> { return this.request("session"); }
   changeMember(memberId: string): Promise<{ member: { id: string; name: string }; identityAssurance: "self_selected" }> { return this.request("session", "PUT", { memberId }); }
   logout(): Promise<void> { return this.request("session", "DELETE"); }
 }

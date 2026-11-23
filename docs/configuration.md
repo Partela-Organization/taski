@@ -10,6 +10,8 @@ Ambos usan el mismo validador y Worker; no se editan dominio, casos de uso o SQL
 
 La validación ocurre al evaluar el módulo de configuración, antes de que el Worker atienda peticiones. Los errores son `ConfigurationError` y nombran el campo, sin volcar el objeto completo. No hay valores por defecto silenciosos para campos requeridos ni claves desconocidas aceptadas. La configuración validada se copia y congela de forma recursiva.
 
+Para una [instalación alojada](deployment/cloudflare.md), el Worker admite el mismo esquema como JSON en `TASKI_INSTALLATION_JSON`. Valida el contenido al recibir la petición y responde 503 si la web alojada carece de una configuración válida.
+
 ## Campos del esquema 1
 
 Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos están en [types.ts](../src/config/types.ts) y la comprobación de datos desconocidos en [schema.ts](../src/config/schema.ts).
@@ -45,6 +47,6 @@ No se guarda el código de acceso en el preset. B4 lo recibirá por secretos del
 
 ## Compatibilidad cuando existan datos
 
-Cambiar name/label conserva IDs. Renombrar un member.id o area.id equivale a crear otra identidad: B3 deberá mantener referencias históricas; no retirar una identidad referenciada sin un plan. El prefijo y project.id forman parte de la identidad inicial: conservar los códigos/URLs ya emitidos o crear una migración explícita con aliases/redirecciones. El validador de B2 no consulta D1 ni puede saber si hay tickets existentes.
+Cambiar name/label conserva IDs. Renombrar un member.id o area.id equivale a crear otra identidad: B3 deberá mantener referencias históricas; no retirar una identidad referenciada sin un plan. El prefijo y project.id forman parte de la identidad inicial. Para cambiar un prefijo con datos existentes, usa el [procedimiento de rotación](data-model.md#rotación-administrativa-de-prefijo) antes de publicar la configuración. El validador de B2 no consulta D1 ni puede saber si hay tickets existentes.
 
 Cambiar baseUrl requiere conservar rutas o redirecciones de enlaces compartidos en el despliegue. Las migraciones durables y la segunda instalación se comprueban en B3/B10/B11; no se afirma que editar un preset migre datos.

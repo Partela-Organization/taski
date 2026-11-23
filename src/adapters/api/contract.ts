@@ -22,9 +22,9 @@ const actor = object({ memberId: string, name: string, kind: { enum: ["person", 
   client: string, identityAssurance: { const: "self_selected" }, authorizationRef: string },
   ["memberId", "name", "kind", "channel", "client", "identityAssurance"]);
 const summaryFields = { key: string, title: string, status, assigneeId: nullableString, highlighted: boolean, version: integer };
-const summary = object({ ...summaryFields, areaId: string, type, prUrl: nullableString }, Object.keys(summaryFields));
+const summary = object({ ...summaryFields, areaId: string, type, prUrl: nullableString, createdBy: string }, Object.keys(summaryFields));
 const ticket = object({ ...summary.properties, id: string, url: string, description: { type: "string" },
-  createdBy: string, createdAt: string, updatedAt: string }, Object.keys(summaryFields));
+  createdAt: string, updatedAt: string }, Object.keys(summaryFields));
 const receipt = object({ key: string, url: string, version: integer, changed: array(string), commentId: string }, ["key", "url", "version", "changed"]);
 const position = { cursor: string, limit: page };
 const mutation = { key: string, expectedVersion: integer, idempotencyKey: { ...string, maxLength: 128 } };
@@ -41,8 +41,10 @@ export const definitions = [
     inputSchema: object({ knownVersion: integer }),
     outputSchema: object({ configVersion: integer, notModified: boolean, project, activityCursor: string }, ["configVersion", "notModified", "activityCursor"]) },
   { name: "list_tickets", description: "List compact summaries. Cursor retains filters. Use work view for UI metadata; fetch detail separately.",
-    inputSchema: object({ ...position, status, assigneeId: nullableString, areaId: string, type, view: { enum: ["summary", "work"], default: "summary" } }),
-    outputSchema: object({ items: array(summary), nextCursor: nullableString, activityCursor: string, omitted: array(string) }, ["items", "nextCursor", "activityCursor", "omitted"]) },
+    inputSchema: object({ ...position, status, assigneeId: nullableString, areaId: string, type,
+      order: { const: "recent" }, view: { enum: ["summary", "work"], default: "summary" } }),
+    outputSchema: object({ items: array(object({ ...summary.properties, createdAt: string }, summary.required)),
+      nextCursor: nullableString, activityCursor: string, omitted: array(string) }, ["items", "nextCursor", "activityCursor", "omitted"]) },
   { name: "get_ticket", description: "Read a ticket and recent comments together. Full content is never silently truncated; page older comments.",
     inputSchema: object({ key: string, view: { enum: ["summary", "work", "full"], default: "work" },
       commentsLimit: { type: "integer", minimum: 0, maximum: 50 }, commentsCursor: string }, ["key"]),

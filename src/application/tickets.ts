@@ -9,7 +9,10 @@ export interface ProjectContext {
   readonly policy: { readonly agentsCanComplete: boolean };
 }
 export interface Runtime { id(): string; now(): string; hash(value: string): Promise<string> }
-export interface ListQuery { limit: number; afterNumber: number; status?: string; assigneeId?: string | null; areaId?: string; type?: string }
+export interface ListQuery {
+  limit: number; afterNumber: number; afterCreatedAt?: string; order?: "recent";
+  status?: string; assigneeId?: string | null; areaId?: string; type?: string;
+}
 export interface Mutation {
   create: boolean; operation: string; idempotencyKey: string; fingerprint: string;
   actor: Actor; ticket: TicketDraft; expectedVersion: number | null;
@@ -74,9 +77,16 @@ export class TicketService {
       changes.highlighted = source.highlighted;
     }
     if ("prUrl" in source) {
-      if (source.prUrl !== null && (typeof source.prUrl !== "string" || source.prUrl.length > 1000
-          || !/^https:\/\/[a-z0-9.-]+(?::[0-9]{1,5})?(?:\/[^\s?#]*)?$/i.test(source.prUrl))) throw new TaskiError("INVALID_INPUT", "Invalid HTTPS PR URL");
-      changes.prUrl = source.prUrl as string | null;
+      changes.prUrl = null;
+      if (source.prUrl !== null) {
+        const value = text(source.prUrl, "prUrl", 1000).trim();
+        const match = /^https:\/\/([a-z0-9](?:[a-z0-9.-]*[a-z0-9])?)(?::([0-9]{1,5}))?(\/[^\s?#\\]*)?$/i.exec(value);
+        if (!match || (match[2] && (+match[2] < 1 || +match[2] > 65535))) {
+          throw new TaskiError("INVALID_INPUT", "Invalid HTTPS PR URL");
+        }
+        const port = match[2] ? Number(match[2]) : 443;
+        changes.prUrl = `https://${match[1]!.toLowerCase()}${port === 443 ? "" : `:${port}`}${match[3] ?? ""}`;
+      }
     }
     return changes;
   }
@@ -108,7 +118,12 @@ export class TicketService {
     // One extra internal row detects a continuation; public adapters cap pages at 50.
     integer(query.limit, "limit", 51);
     if (!Number.isSafeInteger(query.afterNumber) || query.afterNumber < 0) throw new TaskiError("INVALID_INPUT", "Invalid position");
-    const filters = Object.fromEntries(Object.entries(query).filter(([key]) => !["limit", "afterNumber"].includes(key)));
+    const { limit: _limit, afterNumber, afterCreatedAt, order, ...filters } = query;
+    if (order !== undefined && order !== "recent") throw new TaskiError("INVALID_INPUT", "Invalid list order");
+    if ((order === "recent" && afterNumber > 0) !== (afterCreatedAt !== undefined)
+        || (afterCreatedAt !== undefined && !Number.isFinite(Date.parse(afterCreatedAt)))) {
+      throw new TaskiError("INVALID_CURSOR", "Invalid position for the selected list order");
+    }
     this.changes(filters);
     await this.repository.initialize(this.context.project);
     return this.repository.list(query);

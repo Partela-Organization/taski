@@ -4,6 +4,19 @@
 
 La [comprobación fechada de acceso](b6-prerequisites.json) conserva solo versiones y estado de conexión. Codex accede a Linear mediante su OAuth existente; Claude necesita autorizar `linear-server`. El endpoint oficial y su autenticación están documentados por [Linear](https://linear.app/docs/mcp). El probe llama únicamente `get_workspace`; no crea proyectos o tickets, ni incluye identidad del workspace en el informe. Cada CLI usa su autenticación nativa; no se trasladan credenciales entre clientes.
 
+## Verificación del MCP de Linear con un ticket ficticio
+
+El 22 de noviembre de 2026 se inició sesión MCP por Streamable HTTP con una clave API en el endpoint oficial. El catálogo recibido tenía 60 herramientas. El flujo de escritura creó y asignó un ticket, cambió su estado y guardó un comentario. La API GraphQL confirmó el proyecto, responsable, estado y comentario; el ticket se archivó al terminar. No se guardan credenciales, identificadores ni datos del proyecto en este informe.
+
+| Escenario optimizado | Correctas | Llamadas por intento | p50 | p95 | Tokens proxy de argumentos y resultados |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Buscar el fixture por proyecto y título, con `limit: 1` y cuatro campos | 30/30 | 1 | 780 ms | 1624 ms | 182 |
+| Leer descripción y comentarios en paralelo, con campos explícitos y hasta cinco comentarios | 30/30 | 2 | 862 ms | 1469 ms | 297 |
+
+Python 3.14 con solicitudes HTTPS de `urllib`, reloj monotónico alrededor de cada recorrido y percentil 95 por rango más cercano. La serialización JSON compacta se contó con `tiktoken` y `o200k_base`. El catálogo completo ocupó 98.236 bytes y 23.027 tokens proxy; las cinco definiciones de este flujo ocuparon 21.118 bytes y 5.050 tokens proxy. Un ensayo previo de la lectura paralela se interrumpió por un reinicio de conexión. La tabla registra el lote posterior de treinta intentos completos.
+
+Las mediciones son del transporte remoto de Linear, con un solo fixture y sin modelo ni conteo facturado. No son muestras de la suite Taski/Linear del diseño registrado.
+
 ## Diseño registrado antes de medir
 
 El [diseño ejecutable](../../scripts/benchmark-design.mjs) fija las condiciones, el hash de los 20 fixtures neutros y su propio SHA-256. Modificarlo cambia `designDigest`; el evaluador rechaza mezclar muestras de otra revisión del diseño o dataset. El hash de fixtures identifica el archivo fuente original, antes de mapear IDs a cada proveedor; la equivalencia del contenido importado exige comprobación real del colector.

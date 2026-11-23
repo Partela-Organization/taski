@@ -69,3 +69,35 @@ test("failed batch can retry after recovery; another project cannot reuse the da
   const context = structuredClone(demoPreset); context.project.id = "another"; context.project.prefix = "OTHER";
   await assert.rejects(service(context).get(r.key), { code: "PROJECT_IDENTITY_CONFLICT" });
 });
+
+test("a prefix rotation preserves ticket references, revisions, and confirmed retries", async () => {
+  const input = { title: "Preserved ticket", idempotencyKey: "rotate-prefix-create" };
+  const created = await service().create(input, actor);
+  const original = await service().get(created.key);
+  const guard = await db.prepare("SELECT sql FROM sqlite_master WHERE type='trigger' AND name='tickets_update_guard'").first("sql");
+  await db.batch([
+    db.prepare("INSERT INTO ticket_key_aliases(key,ticket_id) SELECT key,id FROM tickets WHERE prefix='DEMO'"),
+    db.prepare("DROP TRIGGER tickets_update_guard"),
+    db.prepare("UPDATE tickets SET prefix='STUDIO' WHERE prefix='DEMO'"),
+    db.prepare("UPDATE project_identity SET prefix='STUDIO' WHERE project_id='demo' AND prefix='DEMO'"),
+    db.prepare(guard),
+  ]);
+  const context = structuredClone(demoPreset);
+  context.project.prefix = "STUDIO";
+  context.configVersion++;
+  const rotated = service(context);
+  const current = await rotated.get(created.key);
+  assert.equal(current.id, original.id);
+  assert.equal(current.number, original.number);
+  assert.equal(current.version, original.version);
+  assert.equal(current.key, created.key.replace("DEMO-", "STUDIO-"));
+  assert.equal(current.url, created.url.replace("/t/DEMO-", "/t/STUDIO-"));
+  assert.deepEqual(await rotated.get(current.key), current);
+  assert.deepEqual(await rotated.create(input, actor), created);
+  const updated = await rotated.update({
+    key: created.key, expectedVersion: current.version, idempotencyKey: "rotate-prefix-edit", changes: { highlighted: true },
+  }, actor);
+  assert.equal(updated.key, current.key);
+  await assert.rejects(db.prepare("UPDATE tickets SET prefix='OTHER',version=version+1 WHERE id=?").bind(original.id).run(), /IMMUTABLE_IDENTITY/);
+  assert.match((await rotated.create({ title: "Next ticket", idempotencyKey: "rotate-prefix-next" }, actor)).key, /^STUDIO-/);
+});

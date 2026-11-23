@@ -129,6 +129,14 @@
             }
           },
           {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "const": "recent"
+            }
+          },
+          {
             "name": "view",
             "in": "query",
             "required": false,
@@ -1001,6 +1009,9 @@
               "feedback"
             ]
           },
+          "order": {
+            "const": "recent"
+          },
           "view": {
             "enum": [
               "summary",
@@ -1064,6 +1075,14 @@
                     "string",
                     "null"
                   ]
+                },
+                "createdBy": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "createdAt": {
+                  "type": "string",
+                  "minLength": 1
                 }
               },
               "required": [
@@ -1184,6 +1203,10 @@
                   "null"
                 ]
               },
+              "createdBy": {
+                "type": "string",
+                "minLength": 1
+              },
               "id": {
                 "type": "string",
                 "minLength": 1
@@ -1194,10 +1217,6 @@
               },
               "description": {
                 "type": "string"
-              },
-              "createdBy": {
-                "type": "string",
-                "minLength": 1
               },
               "createdAt": {
                 "type": "string",

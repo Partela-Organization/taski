@@ -1,0 +1,53 @@
+@import "./workspace/workspace.css";
+@import "./tickets/ticket-panel.css";
+@import "./access/sign-in.css";
+
+:root {
+  --canvas: light-dark(#fff, #191b18);
+  --surface: light-dark(#fff, #1d201a);
+  --sidebar: light-dark(#f7f7f5, #151713);
+  --text: light-dark(#272823, #e4e7de);
+  --muted: light-dark(#65695d, #a4ac98);
+  --border: light-dark(#ebebe6, #2d3128);
+  --line-strong: light-dark(#d9dad2, #414738);
+  --hover: light-dark(#f6f6f3, #24271f);
+  --selected: light-dark(#f2f2ee, #2a2e25);
+  --highlight: light-dark(#f8e5a2, #6a5624);
+  --button-bg: light-dark(#2b2d25, #e0e5d9);
+  --button-ink: light-dark(#fff, #23271d);
+  --success: light-dark(#52805e, #8bb393);
+  --progress: light-dark(#9b722d, #d4af6b);
+  --panel-width: 480px;
+  --mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+body { font-size: 13px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wordmark { font-size: 23px; font-weight: 750; letter-spacing: -.055em; line-height: 1; text-transform: lowercase; }
+.wordmark span { display: inline-block; margin-left: 3px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.workspace-icon { display: inline-block; width: 15px; height: 15px; flex: none; }
+.theme-control { display: flex; align-items: center; gap: 6px; }
+.theme-control label { font-size: 11px; color: var(--muted); }
+.theme-control select { border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); padding-inline: 6px; font-size: 12px; min-height: 36px; }
+.app select {
+  appearance: none;
+  padding-right: 23px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: right 12px center, right 8px center;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+}
+@media (forced-colors: active) {
+  .app select { appearance: auto; background-image: none; }
+}

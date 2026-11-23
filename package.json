@@ -21,7 +21,7 @@
     "check": "npm run typecheck && npm run check:boundaries && npm run api:check && npm test && npm run build",
     "docs:check": "python3 scripts/check_docs.py && python3 scripts/check_linear_baseline.py",
     "ui": "vite --config vite.config.mjs",
-    "build:web": "vite build --config vite.config.mjs",
+    "build:web": "vite build --config vite.config.mjs && npm run build:app",
     "build:worker": "wrangler deploy --dry-run --outdir dist/worker",
     "test:ui": "playwright test",
     "api:generate": "node scripts/generate-api-schema.mjs",
@@ -29,7 +29,10 @@
     "mcp:measure": "node scripts/measure-mcp.mjs",
     "benchmark:plan": "node scripts/benchmark.mjs plan",
     "benchmark:report": "node scripts/benchmark.mjs report",
-    "benchmark:preflight": "node scripts/benchmark-preflight.mjs"
+    "benchmark:preflight": "node scripts/benchmark-preflight.mjs",
+    "app": "vite --config vite.app.config.mjs",
+    "build:app": "vite build --config vite.app.config.mjs",
+    "qa:device": "npm run build:app && node scripts/serve-browser-fixture.mjs --lan"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20261113.1",

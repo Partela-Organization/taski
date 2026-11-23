@@ -22,6 +22,7 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [Preparar y evaluar la comparación B6-04, todavía sin muestras de rendimiento](benchmarks/b6-comparison.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
+- [Preparar el Worker, D1 y la web para Cloudflare](deployment/cloudflare.md)
 - [Solución de problemas de arranque](troubleshooting.md)
 - [Evidencia y validación reproducible del onboarding B1](verification/b1-onboarding.md)
 - [Contribuir por fork y PR](../CONTRIBUTING.md)
@@ -41,3 +42,5 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 ## Se entrega con cada bloque funcional
 
 Instalación local de la app, referencia de configuración, API/OpenAPI, configuración de Claude Code/Codex, despliegue Cloudflare, otra instalación independiente, rebranding, UI alternativa, actualización de versión y recuperación de datos. Sus instrucciones se probarán contra la implementación antes de presentarlas como disponibles.
+
+- [Lista y captura conectadas B7-01, en revisión](web.md)

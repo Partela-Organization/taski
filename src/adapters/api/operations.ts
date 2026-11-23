@@ -24,6 +24,7 @@ function nonnegative(value: unknown): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) throw new TaskiError("INVALID_CURSOR");
   return value;
 }
+const listFields = ["status", "assigneeId", "areaId", "type", "view", "order"] as const;
 function checkEpoch(cursor: Record<string, unknown>, epoch: string): void {
   if (cursor.epoch !== epoch) throw new TaskiError("CURSOR_EXPIRED", "Resynchronize project, ticket pages and activity from a fresh cursor");
 }
@@ -68,31 +69,40 @@ export class Operations {
     return result;
   }
   async list(input: unknown) {
-    const args = record(input, ["limit", "cursor", "status", "assigneeId", "areaId", "type", "view"]);
+    const args = record(input, ["limit", "cursor", ...listFields]);
     const limit = args.limit === undefined ? 20 : integer(args.limit, "limit", 50);
     const position = await this.position();
     let afterNumber = 0;
+    let afterCreatedAt: string | undefined;
     let filters = Object.fromEntries(Object.entries(args).filter(([key]) => !["limit", "cursor"].includes(key)));
     if (args.cursor !== undefined) {
       const cursor = decode(args.cursor, "tickets"); checkEpoch(cursor, position.epoch);
       if (cursor.revision !== position.sequence) throw new TaskiError("INVALID_CURSOR", "List changed; start a fresh query");
       afterNumber = nonnegative(cursor.afterNumber);
-      const saved = record(cursor.filters, ["status", "assigneeId", "areaId", "type", "view"]);
+      if (cursor.afterCreatedAt !== undefined) {
+        if (typeof cursor.afterCreatedAt !== "string" || cursor.afterCreatedAt.length > 30) throw new TaskiError("INVALID_CURSOR");
+        afterCreatedAt = cursor.afterCreatedAt;
+      }
+      const saved = record(cursor.filters, listFields);
       for (const [key, value] of Object.entries(filters)) if (!(key in saved) || canonical(value) !== canonical(saved[key])) throw new TaskiError("INVALID_CURSOR");
       filters = saved;
     }
     const view = filters.view ?? "summary";
     if (!["summary", "work"].includes(view as string)) throw new TaskiError("INVALID_INPUT", "Invalid list view");
-    const query = { ...filters, limit: limit + 1, afterNumber }; delete (query as Record<string, unknown>).view;
+    const { view: _view, ...queryFilters } = filters;
+    const query = { ...queryFilters, limit: limit + 1, afterNumber, ...(afterCreatedAt === undefined ? {} : { afterCreatedAt }) };
     const all = await this.service.list(query as ListQuery);
     const end = await this.position();
     if (end.sequence !== position.sequence) throw new TaskiError("INVALID_CURSOR", "List changed; retry the query");
     const rows = all.slice(0, limit);
-    return { items: rows.map((t) => view === "summary" ? summary(t) : { ...summary(t), areaId: t.areaId, type: t.type, prUrl: t.prUrl }),
-      nextCursor: all.length > limit ? encode({ kind: "tickets", epoch: position.epoch, revision: position.sequence,
-        afterNumber: rows.at(-1)!.number, filters }) : null,
+    const recent = filters.order === "recent";
+    const last = rows.at(-1);
+    return { items: rows.map((t) => view === "summary" ? summary(t) : { ...summary(t), areaId: t.areaId, type: t.type, prUrl: t.prUrl, createdBy: t.createdBy,
+      ...(recent ? { createdAt: t.createdAt } : {}) }),
+      nextCursor: all.length > limit && last ? encode({ kind: "tickets", epoch: position.epoch, revision: position.sequence,
+        afterNumber: last.number, ...(recent ? { afterCreatedAt: last.createdAt } : {}), filters }) : null,
       activityCursor: encode({ kind: "activity", epoch: position.epoch, after: position.sequence }),
-      omitted: view === "summary" ? ["description", "comments", "history", "areaId", "type", "prUrl"] : ["description", "comments", "history"] };
+      omitted: view === "summary" ? ["description", "comments", "history", "areaId", "type", "prUrl", "createdBy"] : ["description", "comments", "history"] };
   }
   async get(input: unknown) {
     const args = record(input, ["key", "view", "commentsLimit", "commentsCursor"]);
@@ -111,12 +121,12 @@ export class Operations {
     const all = limit === 0 ? [] : await this.service.repository.comments(t.id, before, (limit as number) + 1);
     const comments = all.slice(0, limit as number);
     const ticket = view === "summary" ? summary(t) : view === "work"
-      ? { ...summary(t), url: t.url, description: t.description, areaId: t.areaId, type: t.type, prUrl: t.prUrl } : full(t);
+      ? { ...summary(t), url: t.url, description: t.description, areaId: t.areaId, type: t.type, prUrl: t.prUrl, createdBy: t.createdBy } : full(t);
     return { ticket, comments: comments.slice().reverse().map(({ ticketId: _id, ...c }) => c),
       nextCommentsCursor: all.length > (limit as number) ? encode({ kind: "comments", epoch: position.epoch, ticketId: t.id,
         version: t.version, before: comments.at(-1)!.ticketVersion }) : null,
-      omitted: ["history", ...(view === "summary" ? ["url", "description", "areaId", "type", "prUrl"] : []),
-        ...(view !== "full" ? ["id", "createdBy", "createdAt", "updatedAt"] : []),
+      omitted: ["history", ...(view === "summary" ? ["url", "description", "areaId", "type", "prUrl", "createdBy"] : []),
+        ...(view !== "full" ? ["id", "createdAt", "updatedAt"] : []),
         ...(limit === 0 ? ["comments"] : all.length > (limit as number) ? ["olderComments"] : [])] };
   }
   async activity(input: unknown) {

@@ -1,0 +1,30 @@
+import { test, expect } from "@playwright/test";
+
+test("stable routes preserve drafts across tasks and resolve real version conflicts without overwriting unrelated changes", async ({ page, context }) => {
+  await page.goto("http://127.0.0.1:5174/t/DEMO-016");
+  await page.getByLabel("Código del equipo").fill("browser-fixture-only");
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Fixture 16");
+  await page.getByLabel("Título", { exact: true }).fill("Borrador de la tarea");
+  await page.getByLabel("Buscar entre los tickets cargados").fill("Fixture 17");
+  await page.getByRole("button", { name: "Fixture 17", exact: true }).click();
+  await expect(page).toHaveURL(/\/t\/DEMO-017$/);
+  await page.goBack();
+  await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Borrador de la tarea");
+  const url = "http://127.0.0.1:5174/api/v1/tickets/DEMO-016";
+  const before = await (await context.request.get(url)).json();
+  const external = await context.request.patch(url, { data: { expectedVersion: before.ticket.version, idempotencyKey: "detail-external", changes: { description: "Cambio externo que debe conservarse" } } });
+  expect(external.ok()).toBe(true);
+  await page.getByRole("button", { name: "Guardar cambios", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("Otra persona");
+  await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Borrador de la tarea");
+  await page.getByRole("button", { name: "Consultar versión actual y conservar borrador" }).click();
+  await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Cambio externo que debe conservarse");
+  await page.getByRole("button", { name: "Guardar cambios", exact: true }).click();
+  await expect(page.getByRole("region").getByRole("status")).toContainText("Cambios guardados");
+  await page.reload();
+  await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Borrador de la tarea");
+  await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Cambio externo que debe conservarse");
+  await page.keyboard.press("Escape"); await expect(page).toHaveURL("http://127.0.0.1:5174/");
+  await page.goBack(); await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Borrador de la tarea");
+});

@@ -4,12 +4,9 @@ B6-01 expone `/mcp` mediante Streamable HTTP autenticado. Usa los mismos contrat
 
 B6-02 añade [vistas, operaciones compuestas y recuperación incremental verificadas](mcp-intent.md), con llamadas/rondas observadas y recibos de estado + avance dentro del presupuesto proxy.
 
-## Configuración mínima
+## Conectarse a una instalación
 
-1. Instala las dependencias con `npm ci` y aplica las migraciones con `npm run db:migrate`.
-2. Crea `.dev.vars` desde `.dev.vars.example` y elige un código local, según [acceso de equipo](access.md).
-3. Arranca `npm run dev`. El preset demo utiliza `http://127.0.0.1:8787/mcp`.
-4. Configura las cabeceras siguientes en tu cliente Streamable HTTP, conservando el código fuera de Git:
+Cada persona configura en su cliente Streamable HTTP la URL `/mcp` de la instalación y las siguientes cabeceras. El equipo que aloja la instalación prepara una sola vez el Worker, la base D1 y el acceso. El despliegue de producción de Taski está previsto en B11.
 
 | Cabecera | Valor |
 | --- | --- |
@@ -18,6 +15,13 @@ B6-02 añade [vistas, operaciones compuestas y recuperación incremental verific
 | `X-Taski-Client` | Nombre del cliente, opcional, máximo 80 caracteres. |
 
 El código se exige también para descubrir el catálogo. Las cookies web no autentican MCP. Todas las operaciones construyen un actor `agent/mcp` con identidad declarada; el responsable del ticket puede ser otra persona. La política normal permite dejar el trabajo en `in_review` y rechaza `done` sin delegación de servidor.
+
+## Levantar una instalación local
+
+1. Instala las dependencias con `npm ci` y aplica las migraciones con `npm run db:migrate`.
+2. Crea `.dev.vars` desde `.dev.vars.example` y elige un código local, según [acceso de equipo](access.md).
+3. Arranca `npm run dev`. El preset demo utiliza `http://127.0.0.1:8787/mcp`.
+4. Configura en el cliente la URL local y las cabeceras de la tabla. Conserva el código fuera de Git.
 
 El Host debe coincidir con el hostname de `project.baseUrl`; el puerto no interviene en esa comprobación. Con el preset demo usa `127.0.0.1`, no un alias `localhost`. Se rechaza un Origin presente que no coincida con el origen solicitado. No hay CORS abierto, OAuth ni servidor stdio. Un dominio distinto requiere configurar su instalación; no basta con cambiar la URL del cliente.
 
@@ -59,13 +63,13 @@ Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato c
 | Herramienta | Entrada y resultado |
 | --- | --- |
 | `get_project` | `knownVersion` opcional; configuración y cursor actual. Si coincide, omite `project` con `notModified: true`. |
-| `list_tickets` | Filtros, `limit` y cursor; 20 resúmenes por defecto, máximo 50. `view: "work"` añade metadatos de UI. |
+| `list_tickets` | Filtros, `limit` y cursor. 20 resúmenes por defecto, máximo 50. Usa `order: "recent"` para ordenar por fecha de creación. `view: "work"` añade metadatos de UI y, con ese orden, la fecha de creación. |
 | `get_ticket` | `key`; `view: "work"` incluye descripción completa y cinco comentarios recientes. `full` añade identidad/fechas; los comentarios anteriores se paginan. |
 | `create_ticket` | `title`, `idempotencyKey` y campos opcionales; permite crear y asignar juntos. Devuelve recibo. |
 | `update_ticket` | `key`, versión, clave y `changes`, `descriptionPatch` y/o `comment`; escritura atómica y recibo. |
 | `add_comment` | `key`, versión, clave y `body`; recibo con `commentId`. |
 | `list_activity` | Cursor, límite y `ticketKey` opcional; cambios concretos, `nextCursor` y `hasMore`. |
-| `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada, sin consultar GitHub. |
+| `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada. Para retirar o combinar con estado usa `update_ticket` con `changes.prUrl`. Ver [regla compartida](api.md#referencia-manual-a-un-pr). |
 
 Ejemplos de argumentos ficticios, para un ticket cuya versión actual sea 1:
 
@@ -101,8 +105,8 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3101 | 12409 | 4000 |
-| Resultado de listar 20 resúmenes | 805 | 2604 | 1600 |
+| `tools/list` completo + instrucciones | 3134 | 12524 | 4000 |
+| Resultado de listar 20 resúmenes | 808 | 2616 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 
 Se usa JSON canónico con claves ordenadas y `tiktoken==0.14.0/o200k_base`, incluyendo los envelopes `content`/`structuredContent` del resultado SDK. Se excluyen IDs JSON-RPC y cabeceras HTTP. El catálogo es el recibido de `tools/list`, con anotaciones y esquemas de salida, no una proyección del contrato B0. El informe incluye tamaños por herramienta; eso no demuestra qué definiciones carga un host con descubrimiento diferido.

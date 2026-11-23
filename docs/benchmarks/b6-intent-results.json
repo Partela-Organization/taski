@@ -24,15 +24,15 @@
       "utf8Bytes": 325
     },
     "full_read": {
-      "tokensProxy": 353,
+      "tokensProxy": 352,
       "utf8Bytes": 1047
     },
     "work_read": {
-      "tokensProxy": 295,
-      "utf8Bytes": 947
+      "tokensProxy": 296,
+      "utf8Bytes": 954
     },
     "ordinary_update_receipt": {
-      "tokensProxy": 73,
+      "tokensProxy": 74,
       "utf8Bytes": 193
     },
     "pr_state_receipt": {
@@ -40,7 +40,7 @@
       "utf8Bytes": 135
     },
     "patch_progress_receipt": {
-      "tokensProxy": 73,
+      "tokensProxy": 72,
       "utf8Bytes": 198
     },
     "activity_pages": {
@@ -48,11 +48,11 @@
       "utf8Bytes": 1491
     },
     "recovery_full_read": {
-      "tokensProxy": 483,
+      "tokensProxy": 482,
       "utf8Bytes": 1275
     },
     "older_comments": {
-      "tokensProxy": 264,
+      "tokensProxy": 263,
       "utf8Bytes": 852
     },
     "long_create_input": {
@@ -60,8 +60,8 @@
       "utf8Bytes": 46091
     },
     "long_work_read": {
-      "tokensProxy": 10107,
-      "utf8Bytes": 46372
+      "tokensProxy": 10109,
+      "utf8Bytes": 46379
     },
     "long_patch_input": {
       "tokensProxy": 36,
@@ -72,7 +72,7 @@
       "utf8Bytes": 472
     },
     "long_full_read": {
-      "tokensProxy": 10170,
+      "tokensProxy": 10163,
       "utf8Bytes": 46474
     }
   },
