@@ -42,6 +42,10 @@ export function appearanceChecks() {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect.poll(columns).toBe(1);
     await expect(cards).toBeInViewport();
+    for (const label of ["Tema", "Área"]) {
+      const box = await page.getByLabel(label, { exact: true }).boundingBox();
+      expect(box.height).toBeGreaterThanOrEqual(44);
+    }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.getByLabel("Tema", { exact: true }).selectOption("dark");
     await page.screenshot({ path: testInfo.outputPath("mobile-cards.png") });
