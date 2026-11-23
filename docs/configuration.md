@@ -47,6 +47,6 @@ No se guarda el código de acceso en el preset. B4 lo recibirá por secretos del
 
 ## Compatibilidad cuando existan datos
 
-Cambiar name/label conserva IDs. Renombrar un member.id o area.id equivale a crear otra identidad: B3 deberá mantener referencias históricas; no retirar una identidad referenciada sin un plan. El prefijo y project.id forman parte de la identidad inicial: conservar los códigos/URLs ya emitidos o crear una migración explícita con aliases/redirecciones. El validador de B2 no consulta D1 ni puede saber si hay tickets existentes.
+Cambiar name/label conserva IDs. Renombrar un member.id o area.id equivale a crear otra identidad: B3 deberá mantener referencias históricas; no retirar una identidad referenciada sin un plan. El prefijo y project.id forman parte de la identidad inicial. Para cambiar un prefijo con datos existentes, usa el [procedimiento de rotación](data-model.md#rotación-administrativa-de-prefijo) antes de publicar la configuración. El validador de B2 no consulta D1 ni puede saber si hay tickets existentes.
 
 Cambiar baseUrl requiere conservar rutas o redirecciones de enlaces compartidos en el despliegue. Las migraciones durables y la segunda instalación se comprueban en B3/B10/B11; no se afirma que editar un preset migre datos.

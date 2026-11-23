@@ -34,7 +34,12 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
     setError("");
     try {
       const result = await client.getTicket(key, { view: "full", commentsLimit: 5 });
-      if (id === generation.current) setDetail(result);
+      if (id !== generation.current) return;
+      if (result.ticket.key !== key) {
+        history.replaceState(null, "", ticketPath(result.ticket.key));
+        setSelected(result.ticket.key);
+      }
+      setDetail(result);
     } catch (error) {
       if (id === generation.current) setError(operationError(error, onExpired));
     }
