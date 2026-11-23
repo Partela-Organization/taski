@@ -2,15 +2,15 @@
 
 Validado con Codex CLI 0.167.2 y su modelo predeterminado observado `gpt-6.2-sol`, sobre Worker/D1 local. El [informe](../verification/b6-codex-default.json) registra una sesión nueva y su continuación real; no es una simulación con SDK ni una comparación entre modelos.
 
-## Conectar una instalación local
+## Conectar una instalación
 
-Arranca el Worker y configura su código según [MCP](../mcp.md). Define `TASKI_CODE` y `TASKI_MEMBER` en el entorno privado de la terminal que abre Codex. El código debe coincidir con el del Worker y el miembro debe ser un ID de su configuración. `.dev.vars` configura Wrangler, pero no exporta esas variables a otra terminal.
+Para una instalación alojada, usa la URL HTTPS `/mcp` que te dé el equipo. Para una prueba local, arranca el Worker según [MCP](../mcp.md) y usa `http://127.0.0.1:8787/mcp`. Define `TASKI_CODE` y `TASKI_MEMBER` en el entorno privado de la terminal que abre Codex. El código debe coincidir con el del Worker y el miembro debe ser un ID de su configuración. `.dev.vars` configura Wrangler, pero no exporta esas variables a otra terminal.
 
 Integra este bloque en tu configuración local de Codex (`~/.codex/config.toml`), sin guardar valores reales en el repositorio:
 
 ```toml
 [mcp_servers.taski]
-url = "http://127.0.0.1:8787/mcp"
+url = "https://taski.example.com/mcp"
 bearer_token_env_var = "TASKI_CODE"
 env_http_headers = { "X-Taski-Member" = "TASKI_MEMBER" }
 http_headers = { "X-Taski-Client" = "codex" }

@@ -11,3 +11,9 @@ Los índices cubren estado/fecha, responsable/estado, tipo, área, comentarios p
 El guard de UPDATE exige version+1 y conserva identidad/código/URL/creador/fecha inicial. No constituye por sí solo una auditoría de escrituras administrativas externas: las mutaciones de aplicación se agrupan con comentarios y eventos en un batch D1 atómico. La API no expone acceso SQL.
 
 Pruebas de esquema: creación concurrente con datos ficticios, códigos únicos, identidad conservada y rechazo de prefijos/borrado inválidos. Se ejecutan con D1 emulado mediante `npm test`, sin base remota.
+
+## Rotación administrativa de prefijo
+
+La migración `0004_ticket_key_aliases.sql` permite conservar las referencias al cambiar el prefijo de una instalación existente. Por ejemplo, si un administrador cambia `DEMO` a `STUDIO`, los enlaces antiguos como `/t/DEMO-001` abren el mismo ticket y la web pasa a `/t/STUDIO-001`. La API y MCP resuelven ambas claves. Los recibos de operaciones ya confirmadas se conservan, incluida su referencia original.
+
+Aplica primero la migración y el Worker que consulta los aliases. Comprueba la identidad de la base antes de rotar. En una sola transacción D1 registra las claves antiguas en `ticket_key_aliases`, retira temporalmente `tickets_update_guard`, cambia el prefijo de los tickets y de `project_identity`, y restaura el mismo guard. Después publica el prefijo nuevo en la configuración, con `configVersion` incrementada. Durante el cambio, el guard de identidad puede devolver 409 hasta que coincidan base y configuración. Verifica lectura desde ambas claves, numeración, historial y creación bajo el prefijo nuevo.

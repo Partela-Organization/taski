@@ -35,7 +35,9 @@ export class D1TicketRepository implements TicketRepository {
   }
 
   async get(reference: string): Promise<Ticket | null> {
-    const row = await this.db.prepare("SELECT * FROM tickets WHERE key=? OR id=?").bind(reference, reference).first<Row>();
+    const row = await this.db.prepare(
+      "SELECT * FROM tickets WHERE key=? OR id=? OR id=(SELECT ticket_id FROM ticket_key_aliases WHERE key=?)",
+    ).bind(reference, reference, reference).first<Row>();
     return row ? ticket(row) : null;
   }
 

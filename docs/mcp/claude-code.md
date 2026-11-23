@@ -2,9 +2,9 @@
 
 Validado con Claude Code 2.1.327 y su modelo predeterminado observado `claude-sonnet-5-5`, en sesiones nuevas y retomadas, con carga anticipada y diferida. Los [informes anticipado](../verification/b6-claude-eager.json) y [diferido](../verification/b6-claude-deferred.json) contienen resultados reales sobre Worker/D1 local.
 
-## Conectar una instalación local
+## Conectar una instalación
 
-Arranca el Worker según [MCP](../mcp.md). En la terminal de Claude Code define `TASKI_CODE` y `TASKI_MEMBER` desde tu entorno privado; deben coincidir con el código del Worker y un ID de miembro configurado. El `.dev.vars` de Wrangler no exporta variables al cliente.
+Para una instalación alojada, usa la URL HTTPS `/mcp` que te dé el equipo. Para una prueba local, arranca el Worker según [MCP](../mcp.md) y usa `http://127.0.0.1:8787/mcp`. En la terminal de Claude Code define `TASKI_CODE` y `TASKI_MEMBER` desde tu entorno privado. Deben coincidir con el código del Worker y un ID de miembro configurado. El `.dev.vars` de Wrangler no exporta variables al cliente.
 
 Configura el servidor HTTP, por ejemplo mediante un `.mcp.json` con referencias de entorno:
 
@@ -13,7 +13,7 @@ Configura el servidor HTTP, por ejemplo mediante un `.mcp.json` con referencias 
   "mcpServers": {
     "taski": {
       "type": "http",
-      "url": "http://127.0.0.1:8787/mcp",
+      "url": "https://taski.example.com/mcp",
       "headers": {
         "Authorization": "Bearer ${TASKI_CODE}",
         "X-Taski-Member": "${TASKI_MEMBER}",
