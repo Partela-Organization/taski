@@ -21,6 +21,8 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [Evidencia de sesiones nuevas y retomadas con agentes reales](verification/b6-agents.md)
 - [Componentes visuales, temas y vista de ejemplo](ui.md)
 - [Arrancar Worker y D1 locales](getting-started.md)
+- [Instalar Taski en otro proyecto](another-project.md)
+- [Personalizar marca e interfaz](customization.md)
 - [Preparar el Worker, D1 y la web para Cloudflare](deployment/cloudflare.md)
 - [Solución de problemas de arranque](troubleshooting.md)
 - [Evidencia y validación reproducible del onboarding B1](verification/b1-onboarding.md)
