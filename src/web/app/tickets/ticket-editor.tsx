@@ -22,28 +22,36 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
   const pendingArea = !!draft.pending && !pendingConversion;
   const areaChanged = draft.edits.areaId !== server.ticket.areaId;
   const author = project?.members.find((member) => member.id === server.ticket.createdBy)?.name ?? server.ticket.createdBy;
-  return <>
-    <p className="ticket-type">{feedback ? project?.typeLabels?.feedback ?? "Feedback" : project?.typeLabels?.task ?? "Tarea"}</p>
-    {feedback ? <div className="feedback-detail">
-      <h2 className="editor-title">{server.ticket.title}</h2>
-      <p className="detail-origin">Compartido por {author}</p>
-      <p className="description">{server.ticket.description || "Sin contexto adicional"}</p>
-      <form className="feedback-area" onSubmit={(event) => {
-        event.preventDefault();
-        if (!editorBusy && !pendingConversion && draft.edits.areaId && (pendingArea || areaChanged)) {
-          save({ areaId: draft.edits.areaId });
-        }
-      }}>
-        <TicketAreaField id="feedback-area" label="Área del feedback" areas={project?.areas ?? []}
-          value={draft.edits.areaId} disabled={editorBusy || !!draft.pending || !project}
-          onChange={(areaId) => change({ areaId })} />
-        <Button type="submit" variant="secondary" disabled={editorBusy || conflict || pendingConversion || (!pendingArea && !areaChanged)}>
-          {pendingArea && busy ? "Guardando…" : pendingArea ? "Reintentar área" : "Guardar área"}
-        </Button>
-      </form>
+  const refresh = <Button variant="secondary" disabled={editorBusy || !!draft.pending} onClick={() => {
+    if (!drafts.has(key) || confirm("¿Descartar el borrador y cargar la versión actual?")) void reload(false);
+  }}>Actualizar detalle</Button>;
+  const feedbackManagement = <>
+    <form className="feedback-area" onSubmit={(event) => {
+      event.preventDefault();
+      if (!editorBusy && !pendingConversion && draft.edits.areaId && (pendingArea || areaChanged)) {
+        save({ areaId: draft.edits.areaId });
+      }
+    }}>
+      <TicketAreaField id="feedback-area" label="Área del feedback" areas={project?.areas ?? []}
+        value={draft.edits.areaId} disabled={editorBusy || !!draft.pending || !project}
+        onChange={(areaId) => change({ areaId })} />
+      <Button type="submit" variant="secondary" disabled={editorBusy || conflict || pendingConversion || (!pendingArea && !areaChanged)}>
+        {pendingArea && busy ? "Guardando…" : pendingArea ? "Reintentar área" : "Guardar área"}
+      </Button>
+    </form>
+    <div className="feedback-tools">
       <Button variant="secondary" disabled={editorBusy || conflict || pendingArea} onClick={() => save({ ...draft.changes, type: "task" })}>
         {pendingConversion ? "Reintentar conversión" : "Convertir en tarea"}
       </Button>
+      {refresh}
+    </div>
+  </>;
+  return <>
+    {!feedback && <p className="ticket-type">{project?.typeLabels?.task ?? "Tarea"}</p>}
+    {feedback ? <div className="feedback-detail">
+      <h2 className="editor-title">{server.ticket.title}</h2>
+      <p className="detail-origin">Compartido por {author}</p>
+      {server.ticket.description && <p className="description">{server.ticket.description}</p>}
     </div> : <form className="ticket-editor" onSubmit={(event) => { event.preventDefault(); if (!editorBusy) save(draft.changes); }}>
       <fieldset disabled={editorBusy || !!draft.pending}>
         <div className="editor-title-field">
@@ -83,9 +91,10 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
     {drafts.has(key) && <p>Borrador conservado en esta pestaña.</p>}
     {error && <StatusMessage tone="error" title={error} />}
     {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button variant="secondary" disabled={editorBusy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}
-    <Button variant="secondary" disabled={editorBusy || !!draft.pending} onClick={() => { if (!drafts.has(key) || confirm("¿Descartar el borrador y cargar la versión actual?")) void reload(false); }}>Actualizar detalle</Button>
+    {!feedback && refresh}
     {notice && <StatusMessage title={notice} />}
     <Conversation result={server} client={client} cache={conversations} disabled={busy || !!draft.pending}
+      management={feedback ? feedbackManagement : undefined} openManagement={drafts.has(key) || conversations.get(key)?.highlight !== undefined}
       onUpdated={acceptConversationUpdate} onMutationPending={setUpdatingConversation} />
   </>;
 }
