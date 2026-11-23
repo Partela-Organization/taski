@@ -9,14 +9,14 @@ La web conectada ofrece claro, oscuro y sistema; guarda únicamente la preferenc
 | Chromium, escritorio | Claro/oscuro/sistema, persistencia de tema, Enter/Escape, retorno de foco | Aprobado en Chromium local y CI. |
 | Chromium, 390 × 844 | Diálogo completo, Tab, overflow y controles táctiles | Aprobado en Chromium local y CI. |
 | Playwright WebKit, escritorio y 390 × 844 | Misma suite sobre motor WebKit | Aprobado en CI Linux; no equivale a Safari/iPhone físico. |
-| Safari en iPhone físico | Teclado virtual, scroll/foco, barra del navegador y toque real | Pendiente. No hay iPhone físico disponible en esta sesión. |
+| Safari en iPhone físico | Revisión del piloto por el equipo, 22 de noviembre de 2026 | Aceptado. El revisor indicó que la interfaz funciona bien y que admite mejoras visuales. |
 | Lector de pantalla | Orden/nombres y anuncio de errores con VoiceOver | Pendiente de evaluación manual. |
 
 `npm exec playwright install chromium webkit` instala los motores. `npm run test:ui` ejecuta la suite con fixtures ficticios, Worker/D1 efímero y ambos servidores Vite. La prueba de apariencia produce `mobile-dark.png` en el directorio de resultados de cada proyecto; los screenshots no contienen datos reales. CI instala ambos motores y ejecuta la misma configuración. La concurrencia se limita a dos workers para reducir presión sobre el entorno local.
 
-El dispositivo enumerado por las herramientas locales es un iPad sin túnel disponible, no un iPhone utilizable para esta comprobación. No se ha sustituido la prueba física por un viewport emulado. El issue B7-04 permanece abierto hasta registrar modelo/iOS/Safari, pasos y resultado de una prueba física, incluidos límites encontrados. Tampoco se afirma conformidad completa WCAG a partir de pruebas automáticas.
+La validación física corresponde al reporte del equipo. El reporte no incluye modelo, versión de iOS ni resultados desglosados por paso. Las pruebas de teclado y overflow de la matriz se registraron por separado con los motores automatizados. La evaluación manual con VoiceOver queda como cobertura adicional.
 
-## Registro físico pendiente
+## Repetir en un iPhone físico
 
 En la misma red Wi-Fi, arranca el entorno de prueba con la IP privada de tu Mac. En macOS puedes consultar la IP en Ajustes del Sistema → Wi-Fi → Detalles → TCP/IP. Sustituye la IP de ejemplo por la que aparezca allí.
 
