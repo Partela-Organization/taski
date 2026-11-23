@@ -51,9 +51,11 @@ El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz
 
 En móvil se abre Feedback al entrar. También es la vista inicial de quienes tienen esa preferencia en la configuración, incluso desde escritorio. Las demás vistas siguen disponibles para todo el equipo.
 
-1. En **Feedback**, escribe un título y pulsa Enter o el botón de envío. Usa **Añadir contexto** si quieres ampliar la idea. El detalle se abre cuando el servidor guarda el aporte.
-2. Usa **Copiar enlace** para compartir el mismo detalle con otra persona del equipo. El autor y la conversación aparecen en el panel. La lista resume título, tipo y autor.
-3. Elige **Área del feedback** y pulsa **Guardar área** para moverlo a otra categoría mientras sigue en Feedback. Por ejemplo, cambia de General a Web. Si pulsas **Convertir en tarea**, el área guardada, el enlace, el autor, la conversación y el historial pasan a la tarea.
+1. En **Feedback**, escribe una frase en **¿Qué quieres compartir?**, añade detalles si los necesitas y pulsa **Enviar feedback**. El aporte se guarda en el área predeterminada del proyecto y se abre su detalle.
+2. Usa **Copiar enlace** para enviárselo a otra persona del equipo. La conversación está debajo del aporte. Para responder, escribe en **Comentario** y pulsa **Enviar comentario**.
+3. Abre **Gestionar feedback** para cambiar el área, resaltar, revisar actividad o **Convertir en tarea**. La conversión conserva el área guardada, el enlace, el autor, la conversación y el historial.
+
+La lista de Feedback muestra los aportes más recientes primero. **Ver más** amplía la lista y **Cargar más** trae la siguiente página cuando está disponible. Los filtros, grupos y tarjetas se usan desde las vistas de trabajo.
 
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 

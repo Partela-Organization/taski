@@ -71,16 +71,17 @@
 .capture-line:focus-within { background: var(--hover); }
 .capture-line .field { flex: 1; }
 .capture-line .button { color: var(--text); font-size: 12px; }
-.feedback-capture > label { font-size: 11px; color: var(--muted); }
+.workspace-heading[data-feedback] { min-height: 0; margin-bottom: 18px; }
+.feedback-capture {
+  max-width: 640px; padding: 16px; background: var(--sidebar);
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+}
+.feedback-capture > label { display: block; margin-top: 12px; font-size: 12px; color: var(--muted); }
 .feedback-capture textarea {
-  display: block; width: 100%; margin: 6px 0 10px; padding: 8px 10px;
+  display: block; width: 100%; margin: 6px 0 12px; padding: 8px 10px;
   border: 1px solid var(--border); border-radius: 6px; background: var(--surface); resize: vertical;
 }
-.feedback-capture > label, .feedback-capture textarea, .feedback-capture > .button { margin-left: 8px; max-width: calc(100% - 16px); }
 .feedback-capture .button { font-size: 12px; }
-.feedback-capture .context-toggle { margin-top: 5px; }
-.feedback-capture .feedback-context > label { font-size: 11px; color: var(--muted); }
-.feedback-capture .feedback-context > label, .feedback-capture .feedback-context .button { margin-left: 8px; }
 .ticket-group + .ticket-group { margin-top: 26px; }
 .ticket-group h2 { display: flex; align-items: center; gap: 7px; margin: 0 8px 9px; font-size: 10px; font-weight: 450; color: var(--muted); }
 .ticket-group--area h2 {
@@ -173,7 +174,7 @@
   .workspace-area select, .workspace-grouping select, .workspace-search input { min-height: 44px; }
   .workspace-actions { gap: 4px; }
   .workspace-actions .button { padding-inline: 6px; }
-  .workspace-search input, .capture-line .field input, .feedback-capture textarea { font-size: 16px; }
+  .workspace-search input, .capture-line .field input, .feedback-capture input, .feedback-capture textarea { font-size: 16px; }
   .workspace-toolbar .button, .workspace-heading .button, .capture-line .button, .feedback-capture .button { min-height: 44px; }
   .workspace-footer .button { min-height: 44px; }
   .ticket-group-more { min-height: 44px; }

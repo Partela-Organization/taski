@@ -16,7 +16,7 @@ function statusLabel(project: TicketRowContext["project"], status: Status) {
 }
 
 function TicketRows({ rows, context, grouping, label, searching }: {
-  rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping; label: string; searching: boolean;
+  rows: WorkSummary[]; context: TicketRowContext; grouping?: Grouping; label: string; searching: boolean;
 }) {
   const [limit, setLimit] = useState(rowsPerGroup);
   const selectedIndex = rows.findIndex((row) => row.key === context.selected);
@@ -92,6 +92,7 @@ function States({ rows, context, searching }: {
 export function TicketList({ rows, search, presentation, grouping, ...context }: TicketRowContext & {
   rows: WorkSummary[]; search: string; presentation: Presentation; grouping: Grouping;
 }) {
+  if (context.feedback) return <TicketRows rows={rows} context={context} label="Feedback" searching={false} />;
   const query = search.trim().toLocaleLowerCase("es");
   const visible = rows.filter((row) => `${row.key} ${row.title}`.toLocaleLowerCase("es").includes(query));
   if (query && rows.length && !visible.length) return <StatusMessage title="No hay coincidencias en las páginas cargadas" />;

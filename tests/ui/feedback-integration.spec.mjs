@@ -9,24 +9,31 @@ async function enter(page, member) {
 }
 
 test("mobile feedback works without technical fields and conversion preserves identity, author and conversation", async ({ page, browser }, testInfo) => {
+  const feedbackTitle = `${title} · ${testInfo.project.name}`;
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(app);
   await enter(page, "Alex");
   await expect(page.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(".feedback-capture").getByLabel("Área", { exact: true })).toHaveCount(0);
-  await page.getByLabel("Título del feedback").fill(title);
-  await page.getByRole("button", { name: "Añadir contexto", exact: true }).click();
-  await page.getByLabel("Contexto (opcional)").fill("Sería útil explicar qué datos hacen falta.");
+  await expect(page.getByLabel("Área", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Tarjetas", exact: true })).toHaveCount(0);
+  await page.getByLabel("¿Qué quieres compartir?").fill(feedbackTitle);
+  await page.getByLabel("Detalles (opcional)").fill("Sería útil explicar qué datos hacen falta.");
   const creation = page.waitForResponse((r) => r.request().method() === "POST" && r.url().endsWith("/tickets"));
-  await page.getByRole("button", { name: "Compartir feedback" }).click();
+  await page.getByRole("button", { name: "Enviar feedback" }).click();
   const receipt = await (await creation).json();
-  const dialog = page.getByRole("dialog", { name: title });
+  const dialog = page.getByRole("dialog", { name: feedbackTitle });
   await expect(dialog.getByText("Sería útil explicar qué datos hacen falta.", { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "Copiar enlace" }).click();
+  await expect(dialog.getByRole("button", { name: "Convertir en tarea" })).toBeHidden();
+  await expect(dialog.getByRole("heading", { name: "Actividad" })).toBeHidden();
   const link = page.url();
   await expect(page).toHaveURL(`${app}/t/${receipt.key}`);
+  const manualLink = dialog.getByLabel("Enlace del ticket");
+  await expect(manualLink.or(dialog.getByText("Enlace copiado.", { exact: true }))).toBeVisible();
+  if (await manualLink.isVisible()) await expect(manualLink).toHaveValue(link);
   const created = await (await page.request.get(`${app}/api/v1/tickets/${receipt.key}?view=full`)).json();
   await dialog.getByRole("button", { name: "Cerrar detalle" }).click();
-  await expect(page.locator(".tickets li").filter({ hasText: title })).toContainText("Feedback · Alex");
+  await expect(page.locator(".tickets li").filter({ hasText: feedbackTitle })).toContainText("Feedback · Alex");
   await page.screenshot({ path: testInfo.outputPath("feedback-mobile.png") });
   const recipient = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
@@ -34,8 +41,12 @@ test("mobile feedback works without technical fields and conversion preserves id
     await desktop.goto(link);
     await enter(desktop, "Taylor");
     await expect(desktop.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
-    const panel = desktop.getByRole("region", { name: title, exact: true });
+    const panel = desktop.getByRole("region", { name: feedbackTitle, exact: true });
     await expect(panel.getByText("Compartido por Alex")).toBeVisible();
+    await expect(panel.getByLabel("Comentario", { exact: true })).toBeVisible();
+    await expect(panel.getByLabel("Área del feedback", { exact: true })).toBeHidden();
+    await desktop.screenshot({ path: testInfo.outputPath("feedback-desktop.png") });
+    await panel.getByText("Gestionar feedback", { exact: true }).click();
     await panel.getByLabel("Área del feedback", { exact: true }).selectOption("web");
     await panel.getByRole("button", { name: "Guardar área", exact: true }).click();
     await expect(panel.getByRole("status").filter({ hasText: "Cambios guardados" })).toBeVisible();
@@ -56,7 +67,6 @@ test("mobile feedback works without technical fields and conversion preserves id
       resumeDetail();
     }
     await expect(panel.locator("article").getByText("Puedo revisar el texto.", { exact: true })).toBeVisible();
-    await desktop.screenshot({ path: testInfo.outputPath("feedback-desktop.png") });
     await convert.click();
     await expect(panel.getByLabel("Responsable", { exact: true })).toBeVisible();
     await expect(desktop).toHaveURL(link);
@@ -76,6 +86,6 @@ test("mobile feedback works without technical fields and conversion preserves id
     await desktop.getByRole("button", { name: "Todo el equipo" }).click();
     await expect(desktop.getByRole("button", { name: "Cargar más" })).toBeVisible();
     await desktop.getByRole("button", { name: "Cargar más" }).click();
-    await expect(desktop.getByRole("button", { name: title, exact: true })).toBeVisible();
+    await expect(desktop.getByRole("button", { name: feedbackTitle, exact: true })).toBeVisible();
   } finally { await recipient.close(); }
 });
