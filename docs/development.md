@@ -41,7 +41,7 @@ git diff --check
 
 `check` ejecuta tipos, fronteras, pruebas y bundle. `typecheck` verifica el núcleo sin tipos de DOM/Cloudflare; `check:boundaries` inspecciona imports estáticos, exports e imports dinámicos literales. Es una regla de arquitectura, no un sandbox de seguridad. `npm test` prueba fallos de disponibilidad y Worker/D1 reales emulados mediante el harness de Wrangler, con almacenamiento efímero aislado. `build` usa `wrangler deploy --dry-run` para generar `dist` sin desplegar ni requerir credenciales. `dev` y los scripts de D1 usan modo local, sin `--remote`.
 
-CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instalación o Cloudflare. La documentación y el spike de B0 conservan su workflow independiente. No se añade un comando de despliegue remoto hasta B11.
+CI ejecuta estas comprobaciones en PRs, incluidos forks, sin secretos de instalación o Cloudflare. La documentación y el spike de B0 conservan su workflow independiente. La [plantilla de despliegue](deployment/cloudflare.md) se prueba con D1 efímero y se configura por separado.
 
 El workflow documental también ejecuta `npm run mcp:measure -- --intent --check`, con las dependencias Python fijadas de B0, para comprobar los informes de catálogo, vistas y operaciones compuestas del SDK sobre un Worker/D1 aislado. No incorpora el experimento Python a la aplicación. Consulta [medición MCP](mcp.md) y [recorridos por intención](mcp-intent.md) para actualizarlos y distinguir tokens proxy de uso real.
 
