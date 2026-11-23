@@ -7,7 +7,7 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 | Método/ruta | Operación |
 | --- | --- |
 | GET /api/v1/project | Configuración, miembros/áreas/rótulos, configVersion y cursor actual. knownVersion coincidente omite project. |
-| GET /api/v1/tickets | 20 resúmenes por defecto, máximo 50. Filtros status, assigneeId, areaId y type; cursor opaco. |
+| GET /api/v1/tickets | 20 resúmenes por defecto, máximo 50. Filtros status, assigneeId, areaId y type, orden opcional y cursor opaco. |
 | POST /api/v1/tickets | Crear/asignar en una operación. Título + idempotencyKey obligatorios. |
 | GET /api/v1/tickets/{key} | summary/work/full; work incluye descripción íntegra y cinco comentarios recientes. |
 | PATCH /api/v1/tickets/{key} | expectedVersion + idempotencyKey y changes/descriptionPatch/comment, atómicos. |
@@ -17,7 +17,7 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 
 ## Respuestas adecuadas por defecto
 
-Las listas normales solo contienen key/title/status/assigneeId/highlighted/version. `view=work` añade areaId/type/prUrl/createdBy para una UI que necesite esos metadatos, sin descripción o discusión. La consulta SQL tampoco lee las descripciones completas al listar. `omitted` indica el contenido que requiere otra lectura.
+Las listas normales solo contienen key/title/status/assigneeId/highlighted/version. `view=work` añade areaId/type/prUrl/createdBy para una UI que necesite esos metadatos, sin descripción o discusión. `order=recent` ordena por fecha de creación descendente y, en caso de empate, por número descendente. Combinado con `view=work` también devuelve `createdAt`. El orden predeterminado es por número ascendente. La consulta SQL tampoco lee las descripciones completas al listar. `omitted` indica el contenido que requiere otra lectura.
 
 El detalle `work` devuelve campos de trabajo, descripción completa y comentarios recientes. `full` añade ID y fechas; no significa conversación sin límite. `commentsLimit` admite 0–50 y nextCommentsCursor recupera páginas anteriores. No se corta texto silenciosamente. Descripciones largas tienen un coste real que no desaparece cambiando de herramienta.
 
@@ -29,7 +29,7 @@ Las mutaciones devuelven key/URL/versión/campos afectados y commentId opcional,
 
 Guarda configVersion y consulta el proyecto con knownVersion para no repetir miembros/rótulos. Su activityCursor es el punto inicial de seguimiento, no el principio de todo el historial.
 
-Una lista puede continuarse enviando solo cursor y limit: el cursor conserva sus filtros. assigneeId=~ significa sin asignar. Cambiar filtros con un cursor o editar la lista entre páginas provoca INVALID_CURSOR; reinicia la consulta. Se usa una fila extra interna para saber si existe continuación, sin obligar a pedir una página vacía final.
+Una lista puede continuarse enviando solo cursor y limit. El cursor conserva filtros, vista y orden. assigneeId=~ significa sin asignar. Cambiar filtros u orden con un cursor o editar la lista entre páginas provoca INVALID_CURSOR. Reinicia la consulta en ese caso. Se usa una fila extra interna para saber si existe continuación.
 
 La actividad entrega eventos concretos, nextCursor y hasMore; consumir todas las páginas antes de avanzar el punto conocido. Puede acotarse a ticketKey. Los comentarios anteriores tienen un cursor ligado a ticket/versión; si se edita el ticket, se pide una lectura reciente de nuevo. Cursores malformados o futuros se rechazan. Un epoch incompatible produce CURSOR_EXPIRED con indicación de resincronizar configuración, listas y contenido necesario antes de continuar actividad. No hay TTL de actividad en esta versión; conservarlo todo evita descartar cambios silenciosamente.
 

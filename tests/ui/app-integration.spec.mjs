@@ -9,11 +9,19 @@ test("browser uses real cookie sessions, D1 pagination and idempotent recovery a
   await expect(page.getByRole("alert")).toContainText("No se pudo entrar");
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
-  await expect(page.locator(".tickets li")).toHaveCount(20);
+  const loaded = page.locator(".workspace-footer");
+  const general = page.getByRole("region", { name: "General", exact: true });
+  await expect(loaded).toContainText("20 entradas cargadas");
+  await expect(page.getByRole("button", { name: "Cargar más", exact: true })).toBeInViewport();
+  await expect(general.getByRole("listitem")).toHaveCount(10);
+  await expect(general.getByRole("listitem").first()).toContainText("Fixture 23");
+  await general.getByRole("button", { name: "Ver más de General" }).click();
   await page.getByRole("button", { name: "Cargar más" }).click();
+  await expect(loaded).toContainText("24 entradas cargadas");
+  await general.getByRole("button", { name: "Ver más de General" }).click();
   await expect(page.locator(".tickets li")).toHaveCount(24);
   await page.getByRole("button", { name: "Mis tickets", exact: true }).click();
-  await expect(page.locator(".tickets li")).toHaveCount(20);
+  await expect(loaded).toContainText("20 entradas cargadas");
   await expect(page.getByRole("button", { name: "Fixture 24", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Por revisar", exact: true }).click();
   await expect(page.locator(".tickets li")).toHaveCount(1);
@@ -39,9 +47,10 @@ test("browser uses real cookie sessions, D1 pagination and idempotent recovery a
   await expect(page.getByRole("region", { name: "Persistida desde el navegador" })).toBeVisible();
   expect(writes).toHaveLength(2); expect(writes[1]).toEqual(writes[0]);
   await page.reload();
-  await expect(page.locator(".tickets li")).toHaveCount(20);
+  await expect(loaded).toContainText("20 entradas cargadas");
+  await expect(page.getByRole("button", { name: "Persistida desde el navegador", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Cargar más" }).click();
-  await expect(page.locator(".tickets li")).toHaveCount(25);
+  await expect(loaded).toContainText("25 entradas cargadas");
   await expect(page.getByRole("button", { name: "Persistida desde el navegador", exact: true })).toHaveCount(1);
   let cursor, items = [];
   do {

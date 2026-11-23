@@ -1,10 +1,12 @@
+import { useState } from "react";
 import type { Status, WorkSummary } from "../../../client/index.ts";
-import { StatusMessage } from "../../components.tsx";
+import { Button, StatusMessage } from "../../components.tsx";
 import type { Grouping, Presentation } from "./presentation.ts";
 import { TicketRow } from "./ticket-row.tsx";
 import type { TicketRowContext } from "./ticket-row.tsx";
 
 const stateOrder: Status[] = ["in_progress", "todo", "in_review", "done"];
+const rowsPerGroup = 10;
 const fallbackStatusLabels: Record<Status, string> = {
   in_progress: "En curso", todo: "Pendiente", in_review: "Por revisar", done: "Terminado",
 };
@@ -13,13 +15,21 @@ function statusLabel(project: TicketRowContext["project"], status: Status) {
   return project?.statusLabels[status] ?? fallbackStatusLabels[status];
 }
 
-function TicketRows({ rows, context, grouping }: {
-  rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping;
+function TicketRows({ rows, context, grouping, label, searching }: {
+  rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping; label: string; searching: boolean;
 }) {
-  return <ul className="tickets">{rows.map((row) =>
-    <TicketRow key={row.key} row={row} context={context} showArea={grouping === "status"}
-      statusLabel={grouping === "area" ? statusLabel(context.project, row.status) : undefined} />,
-  )}</ul>;
+  const [limit, setLimit] = useState(rowsPerGroup);
+  const selectedIndex = rows.findIndex((row) => row.key === context.selected);
+  const visible = searching ? rows : rows.slice(0, Math.max(limit, selectedIndex + 1));
+  const hidden = rows.length - visible.length;
+  return <>
+    <ul className="tickets">{visible.map((row) =>
+      <TicketRow key={row.key} row={row} context={context} showArea={grouping === "status"}
+        statusLabel={grouping === "area" ? statusLabel(context.project, row.status) : undefined} />,
+    )}</ul>
+    {hidden > 0 && <Button variant="secondary" className="ticket-group-more" aria-label={`Ver más de ${label}`}
+      onClick={() => setLimit(visible.length + rowsPerGroup)}>Ver más · {hidden}</Button>}
+  </>;
 }
 
 function StatusHeading({ status, label, count }: { status: Status; label: string; count: number }) {
@@ -30,11 +40,12 @@ function StatusHeading({ status, label, count }: { status: Status; label: string
 function FinishedTickets({ rows, context, grouping, searching }: {
   rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping; searching: boolean;
 }) {
+  const label = statusLabel(context.project, "done");
   return <details className="ticket-group finished-group" open={searching ? true : undefined}>
-    <summary><StatusHeading status="done" label={statusLabel(context.project, "done")} count={rows.length} />
+    <summary><StatusHeading status="done" label={label} count={rows.length} />
       <span aria-hidden="true" className="finished-caret">⌄</span>
     </summary>
-    <TicketRows rows={rows} context={context} grouping={grouping} />
+    <TicketRows rows={rows} context={context} grouping={grouping} label={label} searching={searching} />
   </details>;
 }
 
@@ -54,11 +65,10 @@ function Areas({ rows, context, searching }: {
     if (!group) return null;
     const label = labels.get(id) ?? id;
     const finished = group.filter((row) => row.status === "done");
-    const active = stateOrder.filter((status) => status !== "done")
-      .flatMap((status) => group.filter((row) => row.status === status));
+    const active = group.filter((row) => row.status !== "done");
     return <section key={id} className="ticket-group ticket-group--area" aria-label={label}>
       <h2>{label}<span className="group-count">{group.length}</span></h2>
-      {active.length > 0 && <TicketRows rows={active} context={context} grouping="area" />}
+      {active.length > 0 && <TicketRows rows={active} context={context} grouping="area" label={label} searching={searching} />}
       {finished.length > 0 && <FinishedTickets rows={finished} context={context} grouping="area" searching={searching} />}
     </section>;
   });
@@ -74,7 +84,7 @@ function States({ rows, context, searching }: {
     const label = statusLabel(context.project, status);
     return <section key={status} className="ticket-group" aria-label={label}>
       <h2><StatusHeading status={status} label={label} count={group.length} /></h2>
-      <TicketRows rows={group} context={context} grouping="status" />
+      <TicketRows rows={group} context={context} grouping="status" label={label} searching={searching} />
     </section>;
   });
 }

@@ -92,15 +92,18 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
             savePresentation(next);
           }} />
         <QuickCapture model={capture} feedback={feedback} />
-        <TicketList rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
+        <TicketList key={`${view}:${area}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
           search={search} presentation={presentation} grouping={grouping} onOpen={(key) => void route.open(key)} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
           <Button variant="secondary" onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
         </StatusMessage>}
-        <footer className="workspace-footer">
-          <span>{list.rows.length === 1 ? "1 entrada cargada" : `${list.rows.length} entradas cargadas`}</span>
+        <footer className="workspace-footer" data-more={list.hasMore || undefined}>
+          <div>
+            <span>{list.rows.length === 1 ? "1 entrada cargada" : `${list.rows.length} entradas cargadas`}</span>
+            {list.rows.length > 0 && <span className="workspace-order">Más recientes primero</span>}
+          </div>
           {list.hasMore && <Button variant="secondary" disabled={list.loading} onClick={() => void list.more()}>Cargar más</Button>}
         </footer>
       </main>
