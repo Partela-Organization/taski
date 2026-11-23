@@ -6,7 +6,7 @@ B2 separa los datos de instalación de las reglas y adaptadores. Cada instalaci�
 
 La selección vive en [src/config/index.ts](../src/config/index.ts): importa el preset y lo pasa a `parseConfiguration`. Por defecto se usa [demo](../src/config/presets/demo.ts). Para probar otro proyecto, cambia solo esa importación por [studio](../src/config/presets/studio.ts) y su export `studioPreset`.
 
-Ambos usan el mismo validador y Worker; no se editan dominio, casos de uso o SQL para cambiar nombres, miembros o marca. Esto demuestra separación de configuración, no el despliegue de dos instalaciones remotas: esa comprobación completa pertenece a B10/B11.
+Ambos usan el mismo validador y Worker; no se editan dominio, casos de uso o SQL para cambiar nombres, miembros o marca. Para probar ambos en paralelo con bases propias y cambiar la interfaz de uno, sigue la [guía de una segunda instalación](another-project.md).
 
 La validación ocurre al evaluar el módulo de configuración, antes de que el Worker atienda peticiones. Los errores son `ConfigurationError` y nombran el campo, sin volcar el objeto completo. No hay valores por defecto silenciosos para campos requeridos ni claves desconocidas aceptadas. La configuración validada se copia y congela de forma recursiva.
 

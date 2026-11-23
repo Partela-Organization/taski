@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesa editorial</title>
+  <style>
+    :root { color-scheme: light dark; --accent: #276658; --accent-light: #276658; --accent-dark: #91d3c0; }
+    @media (prefers-color-scheme: dark) { :root { --accent: var(--accent-dark); } }
+    @media (prefers-color-scheme: light) { :root { --accent: var(--accent-light); } }
+    body { font: 1.1rem/1.5 Georgia, serif; max-width: 40rem; margin: 3rem auto; padding-inline: 1.2rem; }
+    header { border-bottom: 3px solid var(--accent); padding-bottom: .6rem; }
+    header span { color: var(--accent); padding-inline-end: .4rem; }
+    form label { display: block; margin-block: .7rem; }
+    input, select, button { font: inherit; }
+    a { color: var(--accent); }
+    li { padding-block: .35rem; }
+    #description { white-space: pre-wrap; }
+  </style>
+  <header><span aria-hidden="true">¶</span><strong id="brand">Mesa editorial</strong></header>
+  <main>
+    <h1 id="heading">Mesa editorial</h1>
+    <p id="message" role="status"></p>
+    <form hidden id="access">
+      <label>Persona <select name="member" required></select></label>
+      <label>Código de equipo <input name="code" type="password" required></label>
+      <button>Entrar</button>
+    </form>
+    <ul id="tickets"></ul>
+    <p id="description"></p>
+    <a href="/" id="back" hidden>Volver a la mesa</a>
+  </main>
+  <script type="module">
+    import { TaskiClient, TaskiClientError } from "../../src/client/index.ts";
+
+    const client = new TaskiClient({ baseUrl: location.origin });
+    const form = document.querySelector("#access");
+    const message = document.querySelector("#message");
+    const heading = document.querySelector("#heading");
+    const brand = document.querySelector("#brand");
+    const ticketKey = /^\/t\/([A-Za-z0-9_-]+)$/.exec(location.pathname)?.[1];
+
+    async function showAccess() {
+      const access = await client.accessOptions();
+      brand.textContent = access.brandName;
+      heading.textContent = access.projectName;
+      for (const member of access.members) form.elements.member.add(new Option(member.name, member.id));
+      form.hidden = false;
+    }
+
+    async function showWork() {
+      const { project } = await client.getProject();
+      brand.textContent = project.brand.name;
+      for (const [variant, value] of [["light", project.brand.accentLight], ["dark", project.brand.accentDark]]) {
+        document.documentElement.style.setProperty("--accent-" + variant, value);
+      }
+      form.hidden = true;
+      if (ticketKey) {
+        const { ticket } = await client.getTicket(ticketKey);
+        heading.textContent = ticket.title;
+        document.querySelector("#description").textContent = ticket.description;
+        document.querySelector("#back").hidden = false;
+        return;
+      }
+
+      heading.textContent = project.name;
+      const { items } = await client.listTickets({ limit: 10, order: "recent" });
+      if (!items.length) message.textContent = "Todavía no hay tickets.";
+      for (const ticket of items) {
+        const item = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "/t/" + encodeURIComponent(ticket.key);
+        link.textContent = ticket.title;
+        item.append(link, " · " + project.statusLabels[ticket.status]);
+        document.querySelector("#tickets").append(item);
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = form.querySelector("button");
+      button.disabled = true;
+      message.textContent = "";
+      try {
+        await client.login(form.elements.code.value, form.elements.member.value);
+        await showWork();
+      } catch (error) {
+        message.textContent = error instanceof TaskiClientError && error.status === 401
+          ? "Comprueba el código del equipo." : "No se pudo abrir la mesa editorial.";
+      } finally {
+        form.elements.code.value = "";
+        button.disabled = false;
+      }
+    });
+
+    try {
+      await showWork();
+    } catch (error) {
+      if (error instanceof TaskiClientError && error.status === 401) await showAccess();
+      else message.textContent = "No se pudo abrir la mesa editorial.";
+    }
+  </script>
+</html>
