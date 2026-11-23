@@ -44,22 +44,24 @@ Mientras se confirma un comentario o un resaltado, el panel pausa **Guardar camb
 
 ## Temas y dispositivos B7-04
 
-El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico, todavía pendiente. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
+El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz de verificación](verification/b7-accessibility.md) distingue motores automatizados de Safari/iPhone físico confirmado por el equipo. Los controles móviles principales tienen altura mínima de 44 píxeles; panel, foco, etiquetas y mensajes no dependen solo del color.
 
 
 ## Compartir feedback B8-01
 
 En móvil se abre Feedback al entrar. También es la vista inicial de quienes tienen esa preferencia en la configuración, incluso desde escritorio. Las demás vistas siguen disponibles para todo el equipo.
 
-1. En **Feedback**, escribe un título y pulsa Enter o el botón de envío. Usa **Añadir contexto** si quieres ampliar la idea. El detalle se abre cuando el servidor guarda el aporte.
-2. Usa **Copiar enlace** para compartir el mismo detalle con otra persona del equipo. El autor y la conversación aparecen en el panel. La lista resume título, tipo y autor.
-3. Elige **Área del feedback** y pulsa **Guardar área** para moverlo a otra categoría mientras sigue en Feedback. Por ejemplo, cambia de General a Web. Si pulsas **Convertir en tarea**, el área guardada, el enlace, el autor, la conversación y el historial pasan a la tarea.
+1. En **Feedback**, escribe una frase en **¿Qué quieres compartir?**, añade detalles si los necesitas y pulsa **Enviar feedback**. El aporte se guarda en el área predeterminada del proyecto y se abre su detalle.
+2. Usa **Copiar enlace** para enviárselo a otra persona del equipo. La conversación está debajo del aporte. Para responder, escribe en **Comentario** y pulsa **Enviar comentario**.
+3. Abre **Gestionar feedback** para cambiar el área, resaltar, revisar actividad o **Convertir en tarea**. La conversión conserva el área guardada, el enlace, el autor, la conversación y el historial.
+
+La lista de Feedback muestra los aportes más recientes primero. **Ver más** amplía la lista y **Cargar más** trae la siguiente página cuando está disponible. Los filtros, grupos y tarjetas se usan desde las vistas de trabajo.
 
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 
 [Captura móvil con datos ficticios](verification/b8-feedback-mobile.png) y [detalle en escritorio](verification/b8-feedback-desktop.png).
 
-Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#registro-físico-pendiente) y sigue el [recorrido de feedback](verification/b8-feedback.md).
+Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#repetir-en-un-iphone-físico) y sigue el [recorrido de feedback](verification/b8-feedback.md).
 
 ## Enlace manual a un PR B9-01
 

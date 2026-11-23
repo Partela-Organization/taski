@@ -1,8 +1,8 @@
 # B8-02 · Prueba de feedback con participantes
 
-El issue de aceptación pide dos personas de administración o mercadeo que puedan compartir feedback, abrir un enlace y comentar sin ayuda. El recorrido automatizado de B8-01 confirma que esas acciones funcionan en navegador con Worker/D1. La prueba con participantes está pendiente. [Issue #27](https://github.com/Partela-Organization/taski/issues/27).
+El issue de aceptación pide dos personas de administración o mercadeo que puedan compartir feedback, abrir un enlace y comentar sin ayuda. En la primera prueba con el equipo, la cantidad de opciones dificultó entender por dónde empezar. Ahora hay un formulario de envío, una lista cronológica y un detalle con enlace y comentarios. Los controles de clasificación, conversión y actividad están en **Gestionar feedback**, cerrado al abrir el detalle. Falta repetir la prueba con dos participantes. [Issue #27](https://github.com/Partela-Organization/taski/issues/27).
 
-Usa la [demo temporal](b7-accessibility.md#registro-físico-pendiente) con datos ficticios en una red compartida. Pide a cada participante que elija Taylor o Alex en un navegador separado y dale un objetivo, sin indicar qué controles debe usar.
+Usa la [demo temporal](b7-accessibility.md#repetir-en-un-iphone-físico) con datos ficticios en una red compartida. Pide a cada participante que elija Taylor o Alex en un navegador separado y dale un objetivo, sin indicar qué controles debe usar.
 
 > Tienes una idea para facilitar la lectura de un formulario. Compártela con una frase y contexto si lo necesitas. Haz llegar el enlace a otra persona. Cuando recibas un enlace, ábrelo y deja un comentario con tu opinión.
 

@@ -29,9 +29,10 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [signOutError, setSignOutError] = useState("");
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
   const feedback = view === "feedback";
-  const list = useTicketList(client, member?.id, view, area, onExpired);
+  const activeArea = feedback ? "" : area;
+  const list = useTicketList(client, member?.id, view, activeArea, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
-  const capture = useQuickCapture(client, feedback, area, (key) => { list.refresh(); void route.open(key); }, onExpired);
+  const capture = useQuickCapture(client, feedback, activeArea, (key) => { list.refresh(); void route.open(key); }, onExpired);
   const brand = list.project?.brand;
   const brandName = brand?.name ?? access?.brandName ?? "Taski";
   const projectName = list.project?.name ?? access?.projectName ?? brandName;
@@ -77,35 +78,35 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       <WorkspaceTopbar project={projectName} member={member} theme={theme} onTheme={onTheme}
         busy={signingOut || capture.busy} onSignOut={() => void signOut()} />
       <main className="workspace">
-        <div className="workspace-heading">
+        <div className="workspace-heading" data-feedback={feedback || undefined}>
           <h1>{heading}</h1>
-          <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
-            <WorkspaceIcon name="plus" />{feedback ? "Dejar feedback" : "Nueva tarea"}
-          </Button>
+          {!feedback && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
+            <WorkspaceIcon name="plus" />Nueva tarea
+          </Button>}
         </div>
-        <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
+        {!feedback && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
             saveGrouping(next);
           }} presentation={presentation} onPresentation={(next) => {
             setPresentation(next);
             savePresentation(next);
-          }} />
+          }} />}
         <QuickCapture model={capture} feedback={feedback} />
-        <TicketList key={`${view}:${area}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
-          search={search} presentation={presentation} grouping={grouping} onOpen={(key) => void route.open(key)} />
+        <TicketList key={`${view}:${activeArea}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
+          search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => void route.open(key)} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
           <Button variant="secondary" onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
         </StatusMessage>}
-        <footer className="workspace-footer" data-more={list.hasMore || undefined}>
-          <div>
+        {(!feedback || list.hasMore) && <footer className="workspace-footer" data-more={list.hasMore || undefined}>
+          <div hidden={feedback}>
             <span>{list.rows.length === 1 ? "1 entrada cargada" : `${list.rows.length} entradas cargadas`}</span>
             {list.rows.length > 0 && <span className="workspace-order">Más recientes primero</span>}
           </div>
           {list.hasMore && <Button variant="secondary" disabled={list.loading} onClick={() => void list.more()}>Cargar más</Button>}
-        </footer>
+        </footer>}
       </main>
     </div>
     <TicketPanel route={route} client={client} project={list.project} onSaved={list.refresh} />
