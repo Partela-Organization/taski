@@ -1,63 +1,92 @@
-import type { ProjectResult, Status, WorkSummary } from "../../../client/index.ts";
-import { Avatar, Button, StatusMessage } from "../../components.tsx";
-import { WorkspaceIcon } from "../shared/marks.tsx";
-import type { Presentation } from "./presentation.ts";
+import type { Status, WorkSummary } from "../../../client/index.ts";
+import { StatusMessage } from "../../components.tsx";
+import type { Grouping, Presentation } from "./presentation.ts";
+import { TicketRow } from "./ticket-row.tsx";
+import type { TicketRowContext } from "./ticket-row.tsx";
 
-type Project = ProjectResult["project"];
 const stateOrder: Status[] = ["in_progress", "todo", "in_review", "done"];
 const fallbackStatusLabels: Record<Status, string> = {
   in_progress: "En curso", todo: "Pendiente", in_review: "Por revisar", done: "Terminado",
 };
 
-export function TicketList({ rows, feedback, project, selected, search, presentation, onOpen }: {
-  rows: WorkSummary[]; feedback: boolean; project: Project; selected?: string | undefined; search: string;
-  presentation: Presentation; onOpen: (key: string) => void;
+function statusLabel(project: TicketRowContext["project"], status: Status) {
+  return project?.statusLabels[status] ?? fallbackStatusLabels[status];
+}
+
+function TicketRows({ rows, context, grouping }: {
+  rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping;
+}) {
+  return <ul className="tickets">{rows.map((row) =>
+    <TicketRow key={row.key} row={row} context={context} showArea={grouping === "status"}
+      statusLabel={grouping === "area" ? statusLabel(context.project, row.status) : undefined} />,
+  )}</ul>;
+}
+
+function StatusHeading({ status, label, count }: { status: Status; label: string; count: number }) {
+  return <><span className={`status-dot status-dot--${status}`} aria-hidden="true" />
+    {label}<span className="group-count">{count}</span></>;
+}
+
+function FinishedTickets({ rows, context, grouping, searching }: {
+  rows: WorkSummary[]; context: TicketRowContext; grouping: Grouping; searching: boolean;
+}) {
+  return <details className="ticket-group finished-group" open={searching ? true : undefined}>
+    <summary><StatusHeading status="done" label={statusLabel(context.project, "done")} count={rows.length} />
+      <span aria-hidden="true" className="finished-caret">⌄</span>
+    </summary>
+    <TicketRows rows={rows} context={context} grouping={grouping} />
+  </details>;
+}
+
+function Areas({ rows, context, searching }: {
+  rows: WorkSummary[]; context: TicketRowContext; searching: boolean;
+}) {
+  const groups = new Map<string, WorkSummary[]>();
+  for (const row of rows) {
+    const group = groups.get(row.areaId);
+    if (group) group.push(row);
+    else groups.set(row.areaId, [row]);
+  }
+  const labels = new Map(context.project?.areas.map(({ id, label }) => [id, label]));
+  const order = new Set([...labels.keys(), ...groups.keys()]);
+  return [...order].map((id) => {
+    const group = groups.get(id);
+    if (!group) return null;
+    const label = labels.get(id) ?? id;
+    const finished = group.filter((row) => row.status === "done");
+    const active = stateOrder.filter((status) => status !== "done")
+      .flatMap((status) => group.filter((row) => row.status === status));
+    return <section key={id} className="ticket-group ticket-group--area" aria-label={label}>
+      <h2>{label}<span className="group-count">{group.length}</span></h2>
+      {active.length > 0 && <TicketRows rows={active} context={context} grouping="area" />}
+      {finished.length > 0 && <FinishedTickets rows={finished} context={context} grouping="area" searching={searching} />}
+    </section>;
+  });
+}
+
+function States({ rows, context, searching }: {
+  rows: WorkSummary[]; context: TicketRowContext; searching: boolean;
+}) {
+  return stateOrder.map((status) => {
+    const group = rows.filter((row) => row.status === status);
+    if (!group.length) return null;
+    if (status === "done") return <FinishedTickets key={status} rows={group} context={context} grouping="status" searching={searching} />;
+    const label = statusLabel(context.project, status);
+    return <section key={status} className="ticket-group" aria-label={label}>
+      <h2><StatusHeading status={status} label={label} count={group.length} /></h2>
+      <TicketRows rows={group} context={context} grouping="status" />
+    </section>;
+  });
+}
+
+export function TicketList({ rows, search, presentation, grouping, ...context }: TicketRowContext & {
+  rows: WorkSummary[]; search: string; presentation: Presentation; grouping: Grouping;
 }) {
   const query = search.trim().toLocaleLowerCase("es");
   const visible = rows.filter((row) => `${row.key} ${row.title}`.toLocaleLowerCase("es").includes(query));
   if (query && rows.length && !visible.length) return <StatusMessage title="No hay coincidencias en las páginas cargadas" />;
   return <div className="ticket-groups" data-presentation={presentation}>
-    {stateOrder.map((status) => {
-      const group = visible.filter((row) => row.status === status);
-      if (!group.length) return null;
-      const label = project?.statusLabels[status] ?? fallbackStatusLabels[status];
-      const heading = <><span className={`status-dot status-dot--${status}`} aria-hidden="true" />
-        {label}<span className="group-count">{group.length}</span></>;
-      const list = <ul className="tickets">{group.map((row) => {
-          const author = project?.members.find((member) => member.id === row.createdBy)?.name ?? row.createdBy;
-          const assignee = project?.members.find((member) => member.id === row.assigneeId)?.name ?? row.assigneeId;
-          const area = project?.areas.find((entry) => entry.id === row.areaId)?.label;
-          const prNumber = row.prUrl?.match(/\/pull\/(\d+)\/?$/)?.[1];
-          return <li key={row.key} className={row.key === selected ? "ticket-row ticket-row--selected" : "ticket-row"}>
-            <span className="ticket-row__circle" aria-hidden="true">{row.status === "done" ? "✓" : ""}</span>
-            <div className="ticket-row__body">
-              <Button className="ticket-row__open" aria-current={row.key === selected ? "true" : undefined}
-                onClick={() => onOpen(row.key)}><span className={row.highlighted ? "ticket-title-mark" : undefined}>{row.title}</span></Button>
-              <div className="ticket-row__meta">
-                {feedback ? <>{project?.typeLabels?.feedback ?? "Feedback"} · {author}</> : <>
-                  <span className="ticket-key">{row.key}</span>
-                  {row.prUrl && <a href={row.prUrl} target="_blank" rel="noreferrer" aria-label={`Abrir PR de ${row.key}`}>{prNumber ? `PR #${prNumber}` : "PR"}</a>}
-                  {author && <span>{author}</span>}
-                </>}
-              </div>
-            </div>
-            {!feedback && <div className="ticket-row__assignment">
-              {area && <span className="ticket-row__area" title={area}>{area}</span>}
-              {assignee ? <Avatar name={assignee} /> : <span className="avatar" aria-label="Sin asignar" title="Sin asignar">–</span>}
-            </div>}
-            <span className="ticket-row__indicators">
-              {row.highlighted && <span className="ticket-row__marked" title="Resaltada">
-                <WorkspaceIcon name="highlight" /><span className="visually-hidden">Resaltada</span>
-              </span>}
-              <WorkspaceIcon name="chevron" />
-            </span>
-          </li>;
-        })}</ul>;
-      if (status === "done") return <details key={status} className="ticket-group finished-group" open={query ? true : undefined}>
-        <summary>{heading}<span aria-hidden="true" className="finished-caret">⌄</span></summary>
-        {list}
-      </details>;
-      return <section key={status} className="ticket-group" aria-label={label}><h2>{heading}</h2>{list}</section>;
-    })}
+    {grouping === "area" ? <Areas rows={visible} context={context} searching={!!query} />
+      : <States rows={visible} context={context} searching={!!query} />}
   </div>;
 }

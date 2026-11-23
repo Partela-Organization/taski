@@ -57,7 +57,7 @@ La [aplicación B7-01](web.md) arranca con `npm run app` en 5174 y usa el Worker
 | Carpeta | Responsabilidad |
 | --- | --- |
 | `app/access` | Acceso por código, selector de persona y ciclo de sesión. |
-| `app/workspace` | Navegación, filtros, paginación, grupos por estado y captura. |
+| `app/workspace` | Navegación, filtros, paginación, grupos por área o estado y captura. |
 | `app/tickets` | Rutas de ticket, panel, borradores, conversación y actividad. |
 | `app/shared` | Controles y utilidades que usan varios recorridos. |
 

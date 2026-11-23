@@ -10,9 +10,9 @@ El servidor Vite local reenvía `/api` al Worker de 8787. Reescribe únicamente 
 
 ## Espacio de trabajo
 
-La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Las filas se agrupan por estado dentro de las páginas cargadas, con Terminado plegado al inicio y muestran el área, el responsable y el enlace al PR cuando corresponde. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.
+La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Por defecto, las áreas de la instalación aparecen como secciones con su cantidad de entradas cargadas y cada fila muestra su estado. **Agrupar por** permite cambiar a secciones por estado. **Terminado** empieza plegado en ambas vistas. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.
 
-Usa **Lista** o **Tarjetas** en la barra del espacio de trabajo. Por ejemplo, filtra por un área y pulsa **Tarjetas** para revisar esos mismos tickets agrupados por estado. Las tarjetas muestran dos columnas cuando hay espacio y una en móvil o con el panel abierto en un espacio estrecho. Puedes abrir un ticket desde toda su fila o tarjeta. El enlace al PR sigue abriendo el PR. La presentación se guarda en el navegador y cambiarla conserva la búsqueda, el filtro y el detalle abierto.
+Usa **Lista** o **Tarjetas** en la barra del espacio de trabajo. Por ejemplo, filtra por Web y elige **Por estado** para revisar esa área por etapa. Las tarjetas muestran dos columnas cuando hay espacio y una en móvil o con el panel abierto en un espacio estrecho. Puedes abrir un ticket desde toda su fila o tarjeta. El enlace al PR sigue abriendo el PR. La presentación y el agrupamiento se guardan en el navegador y cambiar cualquiera conserva la búsqueda, el filtro y el detalle abierto.
 
 ## Uso y límites
 
@@ -24,7 +24,7 @@ Ante una respuesta perdida, se conserva texto y solicitud, bloqueando la modific
 
 ## Comprobaciones
 
-`npm run check` comprueba cliente, tipos y bundles de preview y aplicación. `npm run test:ui` incluye pruebas de filtros y recuperación de una respuesta de creación perdida usando respuestas HTTP controladas en navegador; además ejecuta un recorrido real navegador → proxy Vite → Worker/D1 efímero con 24 tareas ficticias. Verifica código incorrecto/correcto, cookie HttpOnly, paginación, filtros, recarga, revocación de sesión y una respuesta perdida después de confirmar una creación en D1: el reintento y la lectura paginada posterior confirman una sola tarea. No se ha validado despliegue remoto.
+`npm run check` comprueba cliente, tipos y bundles de preview y aplicación. `npm run test:ui` incluye pruebas de filtros y recuperación de una respuesta de creación perdida usando respuestas HTTP controladas en navegador; además ejecuta un recorrido real navegador → proxy Vite → Worker/D1 efímero con 24 tareas ficticias. Verifica código incorrecto/correcto, cookie HttpOnly, paginación, filtros, recarga, revocación de sesión y una respuesta perdida después de confirmar una creación en D1: el reintento y la lectura paginada posterior confirman una sola tarea. La [guía de Cloudflare](deployment/cloudflare.md) registra el ensayo remoto.
 
 Playwright inicia el [servidor de fixtures](../scripts/serve-browser-fixture.mjs) en 8787 y ambos Vite; esos puertos deben estar libres. El harness usa almacenamiento temporal y exige el preset demo; no abre la D1 de desarrollo ni modifica `.dev.vars`. Al terminar se cierran los servidores.
 
@@ -53,7 +53,7 @@ En móvil se abre Feedback al entrar. También es la vista inicial de quienes ti
 
 1. En **Feedback**, escribe un título y pulsa Enter o el botón de envío. Usa **Añadir contexto** si quieres ampliar la idea. El detalle se abre cuando el servidor guarda el aporte.
 2. Usa **Copiar enlace** para compartir el mismo detalle con otra persona del equipo. El autor y la conversación aparecen en el panel. La lista resume título, tipo y autor.
-3. Pulsa **Convertir en tarea** para llevar el aporte a la lista de trabajo. El enlace, autor, conversación e historial se conservan. En el mismo panel puedes asignar responsable y área después de la conversión.
+3. Elige **Área del feedback** y pulsa **Guardar área** para moverlo a otra categoría mientras sigue en Feedback. Por ejemplo, cambia de General a Web. Si pulsas **Convertir en tarea**, el área guardada, el enlace, el autor, la conversación y el historial pasan a la tarea.
 
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 

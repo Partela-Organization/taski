@@ -48,8 +48,8 @@
 }
 .workspace-search .field { flex: 1; }
 .workspace-area { min-width: 0; }
-.workspace-area select { max-width: 154px; padding-inline: 8px; border: 1px solid var(--line-strong); background: var(--surface); border-radius: var(--radius); min-height: 36px; font-size: 12px; }
-.workspace-search label, .workspace-area label, .capture-line .field label {
+.workspace-area select, .workspace-grouping select { max-width: 154px; padding-inline: 8px; border: 1px solid var(--line-strong); background: var(--surface); border-radius: var(--radius); min-height: 36px; font-size: 12px; }
+.workspace-search label, .workspace-area label, .workspace-grouping label, .capture-line .field label {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%);
 }
 .workspace-search input, .capture-line .field input { border: 0; background: transparent; border-radius: 4px; padding: 6px 3px; font-size: 12px; }
@@ -83,6 +83,12 @@
 .feedback-capture .feedback-context > label, .feedback-capture .feedback-context .button { margin-left: 8px; }
 .ticket-group + .ticket-group { margin-top: 26px; }
 .ticket-group h2 { display: flex; align-items: center; gap: 7px; margin: 0 8px 9px; font-size: 10px; font-weight: 450; color: var(--muted); }
+.ticket-group--area h2 {
+  margin: 0 0 8px; padding: 7px 10px; border-radius: var(--radius); background: var(--sidebar);
+  font-size: 12px; font-weight: 600; color: var(--text); overflow-wrap: anywhere;
+}
+.ticket-group--area h2 .group-count { margin-left: auto; color: var(--muted); }
+.ticket-group--area .finished-group { margin-top: 8px; }
 .group-count { font: 9px var(--mono); margin-left: 3px; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--muted); }
 .status-dot--in_progress { background: var(--progress); border-color: var(--progress); }
@@ -118,6 +124,8 @@
 .ticket-row:has(.ticket-row__open:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
 .ticket-row__open.button:focus-visible { outline: none; }
 .ticket-row__meta { display: flex; flex-wrap: wrap; gap: 4px 8px; color: var(--muted); font-size: 9px; }
+.ticket-row__status { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; }
+.ticket-row__status .status-dot { width: 6px; height: 6px; flex: none; }
 .ticket-row__meta a { position: relative; z-index: 1; color: inherit; }
 .ticket-key { font-family: var(--mono); }
 .ticket-row__assignment { display: flex; gap: 10px; align-items: center; color: var(--muted); }
@@ -159,7 +167,9 @@
   .workspace-heading h1 { font-size: 24px; }
   .workspace-heading .button { margin-top: 7px; }
   .workspace-area select { max-width: 132px; }
-  .workspace-area select, .workspace-search input { min-height: 44px; }
+  .workspace-area select, .workspace-grouping select, .workspace-search input { min-height: 44px; }
+  .workspace-actions { gap: 4px; }
+  .workspace-actions .button { padding-inline: 6px; }
   .workspace-search input, .capture-line .field input, .feedback-capture textarea { font-size: 16px; }
   .workspace-toolbar .button, .workspace-heading .button, .capture-line .button, .feedback-capture .button { min-height: 44px; }
   .workspace-footer .button { min-height: 44px; }

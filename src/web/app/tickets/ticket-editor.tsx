@@ -3,6 +3,7 @@ import type { Edits, ProjectResult, TaskiClient, TicketResult } from "../../../c
 import { Button, Field, StatusMessage } from "../../components.tsx";
 import { Conversation } from "./conversation.tsx";
 import type { ConversationDraft } from "./conversation.tsx";
+import { TicketAreaField } from "./ticket-area-field.tsx";
 import { useTicketEdit } from "./use-ticket-edit.ts";
 import type { Draft } from "./use-ticket-edit.ts";
 
@@ -17,6 +18,9 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
   const editorBusy = busy || updatingConversation;
   const key = server.ticket.key;
   const feedback = server.ticket.type === "feedback";
+  const pendingConversion = draft.pending?.changes?.type === "task";
+  const pendingArea = !!draft.pending && !pendingConversion;
+  const areaChanged = draft.edits.areaId !== server.ticket.areaId;
   const author = project?.members.find((member) => member.id === server.ticket.createdBy)?.name ?? server.ticket.createdBy;
   return <>
     <p className="ticket-type">{feedback ? project?.typeLabels?.feedback ?? "Feedback" : project?.typeLabels?.task ?? "Tarea"}</p>
@@ -24,8 +28,21 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
       <h2 className="editor-title">{server.ticket.title}</h2>
       <p className="detail-origin">Compartido por {author}</p>
       <p className="description">{server.ticket.description || "Sin contexto adicional"}</p>
-      <Button variant="secondary" disabled={editorBusy || conflict} onClick={() => save({ ...draft.changes, type: "task" })}>
-        {busy ? "Guardando…" : draft.pending ? "Reintentar conversión" : "Convertir en tarea"}
+      <form className="feedback-area" onSubmit={(event) => {
+        event.preventDefault();
+        if (!editorBusy && !pendingConversion && draft.edits.areaId && (pendingArea || areaChanged)) {
+          save({ areaId: draft.edits.areaId });
+        }
+      }}>
+        <TicketAreaField id="feedback-area" label="Área del feedback" areas={project?.areas ?? []}
+          value={draft.edits.areaId} disabled={editorBusy || !!draft.pending || !project}
+          onChange={(areaId) => change({ areaId })} />
+        <Button type="submit" variant="secondary" disabled={editorBusy || conflict || pendingConversion || (!pendingArea && !areaChanged)}>
+          {pendingArea && busy ? "Guardando…" : pendingArea ? "Reintentar área" : "Guardar área"}
+        </Button>
+      </form>
+      <Button variant="secondary" disabled={editorBusy || conflict || pendingArea} onClick={() => save({ ...draft.changes, type: "task" })}>
+        {pendingConversion ? "Reintentar conversión" : "Convertir en tarea"}
       </Button>
     </div> : <form className="ticket-editor" onSubmit={(event) => { event.preventDefault(); if (!editorBusy) save(draft.changes); }}>
       <fieldset disabled={editorBusy || !!draft.pending}>
@@ -45,11 +62,8 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
               <option value="">Sin asignar</option>{project?.members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
             </select>
           </div>
-          <div><label htmlFor="ticket-area">Área de la tarea</label>
-            <select id="ticket-area" value={draft.edits.areaId} onChange={(e) => change({ areaId: e.target.value })}>
-              {project?.areas.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-            </select>
-          </div>
+          <TicketAreaField id="ticket-area" label="Área de la tarea" areas={project?.areas ?? []}
+            value={draft.edits.areaId} onChange={(areaId) => change({ areaId })} />
         </div>
         <label htmlFor="description">Descripción</label>
         <textarea id="description" className="editor-description" placeholder="Añade contexto…" value={draft.edits.description ?? ""} onChange={(e) => change({ description: e.target.value })} />

@@ -7,7 +7,7 @@ import type { Access, Member } from "../access/use-team-session.ts";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 import { TicketPanel } from "../tickets/ticket-panel.tsx";
 import { useTicketRoute } from "../tickets/use-ticket-route.ts";
-import { readPresentation, savePresentation } from "./presentation.ts";
+import { readGrouping, readPresentation, saveGrouping, savePresentation } from "./presentation.ts";
 import { QuickCapture } from "./quick-capture.tsx";
 import { useQuickCapture } from "./use-quick-capture.ts";
 import { TicketList } from "./ticket-list.tsx";
@@ -24,6 +24,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [area, setArea] = useState("");
   const [search, setSearch] = useState("");
   const [presentation, setPresentation] = useState(readPresentation);
+  const [grouping, setGrouping] = useState(readGrouping);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
@@ -83,13 +84,16 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           </Button>
         </div>
         <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
-          area={area} onArea={setArea} onRefresh={list.refresh} presentation={presentation} onPresentation={(next) => {
+          area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
+            setGrouping(next);
+            saveGrouping(next);
+          }} presentation={presentation} onPresentation={(next) => {
             setPresentation(next);
             savePresentation(next);
           }} />
         <QuickCapture model={capture} feedback={feedback} />
         <TicketList rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
-          search={search} presentation={presentation} onOpen={(key) => void route.open(key)} />
+          search={search} presentation={presentation} grouping={grouping} onOpen={(key) => void route.open(key)} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>

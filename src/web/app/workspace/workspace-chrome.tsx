@@ -3,7 +3,7 @@ import type { Theme } from "../../theme.ts";
 import type { Member } from "../access/use-team-session.ts";
 import { Wordmark, WorkspaceIcon } from "../shared/marks.tsx";
 import { ThemeControl } from "../shared/theme-control.tsx";
-import type { Presentation } from "./presentation.ts";
+import type { Grouping, Presentation } from "./presentation.ts";
 import { views } from "./views.ts";
 import type { View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
@@ -41,9 +41,10 @@ export function WorkspaceTopbar({ project, member, theme, onTheme, busy, onSignO
   </header>;
 }
 
-export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefresh, presentation, onPresentation }: {
+export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefresh, grouping, onGrouping, presentation, onPresentation }: {
   search: string; onSearch: (search: string) => void;
   areas: { id: string; label: string }[]; area: string; onArea: (area: string) => void; onRefresh: () => void;
+  grouping: Grouping; onGrouping: (grouping: Grouping) => void;
   presentation: Presentation; onPresentation: (presentation: Presentation) => void;
 }) {
   return <div className="workspace-toolbar">
@@ -60,6 +61,13 @@ export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefr
       </div>
     </div>
     <div className="workspace-actions">
+      <div className="workspace-grouping">
+        <label htmlFor="ticket-grouping">Agrupar por</label>
+        <select id="ticket-grouping" value={grouping} onChange={(event) => onGrouping(event.target.value === "status" ? "status" : "area")}>
+          <option value="area">Por área</option>
+          <option value="status">Por estado</option>
+        </select>
+      </div>
       <div className="presentation-control" role="group" aria-label="Presentación">
         <Button aria-pressed={presentation === "list"} onClick={() => onPresentation("list")}>
           <WorkspaceIcon name="list" />Lista
