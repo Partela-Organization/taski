@@ -36,6 +36,11 @@ test("mobile feedback works without technical fields and conversion preserves id
     await expect(desktop.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
     const panel = desktop.getByRole("region", { name: title, exact: true });
     await expect(panel.getByText("Compartido por Alex")).toBeVisible();
+    await panel.getByLabel("Área del feedback", { exact: true }).selectOption("web");
+    await panel.getByRole("button", { name: "Guardar área", exact: true }).click();
+    await expect(panel.getByRole("status").filter({ hasText: "Cambios guardados" })).toBeVisible();
+    const categorized = await (await recipient.request.get(`${app}/api/v1/tickets/${receipt.key}?view=full`)).json();
+    expect(categorized.ticket).toMatchObject({ areaId: "web", type: "feedback" });
     const convert = panel.getByRole("button", { name: "Convertir en tarea" });
     let resumeDetail;
     const detailCanRefresh = new Promise((resolve) => { resumeDetail = resolve; });
@@ -56,7 +61,7 @@ test("mobile feedback works without technical fields and conversion preserves id
     await expect(panel.getByLabel("Responsable", { exact: true })).toBeVisible();
     await expect(desktop).toHaveURL(link);
     await panel.getByLabel("Responsable", { exact: true }).selectOption("sam");
-    await panel.getByLabel("Área de la tarea").selectOption("web");
+    await expect(panel.getByLabel("Área de la tarea")).toHaveValue("web");
     await panel.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(panel.getByRole("status").filter({ hasText: "Cambios guardados" })).toBeVisible();
     await desktop.reload();

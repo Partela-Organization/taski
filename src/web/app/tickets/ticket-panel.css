@@ -20,8 +20,8 @@
 }
 .ticket-editor textarea.editor-title { min-height: 66px; field-sizing: content; }
 .editor-metadata { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 25px; }
-.ticket-editor label, .comment-composer label { display: block; font-size: 10px; color: var(--muted); }
-.editor-metadata select {
+.ticket-editor label, .feedback-area label, .comment-composer label { display: block; font-size: 10px; color: var(--muted); }
+.editor-metadata select, .feedback-area select {
   width: 100%; min-width: 0; min-height: 34px; margin-top: 4px; padding-inline: 5px; background: var(--surface);
   border: 1px solid var(--line-strong); border-radius: var(--radius); font-size: 11px;
 }
@@ -38,6 +38,8 @@
 .app .detail-panel .editor-footer .button { margin: 0; font-size: 11px; min-height: 33px; }
 .app .detail-panel .detail-origin { color: var(--muted); font-size: 10px; }
 .feedback-detail .description { white-space: pre-wrap; margin: 14px 0; font-size: 13px; line-height: 1.85; }
+.feedback-area { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; margin-bottom: 12px; }
+.feedback-area .button { font-size: 11px; }
 .app > .detail-panel > .button { margin: 8px 8px 0 0; font-size: 11px; }
 .conversation { border-top: 1px solid var(--border); padding-top: 18px; margin-top: 22px; }
 .conversation-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
@@ -62,7 +64,7 @@
   .app .detail-panel__top .button { min-width: 44px; min-height: 44px; }
   .app .detail-panel input, .app .detail-panel textarea, .app .detail-panel select { font-size: 16px; }
   .app .detail-panel .editor-title { font-size: 23px; }
-  .editor-metadata select { min-height: 44px; }
+  .editor-metadata select, .feedback-area select { min-height: 44px; }
   .app .detail-panel .editor-footer .button { min-height: 44px; }
   .app .detail-panel .button--secondary { min-height: 44px; }
 }

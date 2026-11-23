@@ -8,6 +8,7 @@ export function appearanceChecks() {
     const list = page.getByRole("button", { name: "Lista", exact: true });
     const cards = page.getByRole("button", { name: "Tarjetas", exact: true });
     const area = page.getByLabel("Área", { exact: true });
+    const grouping = page.getByLabel("Agrupar por", { exact: true });
     const search = page.getByRole("searchbox");
     const ticket = page.getByRole("button", { name: "Fixture 06", exact: true });
     const row = page.locator(".ticket-row").filter({ has: ticket });
@@ -16,6 +17,9 @@ export function appearanceChecks() {
     await expect(list).toHaveAttribute("aria-pressed", "true");
     await area.selectOption("general");
     await expect(ticket).toBeVisible();
+    await expect(grouping).toHaveValue("area");
+    await expect(page.getByRole("region", { name: "General", exact: true }).getByRole("button", { name: "Fixture 06" })).toBeVisible();
+    await expect(row.getByText("Pendiente", { exact: true })).toBeVisible();
     await cards.click();
     await expect(cards).toHaveAttribute("aria-pressed", "true");
     await expect(group).toHaveCSS("display", "grid");
@@ -26,6 +30,8 @@ export function appearanceChecks() {
     await page.mouse.click(edge.x + edge.width / 2, edge.y + edge.height / 2);
     await expect(page).toHaveURL(/\/t\/DEMO-006$/);
     await list.click();
+    await grouping.selectOption("status");
+    await expect(page.getByRole("region", { name: "Pendiente", exact: true }).getByRole("button", { name: "Fixture 06" })).toBeVisible();
     await expect(list).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("region", { name: "Fixture 06", exact: true })).toBeVisible();
     await expect(search).toHaveValue("Fixture 06");
@@ -34,6 +40,8 @@ export function appearanceChecks() {
     await expect.poll(columns).toBe(1);
     await page.reload();
     await expect(cards).toHaveAttribute("aria-pressed", "true");
+    await expect(grouping).toHaveValue("status");
+    await grouping.selectOption("area");
     await page.getByRole("button", { name: "Cerrar detalle", exact: true }).click();
     await expect.poll(columns).toBe(2);
     await page.getByLabel("Tema", { exact: true }).selectOption("light");
@@ -42,7 +50,7 @@ export function appearanceChecks() {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect.poll(columns).toBe(1);
     await expect(cards).toBeInViewport();
-    for (const label of ["Tema", "Área"]) {
+    for (const label of ["Tema", "Área", "Agrupar por"]) {
       const box = await page.getByLabel(label, { exact: true }).boundingBox();
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
