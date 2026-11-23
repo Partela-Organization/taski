@@ -1,6 +1,6 @@
 # Arranque local
 
-El arranque de B1 permite ejecutar un Worker y una base D1 local. Sobre esa base ya están disponibles tickets, acceso de equipo, [API HTTP](api.md), [cliente TypeScript](client.md) y [MCP probado con SDK](mcp.md). Esta guía comprueba la disponibilidad mediante `GET /health`; la web conectada sigue pendiente.
+El arranque de B1 permite ejecutar un Worker y una base D1 local. Sobre esa base ya están disponibles tickets, acceso de equipo, [API HTTP](api.md), [cliente TypeScript](client.md) y [MCP probado con SDK](mcp.md). Esta guía comprueba la disponibilidad mediante `GET /health`. La [web conectada](web.md) tiene su propio recorrido.
 
 ## Requisitos
 
@@ -11,7 +11,7 @@ El arranque de B1 permite ejecutar un Worker y una base D1 local. Sobre esa base
 ## Checkout y base
 
 ```sh
-git clone https://github.com/danirssx/taski.git
+git clone https://github.com/Partela-Organization/taski.git
 cd taski
 npm ci
 npm run db:migrate

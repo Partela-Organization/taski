@@ -5,6 +5,8 @@ const glyphs = {
   feedback: "M4 4h16v12H9l-5 4z M8 9h8 M8 12h5",
   search: "M15.5 10a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z M14 14l5 5",
   plus: "M12 5v14 M5 12h14",
+  list: "M4 6h2 M10 6h10 M4 12h2 M10 12h10 M4 18h2 M10 18h10",
+  chevron: "m9 5 7 7-7 7",
   refresh: "M20 4v5h-5 M20 9a8 8 0 1 0 0 6",
   highlight: "m4 15 10-10 5 5L9 20H4z M13 6l5 5 M4 23h15",
 };

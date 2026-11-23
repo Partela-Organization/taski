@@ -11,6 +11,8 @@ h1, h2, h3, p { margin: 0; }
 .button:hover { background: var(--hover); }
 .button--primary { background: var(--button-bg); color: var(--button-ink); }
 .button--primary:hover { background: var(--button-bg); filter: brightness(.94); }
+.button--secondary { background: var(--surface); border-color: var(--line-strong, var(--border)); }
+.button--secondary[aria-pressed="true"] { border-color: var(--accent); background: var(--hover); }
 .field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
 .field label { color: var(--muted); font-size: 12px; }
 .field input { min-width: 0; width: 100%; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 9px 11px; }

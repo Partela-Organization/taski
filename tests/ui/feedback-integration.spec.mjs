@@ -36,11 +36,23 @@ test("mobile feedback works without technical fields and conversion preserves id
     await expect(desktop.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
     const panel = desktop.getByRole("region", { name: title, exact: true });
     await expect(panel.getByText("Compartido por Alex")).toBeVisible();
-    await panel.getByLabel("Comentario", { exact: true }).fill("Puedo revisar el texto.");
-    await panel.getByRole("button", { name: "Enviar comentario" }).click();
-    await expect(panel.getByText("Puedo revisar el texto.", { exact: true })).toBeVisible();
+    const convert = panel.getByRole("button", { name: "Convertir en tarea" });
+    let resumeDetail;
+    const detailCanRefresh = new Promise((resolve) => { resumeDetail = resolve; });
+    await desktop.route(`${app}/api/v1/tickets/${receipt.key}?view=full&commentsLimit=5`, async (route) => {
+      await detailCanRefresh;
+      await route.continue();
+    }, { times: 1 });
+    try {
+      await panel.getByLabel("Comentario", { exact: true }).fill("Puedo revisar el texto.");
+      await panel.getByRole("button", { name: "Enviar comentario" }).click();
+      await expect(convert).toBeDisabled();
+    } finally {
+      resumeDetail();
+    }
+    await expect(panel.locator("article").getByText("Puedo revisar el texto.", { exact: true })).toBeVisible();
     await desktop.screenshot({ path: testInfo.outputPath("feedback-desktop.png") });
-    await panel.getByRole("button", { name: "Convertir en tarea" }).click();
+    await convert.click();
     await expect(panel.getByLabel("Responsable", { exact: true })).toBeVisible();
     await expect(desktop).toHaveURL(link);
     await panel.getByLabel("Responsable", { exact: true }).selectOption("sam");

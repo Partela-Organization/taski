@@ -23,13 +23,13 @@ export function TicketPanel({ route, client, project, onSaved }: {
   }
 
   return <DetailPanel open={!!selected} title={detail?.ticket.title ?? selected ?? "Detalle"}
-    caption={selected ?? "Detalle"} compactAt={compactWidth} hideTitle={!!detail} onClose={() => { setShare(undefined); close(); }}
-    actions={detail && selected && <Button onClick={() => void copyLink(selected)}>Copiar enlace</Button>}>
+    caption={selected ?? "Detalle"} compactAt={compactWidth} hideTitle={!!detail} showCloseLabel onClose={() => { setShare(undefined); close(); }}
+    actions={detail && selected && <Button variant="secondary" onClick={() => void copyLink(selected)}>Copiar enlace</Button>}>
     {mode === "copied" && <StatusMessage title="Enlace copiado." />}
     {mode === "manual" && <Field label="Enlace del ticket" value={ticketUrl} readOnly onFocus={(event) => event.target.select()} />}
     {!detail && !error && <StatusMessage tone="loading" title="Cargando detalle…" />}
     {error && <StatusMessage tone="error" title={error}>
-      <Button onClick={() => selected && void open(selected)}>Reintentar detalle</Button>
+      <Button variant="secondary" onClick={() => selected && void open(selected)}>Reintentar detalle</Button>
     </StatusMessage>}
     {detail && <TicketEditor key={detail.ticket.key} initial={detail} project={project} client={client}
       drafts={drafts} conversations={conversations} onSaved={(fresh) => { if (fresh) route.syncDetail(fresh); onSaved(); }} />}
