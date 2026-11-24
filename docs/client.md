@@ -1,6 +1,6 @@
 # Cliente TypeScript
 
-`src/client/index.ts` es un cliente sin React, DOM, Cloudflare o dependencias de terceros. Usa tipos públicos en `src/contracts/api.ts` y un transporte fetch opcional. Su tsconfig separado compila sin tipos de navegador/Node/plataforma, además del check de fronteras. La web, Node o un Worker pueden aportar fetch; una app Swift consumirá el mismo HTTP/OpenAPI sin importar TypeScript.
+`src/client/index.ts` es un cliente sin React, DOM, Cloudflare o dependencias de terceros. Usa tipos públicos en `src/contracts/api.ts` y un transporte fetch opcional. Su tsconfig separado compila sin tipos de navegador/Node/plataforma, además del check de fronteras. La web, Node o un Worker pueden aportar fetch. Los clientes en otros lenguajes pueden usar el contrato HTTP/OpenAPI directamente.
 
 ```ts
 import { TaskiClient } from "./src/client/index.ts";

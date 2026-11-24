@@ -27,4 +27,4 @@ La política predeterminada será `agentsCanComplete: false`, independiente de U
 
 ## Fases posteriores
 
-[Q2](q2.md) agrupa imágenes, notas de voz en R2, app SwiftUI y sticky notes de escritorio sincronizadas con la web. Autenticación individual, sincronización de GitHub, notificaciones, WebSockets y ejecución autónoma se evaluarán aparte.
+[Q2](q2.md) agrupa imágenes y notas de voz en R2, sticky notes de escritorio sincronizadas con la web, un bot de feedback por WhatsApp conectado al MCP y una guía de conexión MCP en la web. Autenticación individual, sincronización de GitHub, notificaciones, WebSockets y ejecución autónoma se evaluarán aparte.

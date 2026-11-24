@@ -25,4 +25,4 @@ El subrayado suave es un atributo reversible del ticket, independiente del estad
 
 Se aceptan panel derecho no modal, Inter, captura inline, resaltado independiente del estado, marca discreta y feedback móvil resumido. Los ajustes posteriores conservan estos recorridos y sus criterios de teclado/responsive. El consenso sobre el mock no equivale a tener backend, D1 o MCP real.
 
-Imágenes, voz, SwiftUI y sticky notes pertenecen a [Q2](q2.md); no se presentan como disponibles en esta versión.
+El [alcance de Q2](q2.md) reúne imágenes, voz, sticky notes, feedback por WhatsApp y la guía web de conexión MCP.

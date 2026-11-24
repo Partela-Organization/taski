@@ -38,7 +38,7 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [Ejecutar el spike local con fixtures](../experiments/b0/README.md)
 - [Contrato de ocho herramientas y ejemplos](benchmarks/contract.md)
 - [Protocolo comparativo, presupuestos y gate de B6](benchmarks/protocol.md)
-- [Q2: imágenes, voz, Swift y sticky notes](q2.md)
+- [Q2 · Imágenes, voz, sticky notes, WhatsApp y guía MCP en la web](q2.md)
 
 ## Se entrega con cada bloque funcional
 

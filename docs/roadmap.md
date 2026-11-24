@@ -24,4 +24,4 @@ La documentación se desarrolla y comprueba durante cada bloque. B12 consolida y
 
 ## Q2 · Posterior a v0.1
 
-Imágenes, notas de voz en R2, SwiftUI y sticky notes de escritorio integradas con la web. Ver [alcance de Q2](q2.md). No implica un trimestre calendario ni cambia el alcance actual de B1.
+Imágenes y notas de voz en R2, sticky notes de escritorio, feedback automático desde un bot de WhatsApp conectado al MCP y una guía web para conectar clientes MCP. Ver [alcance de Q2](q2.md). La fase sigue a v0.1 y tiene su propio [backlog](https://github.com/Partela-Organization/taski/milestone/14).
