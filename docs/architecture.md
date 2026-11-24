@@ -1,6 +1,6 @@
 # Arquitectura y dataflow propuestos
 
-TypeScript para servidor y primera web. Un Worker atiende HTTP/MCP; D1 mantiene tickets y actividad. El primer frontend se plantea en React, con contrato independiente para poder sustituirlo o añadir SwiftUI después.
+TypeScript para servidor y web. Un Worker atiende HTTP/MCP y D1 mantiene tickets y actividad. El frontend en React usa un contrato independiente que permite sustituir la interfaz o añadir otros clientes.
 
 HTTP y [MCP](mcp.md) están implementados y comprobados sobre Worker/D1 local. El diagrama incluye también la web conectada y los hosts IA previstos: su integración se valida en B7 y B6-03 respectivamente.
 
@@ -40,6 +40,6 @@ Dominio y casos de uso independientes de React, MCP y D1. Los adaptadores HTTP/M
 
 Otra instalación tendrá otro Worker, otra base y otra configuración. Otro almacenamiento o runtime requiere implementar su adaptador: no se ofrece todavía como una opción funcional.
 
-## Q2: archivos y clientes adicionales
+## Q2 · Archivos, escritorio e integraciones
 
-R2 guardará imágenes/audio; D1 guardará referencias, texto y relaciones de notas/tareas. La app Swift y las sticky notes consumirán la misma API que la web. El bucket no sustituye la base ni la sincronización. Ver [Q2](q2.md).
+R2 guardará imágenes y audio. D1 guardará referencias, texto y relaciones entre notas y tareas. Las sticky notes consumirán la misma API que la web. El bot de WhatsApp recibirá los webhooks de Meta y usará el MCP para crear feedback. La web incluirá una guía para conectar clientes MCP a la instalación. Ver [Q2](q2.md).

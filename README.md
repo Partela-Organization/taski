@@ -17,7 +17,7 @@ La [dirección visual v3](docs/design-direction.md) fue aceptada: captura inline
 - Primer despliegue previsto: TypeScript, Cloudflare Workers y D1.
 - Código de acceso del equipo y selección de persona para la primera versión.
 
-Las capacidades anteriores son objetivos del producto, no funcionalidades disponibles hoy. La app iOS y la sincronización automática de GitHub se evaluarán después.
+El estado de implementación de cada capacidad está en su guía. La sincronización automática de GitHub se evaluará después.
 
 ## Participar ahora
 
@@ -60,7 +60,7 @@ El [spike experimental de B0](experiments/b0/README.md) sí puede ejecutarse con
 - [Criterios de calidad documental](docs/documentation.md)
 - [Referencias para explorar el diseño](docs/design-references.md)
 - [Dirección visual actual](docs/design-direction.md)
-- [Q2: imágenes, voz, SwiftUI y sticky notes](docs/q2.md)
+- [Q2 · Imágenes, voz, sticky notes, WhatsApp y guía MCP en la web](docs/q2.md)
 - [Auditoría de Linear](docs/benchmarks/linear-baseline.md), [contrato candidato](docs/benchmarks/contract.md) y [protocolo comparativo](docs/benchmarks/protocol.md)
 
 ## Licencia
