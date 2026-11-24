@@ -4,6 +4,7 @@ const glyphs = {
   review: "M8 4H5v17h14V4h-3 M8 2h8v5H8z M8 13l3 3 5-5",
   feedback: "M4 4h16v12H9l-5 4z M8 9h8 M8 12h5",
   search: "M15.5 10a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z M14 14l5 5",
+  terminal: "M3 5h18v14H3z M7 9l3 3-3 3 M13 15h4",
   plus: "M12 5v14 M5 12h14",
   list: "M4 6h2 M10 6h10 M4 12h2 M10 12h10 M4 18h2 M10 18h10",
   chevron: "m9 5 7 7-7 7",
