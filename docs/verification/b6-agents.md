@@ -4,7 +4,7 @@ Recorridos ejecutados localmente con los clientes instalados, no con un agente s
 
 | Cliente y condición | Modelo observado | Protocolo solicitado | Llamadas nuevas / retomadas | Resultado |
 | --- | --- | --- | --- | --- |
-| [Codex CLI 0.167.2, predeterminado](b6-codex-default.json) | gpt-6.2-sol | 2025-06-18 | 9 / 3 | Correcto, sin errores. |
+| [Codex CLI 0.170.0, predeterminado](b6-codex-default.json) | gpt-6.2-sol | 2025-06-18 | 9 / 3 | Correcto, sin errores. |
 | [Claude Code 2.1.327, anticipada](b6-claude-eager.json) | claude-sonnet-5-5 | 2026-07-28 | 10 / 3 | Correcto, sin errores. |
 | [Claude Code 2.1.327, diferida](b6-claude-deferred.json) | claude-sonnet-5-5 | 2026-07-28 | 10 / 3 | Correcto, sin errores. |
 

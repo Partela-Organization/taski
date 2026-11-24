@@ -47,6 +47,8 @@ El workflow documental también ejecuta `npm run mcp:measure -- --intent --check
 
 La evaluación optativa `node scripts/verify-mcp-agents.mjs --client codex` (o `--client claude --loading eager|deferred`) requiere un CLI instalado y autenticado y el entorno Python proxy fijado. Crea fixtures y un directorio nuevo, valida una sesión y su continuación, e imprime rutas del informe y logs temporales. No se ejecuta en CI con credenciales personales. Ver [evidencia y alcance](verification/b6-agents.md).
 
+`npm run benchmark:plan` genera el calendario comparativo sin servicios; `benchmark:report -- --input archivo.jsonl` evalúa registros reales sin ejecutar modelos. `benchmark:preflight` es optativo y comprueba acceso nativo a Linear, sin tocar tickets. El [estado B6-04](benchmarks/b6-comparison.md) documenta el formato, los códigos de salida y el colector todavía pendiente. CI verifica el evaluador con casos aritméticos sintéticos explícitos, nunca como evidencia medida.
+
 La [aplicación B7-01](web.md) arranca con `npm run app` en 5174 y usa el Worker local en 8787. `build:web` genera tanto el preview en `dist/web` como la aplicación en `dist/app`. El benchmark B6-04 sigue pendiente, sin afirmaciones comparativas de rendimiento.
 
 

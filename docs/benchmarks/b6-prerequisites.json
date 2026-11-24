@@ -1,0 +1,21 @@
+{
+  "kind": "LIVE_COMPARATIVE_PREREQUISITES",
+  "executedAt": "2026-11-18T16:31:00.123Z",
+  "endpoint": "https://mcp.linear.app/mcp",
+  "results": [
+    {
+      "client": "codex",
+      "version": "codex-cli 0.170.0",
+      "connected": true,
+      "reason": null
+    },
+    {
+      "client": "claude",
+      "version": "2.1.327 (Claude Code)",
+      "connected": false,
+      "reason": "authorization-required"
+    }
+  ],
+  "status": "PREREQUISITES_MISSING",
+  "scope": "One read-only get_workspace per native client. No fixtures, comparative samples, latency or performance claims. Workspace identity/content and credentials are excluded."
+}

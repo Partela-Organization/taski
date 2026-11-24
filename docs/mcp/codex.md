@@ -1,6 +1,6 @@
 # Taski en Codex CLI
 
-Validado con Codex CLI 0.167.2 y su modelo predeterminado observado `gpt-6.2-sol`, sobre Worker/D1 local. El [informe](../verification/b6-codex-default.json) registra una sesión nueva y su continuación real; no es una simulación con SDK ni una comparación entre modelos.
+Validado con Codex CLI 0.170.0 y su modelo predeterminado observado `gpt-6.2-sol`, sobre Worker/D1 local. El [informe](../verification/b6-codex-default.json) registra una sesión nueva y su continuación real; no es una simulación con SDK ni una comparación entre modelos.
 
 ## Conectar una instalación
 
