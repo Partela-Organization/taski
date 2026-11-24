@@ -20,6 +20,10 @@ El Worker responde JSON en `/health`, `/api/v1/*` y `/mcp`. Sirve la web en `/` 
 4. Para un piloto abierto con datos ficticios, el dominio puede servir la pantalla de entrada directamente. Los tickets y el MCP exigen el código de Taski. Para el uso interno con datos del equipo, configura [Cloudflare Access](https://developers.cloudflare.com/workers/configuration/cloudflare-access/) para el hostname antes de asociarlo al Worker. Autoriza los correos o el grupo del equipo y usa [tokens de servicio](https://developers.cloudflare.com/cloudflare-one/access-controls/authenticate-agents/) con Service Auth para MCP. Los clientes MCP envían también las [cabeceras de Taski](../mcp.md#conectarse-a-una-instalación).
 5. Añade el dominio a `routes` en la configuración privada. Usa una entrada como `{"pattern":"taski.example.com","custom_domain":true}`. Ejecuta `npm run build:app` y despliega con `npm exec -- wrangler deploy --config wrangler.deploy.local.jsonc --secrets-file /ruta/privada/secretos.json`.
 
+### Imágenes adjuntas
+
+Para habilitar imágenes, [configura un bucket R2 privado y el binding ATTACHMENTS](../attachments.md#activar-por-instalación). Usa un bucket distinto por entorno y aplica la migración D1 antes de desplegar.
+
 ## Comprobar y revertir
 
 - Para un piloto abierto, comprueba que la pantalla de entrada esté disponible y que `/api/v1/tickets` y `/mcp` devuelvan HTTP 401 sin las credenciales de Taski. Para una instalación protegida por Access, comprueba desde una sesión externa que Access intercepte también `/` y `/api/v1/access`. Con un usuario autorizado, comprueba la entrada web y recarga un enlace directo a un ticket de prueba.

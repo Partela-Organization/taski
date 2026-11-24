@@ -1,5 +1,6 @@
 @import "./workspace/workspace.css";
 @import "./tickets/ticket-panel.css";
+@import "./tickets/ticket-attachments.css";
 @import "./access/sign-in.css";
 
 :root {

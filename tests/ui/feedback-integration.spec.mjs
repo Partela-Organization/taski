@@ -89,3 +89,43 @@ test("mobile feedback works without technical fields and conversion preserves id
     await expect(desktop.getByRole("button", { name: feedbackTitle, exact: true })).toBeVisible();
   } finally { await recipient.close(); }
 });
+
+test("attaching an image survives a lost upload response and the uploader can remove it", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(app);
+  await enter(page, "Alex");
+  const name = `Feedback con captura · ${testInfo.project.name}`;
+  await page.getByLabel("¿Qué quieres compartir?").fill(name);
+  await page.getByRole("button", { name: "Enviar feedback" }).click();
+  const panel = page.getByRole("dialog", { name });
+  await expect(panel.getByRole("button", { name: "Adjuntar imagen" })).toBeVisible();
+
+  let uploadUrl;
+  await page.route("**/api/v1/tickets/*/attachments/*", async (route) => {
+    uploadUrl = route.request().url();
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    await route.abort();
+  }, { times: 1 });
+  await panel.getByLabel("Elegir imagen").setInputFiles({
+    name: "captura.png", mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAIAAADkharWAAAAFUlEQVR4nGOw7OggCTGMahjVgB0BADgh9sFCdXSXAAAAAElFTkSuQmCC", "base64"),
+  });
+  await panel.getByRole("button", { name: "Subir imagen" }).click();
+  await expect(panel.getByText("No se pudo confirmar la subida.", { exact: false })).toBeVisible();
+  const retried = page.waitForResponse((response) => response.request().method() === "PUT");
+  await panel.getByRole("button", { name: "Reintentar subida" }).click();
+  expect((await retried).url()).toBe(uploadUrl);
+  const preview = panel.getByRole("link", { name: "Abrir captura.png" });
+  await expect(preview).toBeVisible();
+  await expect.poll(() => preview.locator("img").evaluate((image) => image.naturalWidth)).toBe(16);
+  await page.reload();
+  await expect(preview).toHaveCount(1);
+  await expect(preview).toHaveAttribute("target", "_blank");
+  await preview.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath("feedback-image.png") });
+  page.once("dialog", (dialog) => dialog.accept());
+  await panel.getByRole("button", { name: "Quitar captura.png" }).click();
+  await expect(preview).toHaveCount(0);
+  expect((await page.request.get(uploadUrl)).status()).toBe(404);
+});

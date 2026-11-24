@@ -13,6 +13,7 @@ import { mcp } from "../mcp/server.ts";
 interface Env extends AccessEnvironment {
   DB: D1Database;
   ASSETS?: Fetcher;
+  ATTACHMENTS?: R2Bucket;
   TASKI_INSTALLATION_JSON?: string;
 }
 

@@ -8,13 +8,20 @@ import type { AccessEnvironment } from "../access/team-access.ts";
 import type { InstallationConfig } from "../../config/types.ts";
 import { runtime } from "../worker/runtime.ts";
 import { errorResponse, jsonBody } from "./body.ts";
+import { attachments } from "./attachments.ts";
+import { D1Attachments } from "../storage/d1-attachments.ts";
 
-export async function api(request: Request, env: AccessEnvironment, config: InstallationConfig): Promise<Response> {
+export async function api(request: Request, env: AccessEnvironment & { ATTACHMENTS?: R2Bucket }, config: InstallationConfig): Promise<Response> {
   try {
     const actor = await new TeamAccess(env, config).authenticate(request, "http");
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean).map(decodeURIComponent);
-    const operations = new Operations(new TicketService(new D1TicketRepository(env.DB), config, runtime), config);
+    const tickets = new TicketService(new D1TicketRepository(env.DB), config, runtime);
+    if (parts[2] === "tickets" && parts[4] === "attachments" && (parts.length === 5 || parts.length === 6)) {
+      const ticket = await tickets.get(parts[3]!);
+      return await attachments(request, new D1Attachments(env.DB), env.ATTACHMENTS, ticket, parts[5], actor);
+    }
+    const operations = new Operations(tickets, config);
     const query: Record<string, unknown> = {};
     for (const [key, value] of url.searchParams) {
       if (key in query) throw new TaskiError("INVALID_INPUT", "Repeated query parameter");

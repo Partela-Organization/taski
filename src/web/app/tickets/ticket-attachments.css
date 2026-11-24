@@ -1,0 +1,48 @@
+.ticket-attachments {
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 14px;
+}
+.ticket-attachments__heading, .ticket-attachments__selection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ticket-attachments h3 { font-size: 13px; }
+.ticket-attachments__selection {
+  justify-content: flex-start;
+  margin-top: 10px;
+}
+.ticket-attachments__selection span { overflow-wrap: anywhere; }
+.ticket-attachments__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.ticket-attachments__grid li {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px;
+}
+.ticket-attachments__grid a { color: var(--text); overflow-wrap: anywhere; }
+.ticket-attachments__grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  margin-bottom: 4px;
+  border-radius: var(--radius);
+  background: var(--sidebar);
+}
+.ticket-attachments__grid .button { justify-self: start; }
+@media (max-width: 760px) {
+  .ticket-attachments .button { min-height: 44px; }
+}
