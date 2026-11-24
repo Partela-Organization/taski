@@ -4,6 +4,8 @@ Validado con Codex CLI 0.167.2 y su modelo predeterminado observado `gpt-6.2-sol
 
 ## Conectar una instalación
 
+En la web de Taski, [Conectar MCP](../web.md#conectar-mcp-desde-el-encabezado) genera una configuración con la URL de la instalación y el ID del miembro seleccionado. Carga `TASKI_CODE` en la terminal. La variante reutilizable de esta página toma el ID de `TASKI_MEMBER`.
+
 Para una instalación alojada, usa la URL HTTPS `/mcp` que te dé el equipo. Para una prueba local, arranca el Worker según [MCP](../mcp.md) y usa `http://127.0.0.1:8787/mcp`. Define `TASKI_CODE` y `TASKI_MEMBER` en el entorno privado de la terminal que abre Codex. El código debe coincidir con el del Worker y el miembro debe ser un ID de su configuración. `.dev.vars` configura Wrangler, pero no exporta esas variables a otra terminal.
 
 Integra este bloque en tu configuración local de Codex (`~/.codex/config.toml`), sin guardar valores reales en el repositorio:

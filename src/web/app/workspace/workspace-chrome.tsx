@@ -31,14 +31,14 @@ export function WorkspaceSidebar({ brand, project, members, view, disabled, onVi
 export function WorkspaceTopbar({ project, member, theme, onTheme, busy, onSignOut }: {
   project: string; member: Member; theme: Theme; onTheme: (theme: Theme) => void; busy: boolean; onSignOut: () => void;
 }) {
-  return <header className="app-topbar">
+  return <div className="app-topbar">
     <span className="breadcrumb">Equipo <span aria-hidden="true">/</span> {project}</span>
     <div className="top-actions">
       <ThemeControl theme={theme} onChange={onTheme} />
       <span className="viewer"><Avatar name={member.name} />{member.name}</span>
       <Button variant="secondary" disabled={busy} onClick={onSignOut}>Salir</Button>
     </div>
-  </header>;
+  </div>;
 }
 
 export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefresh, grouping, onGrouping, presentation, onPresentation }: {

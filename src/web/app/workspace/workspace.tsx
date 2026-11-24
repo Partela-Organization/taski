@@ -4,6 +4,7 @@ import { Button, StatusMessage } from "../../components.tsx";
 import type { Theme } from "../../theme.ts";
 import { operationError } from "../access/use-team-session.ts";
 import type { Access, Member } from "../access/use-team-session.ts";
+import { McpGuide } from "../mcp/mcp-guide.tsx";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 import { TicketPanel } from "../tickets/ticket-panel.tsx";
 import { useTicketRoute } from "../tickets/use-ticket-route.ts";
@@ -75,8 +76,11 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         capture.clearError();
       }} />
     <div className="app-center">
-      <WorkspaceTopbar project={projectName} member={member} theme={theme} onTheme={onTheme}
-        busy={signingOut || capture.busy} onSignOut={() => void signOut()} />
+      <header className="workspace-header">
+        <WorkspaceTopbar project={projectName} member={member} theme={theme} onTheme={onTheme}
+          busy={signingOut || capture.busy} onSignOut={() => void signOut()} />
+        <McpGuide baseUrl={list.project?.baseUrl} memberId={member.id} />
+      </header>
       <main className="workspace">
         <div className="workspace-heading" data-feedback={feedback || undefined}>
           <h1>{heading}</h1>

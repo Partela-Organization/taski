@@ -4,6 +4,8 @@ Validado con Claude Code 2.1.327 y su modelo predeterminado observado `claude-so
 
 ## Conectar una instalación
 
+En la web de Taski, [Conectar MCP](../web.md#conectar-mcp-desde-el-encabezado) genera una configuración con la URL de la instalación y el ID del miembro seleccionado. Carga `TASKI_CODE` en la terminal. La variante reutilizable de esta página toma el ID de `TASKI_MEMBER`.
+
 Para una instalación alojada, usa la URL HTTPS `/mcp` que te dé el equipo. Para una prueba local, arranca el Worker según [MCP](../mcp.md) y usa `http://127.0.0.1:8787/mcp`. En la terminal de Claude Code define `TASKI_CODE` y `TASKI_MEMBER` desde tu entorno privado. Deben coincidir con el código del Worker y un ID de miembro configurado. El `.dev.vars` de Wrangler no exporta variables al cliente.
 
 Configura el servidor HTTP, por ejemplo mediante un `.mcp.json` con referencias de entorno:

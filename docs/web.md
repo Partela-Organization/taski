@@ -28,6 +28,14 @@ Ante una respuesta perdida, se conserva texto y solicitud, bloqueando la modific
 
 Playwright inicia el [servidor de fixtures](../scripts/serve-browser-fixture.mjs) en 8787 y ambos Vite; esos puertos deben estar libres. El harness usa almacenamiento temporal y exige el preset demo; no abre la D1 de desarrollo ni modifica `.dev.vars`. Al terminar se cierran los servidores.
 
+## Conectar MCP desde el encabezado
+
+Entra a Taski y pulsa **Conectar MCP** debajo de la navegación. La guía muestra el endpoint de la instalación y el ID del miembro que seleccionaste. Elige **Codex** o **Claude Code** y copia la configuración al archivo indicado.
+
+Carga el código compartido en `TASKI_CODE` en la terminal que abre el cliente. La guía incluye un comando para Bash o Zsh que lee el código sin mostrarlo. Las configuraciones usan la referencia a esa variable. Para comprobar, pide al cliente que ejecute `get_project` y te diga el nombre del proyecto. Después puedes pedirle que liste tus tickets pendientes.
+
+Consulta los recorridos y el diagnóstico de [Codex](mcp/codex.md) y [Claude Code](mcp/claude-code.md).
+
 ## Panel y enlaces B7-02
 
 El enlace `/t/DEMO-003` es un ejemplo ficticio: abre el detalle después de entrar y funciona al recargar con Vite. Copiar enlace usa el origen de la web. Abrir otra tarea y Atrás recupera el borrador de cada tarea; Escape cierra y vuelve a la lista. Los borradores viven solo en memoria de la pestaña, se eliminan al salir y la recarga avisa si quedan cambios. Confirmar salir de la página descarta esos borradores.
