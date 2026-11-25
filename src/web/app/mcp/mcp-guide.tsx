@@ -90,7 +90,7 @@ export function McpGuide({ baseUrl, memberId }: { baseUrl: string | undefined; m
           <p>Abre el cliente desde esa terminal y pídele «Usa <code>get_project</code> de Taski y dime el nombre del proyecto». Después, prueba «Muéstrame mis tickets pendientes en Taski».</p>
           <details>
             <summary>Si la conexión falla</summary>
-            <p>Comprueba la URL y que termina en <code>/mcp</code>. Ante un error 401 o 403, revisa <code>TASKI_CODE</code> y tu ID de miembro. Reinicia el cliente desde la terminal donde cargaste el código.</p>
+            <p>Comprueba la URL y que termina en <code>/mcp</code>. Si falla DNS, revisa la conexión del equipo. Si Taski devuelve 401, revisa <code>TASKI_CODE</code> y reinicia el cliente. Si Cloudflare devuelve error 1010, identifica tu cliente con un <code>User-Agent</code> descriptivo, como <code>taski-agent/1.0</code>, y vuelve a conectar.</p>
           </details>
         </section>
       </div>

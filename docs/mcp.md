@@ -25,6 +25,14 @@ El código se exige también para descubrir el catálogo. Las cookies web no aut
 
 El Host debe coincidir con el hostname de `project.baseUrl`; el puerto no interviene en esa comprobación. Con el preset demo usa `127.0.0.1`, no un alias `localhost`. Se rechaza un Origin presente que no coincida con el origen solicitado. No hay CORS abierto, OAuth ni servidor stdio. Un dominio distinto requiere configurar su instalación; no basta con cambiar la URL del cliente.
 
+## Diagnóstico de red y Cloudflare
+
+- Si aparece `nodename nor servname provided, or not known`, comprueba que el dominio resuelve desde el entorno donde se ejecuta el agente. Por ejemplo, ejecuta `nslookup taski.example.com` con el dominio de tu instalación y revisa DNS, conexión y proxy de ese entorno. Conserva la URL HTTPS y el hostname original.
+- Si la respuesta dice `Error 1010`, Cloudflare rechazó la firma del cliente antes de que Taski procesara la llamada. En clientes Python que usan `urllib.request`, añade una cabecera descriptiva como `"User-Agent": "taski-agent/1.0"` y vuelve a probar la conexión. Usa el SDK MCP o la configuración nativa de Codex o Claude Code cuando estén disponibles. Consulta la [guía de Cloudflare sobre el error 1010](https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-1xxx-errors/error-1010/).
+- Si llega una respuesta JSON de Taski con `AUTH_REQUIRED` o `AUTH_FAILED`, revisa `Authorization`, el código vigente y las variables disponibles en el proceso. `UNKNOWN_MEMBER` indica un ID de miembro no configurado. Un 403 de Taski puede indicar un origen o Host no admitido, o una operación que necesita autorización de cierre. Revisa el cuerpo del error para distinguirlo de una respuesta de Cloudflare.
+
+Al compartir un error, conserva el código HTTP, el tipo de respuesta y el identificador de Cloudflare si aparece. Excluye el código del equipo, las cabeceras de autorización y los contenidos privados de tickets.
+
 ## Descubrir y leer con el SDK
 
 Desde la raíz, con `TASKI_CLIENT_CODE` y `TASKI_CLIENT_MEMBER` definidos en un entorno privado y el Worker activo:
