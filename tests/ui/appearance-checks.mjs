@@ -50,12 +50,16 @@ export function appearanceChecks() {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect.poll(columns).toBe(1);
     await expect(cards).toBeInViewport();
+    const account = page.locator(".mobile-account summary");
+    await expect(page.getByLabel("Tema", { exact: true })).toBeHidden();
+    await account.click();
     for (const label of ["Tema", "Área", "Agrupar por"]) {
       const box = await page.getByLabel(label, { exact: true }).boundingBox();
       expect(box.height).toBeGreaterThanOrEqual(44);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.getByLabel("Tema", { exact: true }).selectOption("dark");
+    await account.click();
     await page.screenshot({ path: testInfo.outputPath("mobile-cards.png") });
   });
 

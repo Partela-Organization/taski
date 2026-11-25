@@ -2,21 +2,31 @@ import { Button, Field, StatusMessage } from "../../components.tsx";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 import type { useQuickCapture } from "./use-quick-capture.ts";
 
-export function QuickCapture({ model, feedback }: { model: ReturnType<typeof useQuickCapture>; feedback: boolean }) {
+export function QuickCapture({ model, feedback, onCancel }: {
+  model: ReturnType<typeof useQuickCapture>; feedback: boolean; onCancel?: (() => void) | undefined;
+}) {
   const { title, setTitle, context, setContext, attempt, busy, error, submit } = model;
   const busyLabel = busy ? "Guardando…" : attempt ? "Confirmar reintento" : undefined;
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     void submit();
   };
+  const details = <>
+    <label htmlFor="feedback-context">Detalles (opcional)</label>
+    <textarea id="feedback-context" rows={3} maxLength={100000} value={context} disabled={busy || !!attempt}
+      onChange={(event) => setContext(event.target.value)} />
+  </>;
   return <>
     {feedback ? <form className="feedback-capture" onSubmit={onSubmit}>
-      <Field id="capture-title" label="¿Qué quieres compartir?" placeholder="Escribe una idea o algo que mejorar…"
+      <Field id="capture-title" label="¿Qué quieres compartir?" placeholder={onCancel ? "Escribe tu idea…" : "Escribe una idea o algo que mejorar…"}
         maxLength={240} value={title} disabled={busy || !!attempt} onChange={(event) => setTitle(event.target.value)} />
-      <label htmlFor="feedback-context">Detalles (opcional)</label>
-      <textarea id="feedback-context" rows={2} maxLength={100000} value={context} disabled={busy || !!attempt}
-        onChange={(event) => setContext(event.target.value)} />
-      <Button variant="primary" type="submit" disabled={busy || (!attempt && !title.trim())}>{busyLabel ?? "Enviar feedback"}</Button>
+      {onCancel ? <details className="feedback-context" open={context ? true : undefined}>
+        <summary>Añadir detalles</summary>{details}
+      </details> : details}
+      <div className="feedback-capture__actions">
+        <Button variant="primary" type="submit" disabled={busy || (!attempt && !title.trim())}>{busyLabel ?? "Enviar feedback"}</Button>
+        {onCancel && <Button variant="secondary" disabled={busy || !!attempt} onClick={onCancel}>Cerrar editor</Button>}
+      </div>
     </form> : <form className="capture" onSubmit={onSubmit}>
       <div className="capture-line">
         <WorkspaceIcon name="plus" />

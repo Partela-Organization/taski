@@ -59,11 +59,13 @@ El selector Tema ofrece Claro/Oscuro/Sistema y conserva la elección. La [matriz
 
 En móvil se abre Feedback al entrar. También es la vista inicial de quienes tienen esa preferencia en la configuración, incluso desde escritorio. Las demás vistas siguen disponibles para todo el equipo.
 
-1. En **Feedback**, escribe una frase en **¿Qué quieres compartir?**, añade detalles si los necesitas y pulsa **Enviar feedback**. El aporte se guarda en el área predeterminada del proyecto y se abre su detalle.
+1. En **Feedback**, pulsa **Nuevo feedback** en el teléfono para abrir el editor. Escribe una frase en **¿Qué quieres compartir?**, usa **Añadir detalles** si necesitas contexto y pulsa **Enviar feedback**. El aporte se guarda en el área predeterminada del proyecto y se abre su detalle. En escritorio el editor está a la vista.
 2. Usa **Copiar enlace** para enviárselo a otra persona del equipo. La conversación está debajo del aporte. Para responder, escribe en **Comentario** y pulsa **Enviar comentario**.
 3. Abre **Gestionar feedback** para cambiar el área, resaltar, revisar actividad o **Convertir en tarea**. La conversión conserva el área guardada, el enlace, el autor, la conversación y el historial.
 
 La lista de Feedback muestra los aportes más recientes primero. **Ver más** amplía la lista y **Cargar más** trae la siguiente página cuando está disponible. Los filtros, grupos y tarjetas se usan desde las vistas de trabajo.
+
+En móvil, toca tu nombre en el encabezado para cambiar el tema o salir. **Conectar MCP** queda debajo de las pestañas. Si cierras el editor de Feedback, el borrador permanece mientras sigas en la misma sesión y pestaña.
 
 La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas comparten los mismos permisos. La prueba de navegador cubre captura móvil, apertura desde otra sesión, comentario y conversión con Worker/D1 efímero.
 

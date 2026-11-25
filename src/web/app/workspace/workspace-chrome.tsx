@@ -1,4 +1,6 @@
 import { Avatar, Button, Field } from "../../components.tsx";
+import { useEffect, useRef } from "react";
+import type { ReactNode } from "react";
 import type { Theme } from "../../theme.ts";
 import type { Member } from "../access/use-team-session.ts";
 import { Wordmark, WorkspaceIcon } from "../shared/marks.tsx";
@@ -8,11 +10,11 @@ import { views } from "./views.ts";
 import type { View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
 
-export function WorkspaceSidebar({ brand, project, members, view, disabled, onView }: {
-  brand: string; project: string; members: Member[]; view: View; disabled: boolean; onView: (view: View) => void;
+export function WorkspaceSidebar({ brand, project, members, view, disabled, onView, account }: {
+  brand: string; project: string; members: Member[]; view: View; disabled: boolean; onView: (view: View) => void; account?: ReactNode;
 }) {
   return <aside className="app-sidebar">
-    <Wordmark name={brand} />
+    <div className="sidebar-heading"><Wordmark name={brand} />{account}</div>
     <p className="sidebar-project">{project}</p>
     <nav aria-label="Vistas">{views.map(({ id, label }) =>
       <Button key={id} aria-pressed={view === id} disabled={disabled} onClick={() => onView(id)}>
@@ -28,9 +30,36 @@ export function WorkspaceSidebar({ brand, project, members, view, disabled, onVi
   </aside>;
 }
 
-export function WorkspaceTopbar({ project, member, theme, onTheme, busy, onSignOut }: {
-  project: string; member: Member; theme: Theme; onTheme: (theme: Theme) => void; busy: boolean; onSignOut: () => void;
-}) {
+interface AccountActions {
+  member: Member; theme: Theme; onTheme: (theme: Theme) => void; busy: boolean; onSignOut: () => void;
+}
+
+export function WorkspaceMobileAccount({ member, theme, onTheme, busy, onSignOut }: AccountActions) {
+  const menu = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const dismiss = (event: PointerEvent) => {
+      if (menu.current?.open && event.target instanceof Node && !menu.current.contains(event.target)) menu.current.open = false;
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, []);
+  return <details ref={menu} className="mobile-account" onKeyDown={(event) => {
+    if (event.key !== "Escape" || !event.currentTarget.open) return;
+    event.preventDefault();
+    event.currentTarget.open = false;
+    event.currentTarget.querySelector("summary")?.focus();
+  }}>
+    <summary aria-label={`Cuenta de ${member.name}`}>
+      <Avatar name={member.name} /><span>{member.name}</span><WorkspaceIcon name="chevron" />
+    </summary>
+    <div className="mobile-account__actions">
+      <ThemeControl theme={theme} onChange={onTheme} />
+      <Button variant="secondary" disabled={busy} onClick={onSignOut}>Salir</Button>
+    </div>
+  </details>;
+}
+
+export function WorkspaceTopbar({ project, member, theme, onTheme, busy, onSignOut }: AccountActions & { project: string }) {
   return <div className="app-topbar">
     <span className="breadcrumb">Equipo <span aria-hidden="true">/</span> {project}</span>
     <div className="top-actions">

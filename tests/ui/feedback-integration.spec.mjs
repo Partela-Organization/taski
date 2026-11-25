@@ -16,8 +16,20 @@ test("mobile feedback works without technical fields and conversion preserves id
   await expect(page.getByRole("button", { name: "Feedback", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByLabel("Área", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Tarjetas", exact: true })).toHaveCount(0);
+  const compose = page.getByRole("button", { name: "Nuevo feedback", exact: true });
+  const titleField = page.getByLabel("¿Qué quieres compartir?");
+  await expect(titleField).toHaveCount(0);
+  await compose.click();
+  await expect(titleField).toBeFocused();
   await page.getByLabel("¿Qué quieres compartir?").fill(feedbackTitle);
+  await expect(page.getByLabel("Detalles (opcional)")).toBeHidden();
+  await page.getByText("Añadir detalles", { exact: true }).click();
   await page.getByLabel("Detalles (opcional)").fill("Sería útil explicar qué datos hacen falta.");
+  await page.getByRole("button", { name: "Cerrar editor" }).click();
+  await expect(compose).toBeFocused();
+  await compose.click();
+  await expect(titleField).toHaveValue(feedbackTitle);
+  await expect(page.getByLabel("Detalles (opcional)")).toHaveValue("Sería útil explicar qué datos hacen falta.");
   const creation = page.waitForResponse((r) => r.request().method() === "POST" && r.url().endsWith("/tickets"));
   await page.getByRole("button", { name: "Enviar feedback" }).click();
   const receipt = await (await creation).json();
@@ -33,7 +45,10 @@ test("mobile feedback works without technical fields and conversion preserves id
   if (await manualLink.isVisible()) await expect(manualLink).toHaveValue(link);
   const created = await (await page.request.get(`${app}/api/v1/tickets/${receipt.key}?view=full`)).json();
   await dialog.getByRole("button", { name: "Cerrar detalle" }).click();
-  await expect(page.locator(".tickets li").filter({ hasText: feedbackTitle })).toContainText("Feedback · Alex");
+  const entry = page.locator(".tickets li").filter({ hasText: feedbackTitle });
+  await expect(entry.getByText("Alex", { exact: true })).toBeVisible();
+  await expect(entry).toBeInViewport();
+  await expect(compose).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("feedback-mobile.png") });
   const recipient = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   try {
@@ -95,6 +110,7 @@ test("attaching an image survives a lost upload response and the uploader can re
   await page.goto(app);
   await enter(page, "Alex");
   const name = `Feedback con captura · ${testInfo.project.name}`;
+  await page.getByRole("button", { name: "Nuevo feedback", exact: true }).click();
   await page.getByLabel("¿Qué quieres compartir?").fill(name);
   await page.getByRole("button", { name: "Enviar feedback" }).click();
   const panel = page.getByRole("dialog", { name });

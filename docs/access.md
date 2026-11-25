@@ -24,6 +24,14 @@ Las escrituras de sesión exigen JSON y rechazan Origin distinto al del Worker. 
 
 El backend no registra el código en respuestas, actividad o errores. El bundle web de componentes no importa el adaptador de acceso. La API de tickets y el [MCP](mcp.md) usan esta frontera y el mismo núcleo.
 
+## Cambiar el código en Cloudflare
+
+1. En **Workers & Pages**, abre el Worker de tu instalación y entra a **Settings → Variables and Secrets**.
+2. Edita el secreto `TASKI_TEAM_ACCESS_CODE`, introduce el código nuevo y publica el cambio. Si tu próximo despliegue usa `--secrets-file`, actualiza el mismo valor en el archivo privado de la instalación.
+3. Entra a la web con el código nuevo y actualiza `TASKI_CODE` en las terminales que abren los clientes MCP. El cambio invalida las sesiones anteriores.
+
+Desde una terminal autorizada también puedes usar `npm exec -- wrangler secret put TASKI_TEAM_ACCESS_CODE --config wrangler.deploy.local.jsonc`. Wrangler solicita el valor y despliega una versión con el secreto actualizado. Consulta la [guía de secretos de Cloudflare](https://developers.cloudflare.com/workers/configuration/secrets/).
+
 ## Agentes HTTP y MCP
 
 La frontera común `TeamAccess.authenticate` acepta `Authorization: Bearer <código>` y `X-Taski-Member: <ID>`, más X-Taski-Client opcional (máximo 80 caracteres). Construye actor agent con canal http o mcp; una cookie de web construye person/web. El canal no otorga permisos y el actor nunca se toma del cuerpo del ticket. MCP exige cabeceras, sin convertir una cookie de persona en identidad de agente. Los adaptadores están disponibles en `/api/v1` y `/mcp`.

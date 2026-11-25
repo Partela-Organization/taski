@@ -76,12 +76,13 @@
   max-width: 640px; padding: 16px; background: var(--sidebar);
   border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
 }
-.feedback-capture > label { display: block; margin-top: 12px; font-size: 12px; color: var(--muted); }
+.feedback-capture > label, .feedback-context label { display: block; margin-top: 12px; font-size: 12px; color: var(--muted); }
 .feedback-capture textarea {
   display: block; width: 100%; margin: 6px 0 12px; padding: 8px 10px;
   border: 1px solid var(--border); border-radius: 6px; background: var(--surface); resize: vertical;
 }
 .feedback-capture .button { font-size: 12px; }
+.feedback-capture__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .ticket-group + .ticket-group { margin-top: 26px; }
 .ticket-group h2 { display: flex; align-items: center; gap: 7px; margin: 0 8px 9px; font-size: 10px; font-weight: 450; color: var(--muted); }
 .ticket-group--area h2 {
