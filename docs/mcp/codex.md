@@ -50,7 +50,7 @@ Los logs del cliente y su sesión persistida contienen solo el recorrido fictici
 ## Diagnóstico
 
 - Fallo de arranque del MCP: confirma Worker activo, migraciones y URL `/mcp`; el preset demo exige `127.0.0.1` en lugar de un alias de Host.
-- 401/403: revisa código, miembro y variables exportadas en el proceso cliente. Una cookie web no sustituye las cabeceras de agente.
+- Ante errores de resolución DNS, respuesta 401 o error 1010 de Cloudflare, sigue el [diagnóstico de red](../mcp.md#diagnóstico-de-red-y-cloudflare). Una cookie web no sustituye las cabeceras de agente.
 - Parámetros rechazados: consulta el esquema y conserva el texto del error; no adivines aliases como `fields`, `set` o `patch` para los campos de edición.
 - `VERSION_CONFLICT`: relee y reconcilia. Un reintento incierto conserva clave y argumentos; no incrementa la versión a ciegas.
 - Sin acceso al proveedor del modelo: comprueba `codex login status` en tu terminal. Una conexión MCP correcta no prueba acceso al modelo.

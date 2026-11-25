@@ -58,6 +58,7 @@ Se conservan los campos de uso expuestos por Claude con entrada, salida, creaci�
 - Sin herramientas: revisa `/mcp`, URL y variables del proceso. El descubrimiento también exige código y miembro.
 - 401: el código de Taski no es el token de Claude; no uses `ANTHROPIC_AUTH_TOKEN` como cabecera de este MCP.
 - 403: confirma Host/Origin y usa `127.0.0.1` con el preset demo.
+- DNS o error 1010 de Cloudflare: consulta el [diagnóstico de red](../mcp.md#diagnóstico-de-red-y-cloudflare).
 - Herramienta excluida o error de esquema: revisa el mensaje del cliente y sus versiones. La versión probada conservó `update_ticket` con su validación de entrada; el servidor sigue rechazando combinaciones inválidas.
 - Conflicto de versión o cursor: relee/reconcilia o resincroniza con un cursor nuevo, según [MCP](../mcp.md). Nunca inventes el recibo de una escritura rechazada.
 - Fallo de acceso al modelo: revisa la autenticación normal de Claude Code desde tu terminal. Un código de Taski válido no autentica al proveedor del modelo.
