@@ -16,6 +16,8 @@ Para agentes o scripts, construye el cliente con `code`, `memberId` y `clientNam
 
 Métodos: getProject, listTickets, getTicket, createTicket, updateTicket, addComment, listActivity y linkPullRequest; más accessOptions/login/changeMember/logout para sesiones web. login envía el código y no lo retiene; la cookie queda a cargo del navegador. Node no mantiene cookie jar automáticamente: para scripts se recomienda acceso por cabeceras o un transporte que lo gestione explícitamente.
 
+Desde una sesión web, `client.deleteTicket(key, { expectedVersion, idempotencyKey })` quita una tarea o feedback de las vistas activas y devuelve su recibo.
+
 Para [imágenes adjuntas](attachments.md), usa `listAttachments`, `uploadAttachment`, `attachmentUrl` y `removeAttachment`. El cuerpo de `uploadAttachment` es un `Uint8Array`. Si inyectas un transporte `fetch`, proporciona también `fetchBytes` para las subidas y transmite los bytes directamente. El transporte nativo admite ambos formatos.
 
 Las vistas son genéricas: getTicket(key) tiene los campos de trabajo, getTicket(key,{view:"full"}) añade identidad/fechas y summary los reduce. listTickets({view:"work"}) añade metadatos de UI. Consulta `omitted`, nextCursor y nextCommentsCursor; las páginas pueden continuarse solo con el cursor y el límite. getProject(knownVersion) evita retransmitir el catálogo de miembros cuando no cambió.

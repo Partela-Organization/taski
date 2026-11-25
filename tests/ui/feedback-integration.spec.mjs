@@ -8,6 +8,43 @@ async function enter(page, member) {
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
 }
 
+for (const type of ["task", "feedback"]) {
+  test(`delete a ${type} from its detail after confirming`, async ({ page }, testInfo) => {
+    const isFeedback = type === "feedback";
+    const title = `Entrada para eliminar · ${type} · ${testInfo.project.name}`;
+    if (isFeedback) await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto(app);
+    await enter(page, "Alex");
+    const heading = page.getByRole("heading", { name: isFeedback ? "Feedback" : "Trabajo del equipo", exact: true });
+    await expect(heading).toBeVisible();
+    const created = await page.request.post(`${app}/api/v1/tickets`, { data: { type, title, idempotencyKey: title } });
+    expect(created.ok()).toBe(true);
+    const { key } = await created.json();
+    await page.goto(`${app}/t/${key}`);
+    const row = page.locator(".tickets").getByRole("button", { name: title, exact: true });
+    const subject = isFeedback ? "el feedback" : "la tarea";
+    const trigger = page.getByRole("button", { name: `Eliminar ${subject}`, exact: true });
+    const confirmation = page.getByRole("alertdialog", { name: `¿Eliminar ${subject}?` });
+    await expect(trigger).toBeInViewport();
+    await trigger.click();
+    await expect(confirmation.getByText(title, { exact: true })).toBeVisible();
+    await expect(confirmation.getByRole("button", { name: "Cancelar" })).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(confirmation).toBeHidden();
+    await expect(trigger).toBeFocused();
+    await expect(page).toHaveURL(`${app}/t/${key}`);
+
+    await trigger.click();
+    await confirmation.getByRole("button", { name: "Eliminar", exact: true }).click();
+    await expect(page).toHaveURL(`${app}/`);
+    await expect(page.getByRole("status").filter({ hasText: isFeedback ? "Feedback eliminado." : "Tarea eliminada." })).toBeVisible();
+    await expect(row).toHaveCount(0);
+    await expect(heading).toBeFocused();
+    await page.goto(`${app}/t/${key}`);
+    await expect(page.getByRole("alert")).toContainText("Este ticket ya no está disponible.");
+  });
+}
+
 test("mobile feedback works without technical fields and conversion preserves identity, author and conversation", async ({ page, browser }, testInfo) => {
   const feedbackTitle = `${title} · ${testInfo.project.name}`;
   await page.setViewportSize({ width: 390, height: 844 });

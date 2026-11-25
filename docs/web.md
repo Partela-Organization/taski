@@ -40,6 +40,8 @@ Consulta los recorridos y el diagnóstico de [Codex](mcp/codex.md) y [Claude Cod
 
 El enlace `/t/DEMO-003` es un ejemplo ficticio: abre el detalle después de entrar y funciona al recargar con Vite. Copiar enlace usa el origen de la web. Abrir otra tarea y Atrás recupera el borrador de cada tarea; Escape cierra y vuelve a la lista. Los borradores viven solo en memoria de la pestaña, se eliminan al salir y la recarga avisa si quedan cambios. Confirmar salir de la página descarta esos borradores.
 
+Para quitar una tarea o feedback, abre su detalle y pulsa **Eliminar** junto a **Copiar enlace**. Confirma tras revisar el título. La lista se actualiza y el enlace, los comentarios y los adjuntos dejan de estar disponibles en el detalle. Taski conserva el registro de auditoría.
+
 Título, descripción, responsable, estado y área se guardan con la versión consultada; solo se envían los campos editados. Los errores conservan el texto y los reintentos inciertos mantienen la misma solicitud. Un conflicto exige consultar la versión actual y revisar antes de volver a guardar; los campos que no editaste reciben los cambios del servidor. Actualizar detalle pide confirmación antes de descartar un borrador. En escritorio el panel permite seguir usando la lista; en móvil conserva el diálogo completo con Escape y control del foco.
 
 ## Conversación y auditoría B7-03

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TaskiClientError } from "../../../client/index.ts";
 import type { TaskiClient, TicketResult } from "../../../client/index.ts";
 import { operationError } from "../access/use-team-session.ts";
 import type { ConversationDraft } from "./conversation.tsx";
@@ -41,7 +42,8 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
       }
       setDetail(result);
     } catch (error) {
-      if (id === generation.current) setError(operationError(error, onExpired));
+      if (id === generation.current) setError(error instanceof TaskiClientError && error.code === "NOT_FOUND"
+        ? "Este ticket ya no está disponible." : operationError(error, onExpired));
     }
   }, [client, onExpired]);
 
@@ -78,5 +80,13 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
   function syncDetail(fresh: TicketResult<"full">) {
     setDetail((current) => current?.ticket.key === fresh.ticket.key ? fresh : current);
   }
-  return { selected, detail, error, syncDetail, drafts: drafts.current, conversations: conversations.current, open, close, reset };
+  function remove(key: string) {
+    drafts.current.delete(key);
+    conversations.current.delete(key);
+    if (location.pathname !== ticketPath(key)) return false;
+    clear();
+    history.replaceState(null, "", "/");
+    return true;
+  }
+  return { selected, detail, error, syncDetail, drafts: drafts.current, conversations: conversations.current, open, close, reset, remove };
 }

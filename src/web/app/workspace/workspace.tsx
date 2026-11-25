@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import type { TaskiClient } from "../../../client/index.ts";
 import { Button, StatusMessage } from "../../components.tsx";
@@ -31,6 +31,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
   const [composingFeedback, setComposingFeedback] = useState(false);
+  const [deletion, setDeletion] = useState<{ message: string; closed: boolean }>();
+  const workspaceHeading = useRef<HTMLHeadingElement>(null);
   const compact = useCompactLayout();
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
   const feedback = view === "feedback";
@@ -39,6 +41,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const route = useTicketRoute(client, member?.id, onExpired);
   const capture = useQuickCapture(client, feedback, activeArea, (key) => {
     if (feedback) setComposingFeedback(false);
+    setDeletion(undefined);
     list.refresh();
     void route.open(key);
   }, onExpired);
@@ -47,6 +50,10 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const projectName = list.project?.name ?? access?.projectName ?? brandName;
   const accentLight = brand?.accentLight;
   const accentDark = brand?.accentDark;
+
+  useEffect(() => {
+    if (deletion?.closed) workspaceHeading.current?.focus({ preventScroll: true });
+  }, [deletion]);
 
   useEffect(() => {
     if (!member) return;
@@ -74,6 +81,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       setComposingFeedback(false);
       setArea("");
       setSearch("");
+      setDeletion(undefined);
     } catch (error) {
       setSignOutError(operationError(error, onExpired));
     } finally {
@@ -101,6 +109,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => {
         setSelection({ memberId: member.id, view: next });
         capture.clearError();
+        setDeletion(undefined);
       }} />
     <div className="app-center">
       <header className="workspace-header">
@@ -109,7 +118,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       </header>
       <main className="workspace" data-view={view}>
         <div className="workspace-heading" data-feedback={feedback || undefined}>
-          <h1>{heading}</h1>
+          <h1 ref={workspaceHeading} tabIndex={-1}>{heading}</h1>
           {mobileFeedback && !composingFeedback && !capture.attempt &&
             <Button id="new-feedback" variant="primary" onClick={compose}>
               <WorkspaceIcon name="plus" />Nuevo feedback
@@ -118,6 +127,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
             <WorkspaceIcon name="plus" />Nueva tarea
           </Button>}
         </div>
+        {deletion && <StatusMessage title={deletion.message} />}
         {!feedback && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
@@ -129,7 +139,10 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         {(!mobileFeedback || composingFeedback || capture.attempt) &&
           <QuickCapture model={capture} feedback={feedback} onCancel={mobileFeedback ? cancelFeedback : undefined} />}
         <TicketList key={`${view}:${activeArea}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
-          search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => void route.open(key)} />
+          search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => {
+            setDeletion(undefined);
+            void route.open(key);
+          }} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
@@ -144,6 +157,10 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         </footer>}
       </main>
     </div>
-    <TicketPanel route={route} client={client} project={list.project} onSaved={list.refresh} />
+    <TicketPanel route={route} client={client} project={list.project} onSaved={list.refresh} onExpired={onExpired}
+      onDeleted={(type, closed) => {
+        setDeletion({ message: type === "feedback" ? "Feedback eliminado." : "Tarea eliminada.", closed });
+        list.refresh();
+      }} />
   </div>;
 }

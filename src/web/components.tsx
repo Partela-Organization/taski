@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type { ComponentPropsWithRef, InputHTMLAttributes, ReactNode } from "react";
 
 export function Button({ variant = "quiet", className = "", type = "button", ...props }:
-  ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "quiet" | "primary" | "secondary" }) {
+  ComponentPropsWithRef<"button"> & { variant?: "quiet" | "primary" | "secondary" }) {
   return <button {...props} type={type} className={`button button--${variant} ${className}`} />;
 }
 

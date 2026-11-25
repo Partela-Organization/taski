@@ -68,6 +68,7 @@ export class TaskiClient {
   }
   createTicket(input: CreateTicket): Promise<Receipt> { return this.request("tickets", "POST", input); }
   updateTicket(key: string, input: UpdateTicket): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "PATCH", input); }
+  deleteTicket(key: string, input: Mutation): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "DELETE", input); }
   addComment(key: string, input: Mutation & { body: string }): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}/comments`, "POST", input); }
   listAttachments(key: string): Promise<AttachmentList> { return this.request(`tickets/${encodeURIComponent(key)}/attachments`); }
   attachmentUrl(key: string, id: string): string { return this.apiUrl(`tickets/${encodeURIComponent(key)}/attachments/${encodeURIComponent(id)}`); }

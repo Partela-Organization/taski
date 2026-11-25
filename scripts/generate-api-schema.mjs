@@ -1,9 +1,10 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { definitions } from "../src/adapters/api/contract.ts";
+import { definitions, deleteTicketDefinition } from "../src/adapters/api/contract.ts";
 import { attachmentContentTypes, maxAttachmentBytes, maxTicketAttachments } from "../src/contracts/attachments.ts";
 
 const components = {};
-for (const definition of definitions) {
+const httpDefinitions = [...definitions, deleteTicketDefinition];
+for (const definition of httpDefinitions) {
   components[`${definition.name}Input`] = definition.inputSchema;
   components[`${definition.name}Output`] = definition.outputSchema;
 }
@@ -12,10 +13,11 @@ const routes = [
   ["get", "/api/v1/project", "get_project"], ["get", "/api/v1/tickets", "list_tickets"],
   ["get", "/api/v1/tickets/{key}", "get_ticket"], ["post", "/api/v1/tickets", "create_ticket"],
   ["patch", "/api/v1/tickets/{key}", "update_ticket"], ["post", "/api/v1/tickets/{key}/comments", "add_comment"],
+  ["delete", "/api/v1/tickets/{key}", "delete_ticket"],
   ["get", "/api/v1/activity", "list_activity"], ["put", "/api/v1/tickets/{key}/pull-request", "link_pull_request"],
 ];
 for (const [method, path, name] of routes) {
-  const definition = definitions.find((entry) => entry.name === name);
+  const definition = httpDefinitions.find((entry) => entry.name === name);
   const input = structuredClone(definition.inputSchema);
   const parameters = [];
   if (path.includes("{key}")) {
@@ -32,6 +34,7 @@ for (const [method, path, name] of routes) {
     }, default: { description: "Typed error; inspect error.code. 401/403 access, 409 conflict, 429 rate limit, 503 configuration, 500 unconfirmed internal failure.",
       content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } } } };
   if (method !== "get") entry.requestBody = { required: true, content: { "application/json": { schema: input } } };
+  if (name === "delete_ticket") entry.security = [{ TeamCookie: [] }];
   paths[path] ??= {}; paths[path][method] = entry;
 }
 components.Error = { type: "object", required: ["error"], properties: { error: { type: "object", required: ["code", "message"], properties: { code: { type: "string" }, message: { type: "string" } } } } };

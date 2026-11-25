@@ -9,6 +9,22 @@
 .detail-panel__actions { display: flex; align-items: center; gap: 8px; }
 .app .detail-panel__top > span { font: 10px var(--mono); }
 .app .detail-panel__top .button { font-size: 11px; }
+.app .detail-panel__top .ticket-delete-trigger {
+  display: inline-flex; align-items: center; gap: 5px; color: var(--error);
+}
+.ticket-delete-trigger .workspace-icon { width: 14px; height: 14px; }
+.ticket-delete-dialog {
+  width: min(420px, calc(100% - 32px)); max-height: 85dvh; padding: 22px;
+  border: 1px solid var(--line-strong); border-radius: 16px;
+  background: var(--surface); color: var(--text); box-shadow: 0 16px 58px #0004;
+}
+.ticket-delete-dialog::backdrop { background: #120f167a; }
+.ticket-delete-dialog h3 { font-size: 19px; margin-bottom: 8px; }
+.app .detail-panel .ticket-delete-dialog p { font-size: 14px; }
+.ticket-delete-dialog p strong { color: var(--text); }
+.ticket-delete-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.app .detail-panel .ticket-delete-actions .button { margin: 0; min-height: 44px; font-size: 14px; }
+.ticket-delete-actions .ticket-delete-confirm { background: var(--error); color: var(--canvas); }
 .app .detail-panel .ticket-type {
   display: table; color: var(--text); border-bottom: 1px solid var(--text);
   padding-bottom: 5px; margin-bottom: 17px; font-size: 11px; line-height: 16px;
@@ -74,4 +90,8 @@
   .app .detail-panel .button--secondary { min-height: 44px; }
   .feedback-management summary, .conversation[aria-label="Comentarios"] .button--primary { min-height: 44px; }
   .conversation[aria-label="Comentarios"] .comment-composer { grid-template-columns: minmax(0, 1fr); justify-items: start; row-gap: 6px; }
+}
+@media (max-width: 360px) {
+  .app > .detail-panel > .detail-panel__top { padding-inline: 16px; }
+  .app .detail-panel__top .button { padding-inline: 8px; }
 }
