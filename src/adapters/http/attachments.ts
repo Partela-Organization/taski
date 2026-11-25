@@ -10,6 +10,9 @@ const privateHeaders = { "cache-control": "private, no-store" };
 const attachmentId = /^[0-9a-f]{32}$/;
 
 function identifyImage(bytes: Uint8Array): AttachmentContentType | undefined {
+  if (bytes.length >= 12 && String.fromCharCode(...bytes.subarray(4, 8)) === "ftyp") return "audio/mp4";
+  if (bytes.length >= 4 && bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) return "audio/webm";
+  if (bytes.length >= 4 && String.fromCharCode(...bytes.subarray(0, 4)) === "OggS") return "audio/ogg";
   if (bytes.length >= 4 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
   if (bytes.length >= 24 && [137, 80, 78, 71, 13, 10, 26, 10].every((byte, i) => bytes[i] === byte)
       && String.fromCharCode(...bytes.subarray(12, 16)) === "IHDR") return "image/png";

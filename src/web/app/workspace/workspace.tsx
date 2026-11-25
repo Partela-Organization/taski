@@ -94,11 +94,11 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
     flushSync(() => setComposingFeedback(false));
     document.getElementById("new-feedback")?.focus();
   };
-  const account = { member, theme, onTheme, busy: signingOut || capture.busy, onSignOut: () => void signOut() };
+  const account = { member, theme, onTheme, busy: signingOut || capture.busy || capture.recording, onSignOut: () => void signOut() };
   return <div className="app" data-detail={route.selected ? "open" : undefined}>
     <WorkspaceSidebar brand={brandName} project={projectName} members={list.project?.members ?? access?.members ?? []}
       account={compact ? <WorkspaceMobileAccount {...account} /> : null}
-      view={view} disabled={capture.busy || !!capture.attempt} onView={(next) => {
+      view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => {
         setSelection({ memberId: member.id, view: next });
         capture.clearError();
       }} />

@@ -1,4 +1,5 @@
 import { Button, Field, StatusMessage } from "../../components.tsx";
+import { FeedbackMedia } from "./feedback-media.tsx";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 import type { useQuickCapture } from "./use-quick-capture.ts";
 
@@ -23,9 +24,10 @@ export function QuickCapture({ model, feedback, onCancel }: {
       {onCancel ? <details className="feedback-context" open={context ? true : undefined}>
         <summary>Añadir detalles</summary>{details}
       </details> : details}
+      <FeedbackMedia items={model.attachments} onChange={model.setAttachments} disabled={busy || !!attempt} canRemove={!busy && (!attempt || !!model.createdKey)} recording={model.recording} onRecording={model.setRecording} />
       <div className="feedback-capture__actions">
-        <Button variant="primary" type="submit" disabled={busy || (!attempt && !title.trim())}>{busyLabel ?? "Enviar feedback"}</Button>
-        {onCancel && <Button variant="secondary" disabled={busy || !!attempt} onClick={onCancel}>Cerrar editor</Button>}
+        <Button variant="primary" type="submit" disabled={busy || model.recording || (!attempt && !title.trim())}>{busyLabel ?? "Enviar feedback"}</Button>
+        {onCancel && <Button variant="secondary" disabled={busy || model.recording || !!attempt} onClick={onCancel}>Cerrar editor</Button>}
       </div>
     </form> : <form className="capture" onSubmit={onSubmit}>
       <div className="capture-line">

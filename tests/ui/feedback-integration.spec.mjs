@@ -145,3 +145,53 @@ test("attaching an image survives a lost upload response and the uploader can re
   await expect(preview).toHaveCount(0);
   expect((await page.request.get(uploadUrl)).status()).toBe(404);
 });
+
+test("feedback creation uploads a selected image and a recorded voice note", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "mediaDevices", { value: { getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }) } });
+    class FakeRecorder {
+      static isTypeSupported(type) { return type === "audio/webm"; }
+      state = "inactive";
+      ondataavailable = null;
+      onstop = null;
+      onerror = null;
+      start() { this.state = "recording"; }
+      stop() {
+        this.state = "inactive";
+        this.ondataavailable?.({ data: new Blob([new Uint8Array([0x1a, 0x45, 0xdf, 0xa3, 0, 0, 0, 0])], { type: "audio/webm" }) });
+        this.onstop?.();
+      }
+    }
+    window.MediaRecorder = FakeRecorder;
+  });
+  await page.goto(app);
+  await enter(page, "Alex");
+  await page.getByRole("button", { name: "Nuevo feedback" }).click();
+  await page.getByLabel("¿Qué quieres compartir?").fill("Feedback multimedia " + testInfo.project.name);
+  await page.getByLabel("Elegir imagen para feedback").setInputFiles({
+    name: "captura.png", mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAIAAADkharWAAAAFUlEQVR4nGOw7OggCTGMahjVgB0BADgh9sFCdXSXAAAAAElFTkSuQmCC", "base64"),
+  });
+  await page.getByRole("button", { name: "Grabar audio" }).click();
+  await expect(page.getByRole("button", { name: "Enviar feedback" })).toBeDisabled();
+  await page.getByRole("button", { name: "Detener grabación" }).click();
+  await expect(page.locator(".feedback-media audio")).toBeVisible();
+  let firstUpload;
+  await page.route("**/api/v1/tickets/*/attachments/*", async (route) => {
+    firstUpload = route.request().url();
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    await route.abort();
+  }, { times: 1 });
+  await page.getByRole("button", { name: "Enviar feedback" }).click();
+  await expect(page.getByText("El feedback se guardó. Reintenta para completar los adjuntos.")).toBeVisible();
+  const retry = page.waitForResponse((response) => response.url() === firstUpload && response.request().method() === "PUT");
+  await page.getByRole("button", { name: "Confirmar reintento" }).click();
+  expect((await retry).status()).toBe(200);
+  const panel = page.getByRole("dialog", { name: "Feedback multimedia " + testInfo.project.name });
+  await expect(panel.getByRole("link", { name: "Abrir captura.png" })).toBeVisible();
+  await expect(panel.locator("audio")).toBeVisible();
+  await page.reload();
+  await expect(panel.locator("audio")).toBeVisible();
+});

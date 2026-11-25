@@ -90,10 +90,10 @@ export function TicketAttachments({ client, ticketKey }: { client: TaskiClient; 
   </StatusMessage>;
   if (!list?.enabled) return null;
 
-  return <section className="ticket-attachments" aria-label="Imágenes adjuntas" aria-busy={busy || undefined}>
+  return <section className="ticket-attachments" aria-label="Adjuntos" aria-busy={busy || undefined}>
     <div className="ticket-attachments__heading">
-      <h3>Imágenes</h3>
-      <input ref={picker} type="file" aria-label="Elegir imagen" accept={attachmentContentTypes.join(",")}
+      <h3>Imágenes y audio</h3>
+      <input ref={picker} type="file" aria-label="Elegir imagen" accept="image/jpeg,image/png,image/webp"
         hidden onChange={(event) => {
           select(event.currentTarget.files?.[0]);
           event.currentTarget.value = "";
@@ -112,10 +112,11 @@ export function TicketAttachments({ client, ticketKey }: { client: TaskiClient; 
       {list.items.map((image) => {
         const url = client.attachmentUrl(ticketKey, image.id);
         return <li key={image.id}>
-          <a href={url} target="_blank" rel="noreferrer" aria-label={`Abrir ${image.name}`}>
-            <img src={url} alt="" loading="lazy" />
-            <span>{image.name}</span>
-          </a>
+          {image.contentType.startsWith("audio/") ? <><span>{image.name}</span><audio controls preload="metadata" src={url} /></> :
+            <a href={url} target="_blank" rel="noreferrer" aria-label={`Abrir ${image.name}`}>
+              <img src={url} alt="" loading="lazy" />
+              <span>{image.name}</span>
+            </a>}
           {image.canRemove && <Button variant="secondary" disabled={busy} aria-label={`Quitar ${image.name}`}
             onClick={() => void remove(image)}>Quitar</Button>}
         </li>;

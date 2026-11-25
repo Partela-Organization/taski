@@ -1,6 +1,6 @@
-# Imágenes adjuntas
+# Imágenes y notas de voz
 
-Taski admite JPEG, PNG y WebP de hasta 5 MiB, con diez imágenes por ticket. Se añaden al detalle de un feedback o tarea ya guardados. D1 guarda la referencia, el nombre, el tipo, el tamaño y los actores y fechas de alta y retirada. R2 guarda el archivo original. Convertir feedback en tarea conserva sus imágenes.
+Taski admite JPEG, PNG, WebP y notas de voz WebM, MP4 y Ogg de hasta 5 MiB, con diez adjuntos por ticket. Las imágenes se pueden añadir al detalle de un ticket guardado. Desde el formulario de Feedback también puedes seleccionar una imagen o grabar, escuchar y descartar una nota de voz antes de enviar. El navegador debe tener permiso para usar el micrófono. D1 guarda la referencia, el nombre, el tipo, el tamaño y los actores y fechas de alta y retirada. R2 guarda el archivo original. Convertir feedback en tarea conserva sus imágenes.
 
 ## Usar desde la web
 
@@ -10,7 +10,7 @@ Taski admite JPEG, PNG y WebP de hasta 5 MiB, con diez imágenes por ticket. Se 
 
 Ejemplo: guarda un aporte titulado “El mensaje de confirmación tapa el formulario” y adjunta `captura.png`. La vista previa solicita el original al mostrarse. La primera versión no genera archivos de miniatura separados.
 
-El navegador necesita acceso al selector de archivos. Para una foto HEIC, exporta primero una copia JPEG o PNG. La API verifica tamaño, firma de formato y tipo declarado.
+El navegador necesita acceso al selector de archivos. Para una foto HEIC, exporta primero una copia JPEG o PNG. La API verifica tamaño, firma de formato y tipo declarado. La grabación elige un formato compatible con el navegador y el audio se reproduce en el detalle del ticket.
 
 ## Activar por instalación
 
