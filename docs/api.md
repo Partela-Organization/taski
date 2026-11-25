@@ -11,6 +11,7 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 | POST /api/v1/tickets | Crear/asignar en una operación. Título + idempotencyKey obligatorios. |
 | GET /api/v1/tickets/{key} | summary/work/full; work incluye descripción íntegra y cinco comentarios recientes. |
 | PATCH /api/v1/tickets/{key} | expectedVersion + idempotencyKey y changes/descriptionPatch/comment, atómicos. |
+| DELETE /api/v1/tickets/{key} | Quitar una tarea o feedback con sesión web, `expectedVersion` e `idempotencyKey`. |
 | POST /api/v1/tickets/{key}/comments | Añadir body con versión y clave de reintento. |
 | PUT /api/v1/tickets/{key}/pull-request | URL manual con versión y clave; no consulta GitHub. |
 | GET /api/v1/activity | Cambios desde cursor; filtro ticketKey opcional. |
@@ -46,6 +47,8 @@ Ejemplo de actualización (en un cliente que ya configuró su acceso):
 ```
 
 Un conflicto 409 exige releer/reconciliar; un reintento de transporte usa la misma clave y los mismos parámetros. No hacer reintentos ciegos con otra versión o clave. Las rutas no tienen CORS abierto; una UI futura usará el mismo origen o un proxy de desarrollo acotado.
+
+Para eliminar `DEMO-003`, envía `DELETE /api/v1/tickets/DEMO-003` desde una sesión web con el cuerpo `{"expectedVersion":2,"idempotencyKey":"borrar-demo-003-v2"}`. El recibo devuelve `changed: ["deleted"]`. El ticket desaparece de las listas y su detalle y adjuntos pasan a responder 404. La actividad general del proyecto conserva el historial y registra el borrado. Repite la misma petición si se pierde el recibo durante el envío.
 
 
 ## Imágenes adjuntas

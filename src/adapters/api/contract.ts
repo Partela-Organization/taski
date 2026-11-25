@@ -66,3 +66,10 @@ export const definitions = [
 ] satisfies { name: OperationName; description: string; inputSchema: ReturnType<typeof object> & { anyOf?: unknown[] }; outputSchema: ReturnType<typeof object> }[];
 
 export const serverInstructions = "One project per installation. Reuse configVersion and activity cursors. Lists are summaries; fetch needed detail. Mutations are version checked, audited and idempotent. Agents normally finish in review. Errors are explicit; never claim a failed write was saved.";
+
+export const deleteTicketDefinition = {
+  name: "delete_ticket",
+  description: "Remove a task or feedback from active views using a team session. Supply the current version and reuse the same idempotency key on retries.",
+  inputSchema: object(mutation, Object.keys(mutation)),
+  outputSchema: receipt,
+};

@@ -35,11 +35,15 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
       if (request.method === "GET") operation = "list_tickets";
       else if (request.method === "POST") { operation = "create_ticket"; input = await jsonBody(request); }
     } else if (parts[2] === "tickets" && parts.length === 4) {
-      allow = "GET, PATCH";
+      allow = "GET, PATCH, DELETE";
       if (request.method === "GET") { operation = "get_ticket"; input = { ...query, key: parts[3] }; }
       else if (request.method === "PATCH") {
         operation = "update_ticket";
         input = { ...record(await jsonBody(request), ["expectedVersion", "idempotencyKey", "changes", "descriptionPatch", "comment"]), key: parts[3] };
+      } else if (request.method === "DELETE") {
+        const body = record(await jsonBody(request), ["expectedVersion", "idempotencyKey"]);
+        const result = await tickets.delete({ ...body, key: parts[3] }, actor);
+        return Response.json(result, { headers: { "cache-control": "no-store" } });
       }
     } else if (parts[2] === "tickets" && parts.length === 5 && ["comments", "pull-request"].includes(parts[4]!)) {
       const comments = parts[4] === "comments"; allow = comments ? "POST" : "PUT";

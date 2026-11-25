@@ -10,6 +10,8 @@ Taski admite JPEG, PNG, WebP y notas de voz WebM, MP4 y Ogg de hasta 5 MiB, con 
 
 Ejemplo: guarda un aporte titulado “El mensaje de confirmación tapa el formulario” y adjunta `captura.png`. La vista previa solicita el original al mostrarse. La primera versión no genera archivos de miniatura separados.
 
+Al eliminar el ticket, Taski cierra el acceso a sus adjuntos y conserva los archivos en el bucket privado con sus referencias de auditoría.
+
 El navegador necesita acceso al selector de archivos. Para una foto HEIC, exporta primero una copia JPEG o PNG. La API verifica tamaño, firma de formato y tipo declarado. La grabación elige un formato compatible con el navegador y el audio se reproduce en el detalle del ticket.
 
 ## Activar por instalación

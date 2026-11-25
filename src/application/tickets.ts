@@ -15,6 +15,7 @@ export interface ListQuery {
 }
 export interface Mutation {
   create: boolean; operation: string; idempotencyKey: string; fingerprint: string;
+  deleted?: true;
   actor: Actor; ticket: TicketDraft; expectedVersion: number | null;
   changes: Record<string, unknown>; comment: { id: string; body: string } | null; at: string;
 }
@@ -186,6 +187,21 @@ export class TicketService {
     const args = record(input, ["key", "expectedVersion", "idempotencyKey", "body"]);
     return this.update({ key: args.key, expectedVersion: args.expectedVersion, idempotencyKey: args.idempotencyKey, comment: args.body }, actor, "add_comment");
   }
+  async delete(input: unknown, actor: Actor): Promise<Receipt> {
+    if (actor.kind !== "person") throw new TaskiError("ACCESS_DENIED");
+    const source = record(input, ["key", "expectedVersion", "idempotencyKey"]);
+    const key = text(source.key, "key", 200);
+    const expectedVersion = integer(source.expectedVersion, "expectedVersion");
+    const operation = "delete_ticket";
+    const request = await this.request(operation, { key, expectedVersion, idempotencyKey: source.idempotencyKey }, actor);
+    if (request.cached) return request.cached;
+    const before = await this.get(key);
+    if (before.version !== expectedVersion) throw new TaskiError("VERSION_CONFLICT");
+    const at = this.runtime.now();
+    return this.repository.commit({ ...request, create: false, deleted: true, operation, expectedVersion,
+      ticket: { ...before, version: before.version + 1, updatedAt: at }, changes: { deleted: { before: false, after: true } }, comment: null, at });
+  }
+
   async linkPullRequest(input: unknown, actor: Actor): Promise<Receipt> {
     const args = record(input, ["key", "expectedVersion", "idempotencyKey", "url"]);
     return this.update({ key: args.key, expectedVersion: args.expectedVersion, idempotencyKey: args.idempotencyKey, changes: { prUrl: args.url } }, actor, "link_pull_request");

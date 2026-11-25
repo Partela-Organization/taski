@@ -9,6 +9,7 @@ Taski está pensado para equipos pequeños que necesitan capturar tareas e ideas
 - Tareas y feedback con título, descripción, área, responsable opcional y estado.
 - Estados iniciales: Pendiente, En curso, Por revisar y Terminado; IDs estables independientes del idioma.
 - Convertir feedback en tarea conservando ID, enlace, comentarios e historial.
+- Quitar tareas o feedback de las vistas del equipo desde una sesión web, con confirmación y auditoría.
 - Enlace estable por ticket, como `/t/TSK-001`.
 - Comentarios y auditoría de cambios con valores antes/después y canal.
 - Enlace principal a un PR introducido manualmente, sin afirmar su estado externo.

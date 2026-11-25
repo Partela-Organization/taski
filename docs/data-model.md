@@ -2,7 +2,9 @@
 
 La migración `0002_tickets.sql` crea tickets, comentarios, actividad y recibos idempotentes, además de la identidad de la instalación. No incluye datos reales ni crea tickets por defecto. Aplicar con `npm run db:migrate`; el esquema de bootstrap de B1 sigue vigente.
 
-`tickets.number` es un INTEGER PRIMARY KEY AUTOINCREMENT, asignado por SQLite/D1. El código generado combina el prefijo fijado para la instalación y ese número; nunca usa COUNT(*) ni un contador en memoria. `id` es otro identificador estable generado por la aplicación. La URL almacena su base original y código: renombrar, reasignar o convertir feedback no los cambia. El borrado de tickets está deshabilitado; las transacciones fallidas no publican un código confirmado.
+`tickets.number` es un INTEGER PRIMARY KEY AUTOINCREMENT, asignado por SQLite/D1. El código generado combina el prefijo fijado para la instalación y ese número; nunca usa COUNT(*) ni un contador en memoria. `id` es otro identificador estable generado por la aplicación. La URL almacena su base original y código: renombrar, reasignar o convertir feedback no los cambia. Las transacciones fallidas no publican un código confirmado.
+
+La migración `0008_ticket_deletion.sql` añade `tickets.deleted_at`. La operación de borrado marca esa fecha, avanza la versión y añade el evento y el recibo en un mismo batch. Las lecturas de tickets omiten filas eliminadas, incluidos accesos por ID o alias. Las filas y sus códigos se conservan para que la actividad siga siendo consultable.
 
 La instalación vincula project.id/prefix al primer uso. Reutilizar la base con otro ID/prefijo produce conflicto, sin reescribir tickets. Un proyecto distinto usa otra base. Los rótulos y nombres siguen en configuración; los registros guardan IDs de referencia y snapshots de actor para mantener la atribución histórica.
 

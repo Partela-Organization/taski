@@ -6,6 +6,7 @@ const glyphs = {
   search: "M15.5 10a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z M14 14l5 5",
   terminal: "M3 5h18v14H3z M7 9l3 3-3 3 M13 15h4",
   plus: "M12 5v14 M5 12h14",
+  trash: "M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v5 M14 11v5",
   list: "M4 6h2 M10 6h10 M4 12h2 M10 12h10 M4 18h2 M10 18h10",
   chevron: "m9 5 7 7-7 7",
   refresh: "M20 4v5h-5 M20 9a8 8 0 1 0 0 6",

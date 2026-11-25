@@ -82,3 +82,42 @@ test("recent order paginates by creation date, breaking ties by ticket number", 
   assert(!("createdAt" in originalOrder.items[0]));
   assert.equal((await send("tickets?order=invalid")).status, 400);
 });
+
+test("a team session can delete feedback once with version, retry and audit protection", async () => {
+  const { key } = await (await send("tickets", "POST", { title: "Feedback to remove", type: "feedback", idempotencyKey: "delete-fixture" })).json();
+  const path = `tickets/${key}`;
+  const { ticket } = await (await send(`${path}?view=full`)).json();
+  const db = (await server.getWorker().getEnv()).DB;
+  await db.prepare("INSERT INTO ticket_key_aliases (key,ticket_id) VALUES (?,?)").bind("OLD-001", ticket.id).run();
+  const { activityCursor } = await (await send("project")).json();
+  const mutation = { expectedVersion: ticket.version, idempotencyKey: "delete-feedback" };
+  assert.equal((await send(path, "DELETE", mutation)).status, 403);
+
+  const login = await server.fetch("/api/v1/session", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ code, memberId: "sam" }) });
+  assert.equal(login.status, 200);
+  const cookie = login.headers.get("set-cookie").split(";")[0];
+  const remove = (body) => server.fetch(`/api/v1/${path}`, { method: "DELETE",
+    headers: { cookie, "content-type": "application/json" }, body: JSON.stringify(body) });
+  assert.equal((await remove({ ...mutation, expectedVersion: ticket.version + 1 })).status, 409);
+  const deleted = await remove(mutation);
+  assert.equal(deleted.status, 200);
+  const receipt = await deleted.json();
+  assert.deepEqual(receipt.changed, ["deleted"]);
+  assert.equal(receipt.version, ticket.version + 1);
+  assert.deepEqual(await (await remove(mutation)).json(), receipt);
+  assert.equal((await remove({ ...mutation, idempotencyKey: "another-delete" })).status, 404);
+
+  for (const reference of [key, ticket.id, "OLD-001"]) assert.equal((await send(`tickets/${reference}`)).status, 404);
+  assert.equal((await send(`${path}/attachments`)).status, 404);
+  assert.equal((await send(path, "PATCH", { expectedVersion: receipt.version, idempotencyKey: "edit-deleted", changes: { title: "Changed" } })).status, 404);
+  for (const order of ["", "&order=recent"]) {
+    const { items } = await (await send(`tickets?type=feedback${order}`)).json();
+    assert(!items.some((item) => item.key === key));
+  }
+  const { items } = await (await send(`activity?cursor=${encodeURIComponent(activityCursor)}`)).json();
+  assert.equal(items.length, 1);
+  assert.equal(items[0].ticketKey, key);
+  assert.equal(items[0].actor.memberId, "sam");
+  assert.deepEqual(items[0].changes.deleted, { before: false, after: true });
+});

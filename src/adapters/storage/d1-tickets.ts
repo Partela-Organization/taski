@@ -36,14 +36,14 @@ export class D1TicketRepository implements TicketRepository {
 
   async get(reference: string): Promise<Ticket | null> {
     const row = await this.db.prepare(
-      "SELECT * FROM tickets WHERE key=? OR id=? OR id=(SELECT ticket_id FROM ticket_key_aliases WHERE key=?)",
+      "SELECT * FROM tickets WHERE deleted_at IS NULL AND (key=? OR id=? OR id=(SELECT ticket_id FROM ticket_key_aliases WHERE key=?))",
     ).bind(reference, reference, reference).first<Row>();
     return row ? ticket(row) : null;
   }
 
   async list(query: ListQuery): Promise<TicketSummary[]> {
     const recent = query.order === "recent";
-    const where: string[] = [];
+    const where = ["deleted_at IS NULL"];
     const values: (string | number | null)[] = [];
     if (!recent) {
       where.push("number > ?");
@@ -55,10 +55,9 @@ export class D1TicketRepository implements TicketRepository {
     for (const [key, column] of [["status", "status"], ["assigneeId", "assignee_id"], ["areaId", "area_id"], ["type", "type"]] as const) {
       if (query[key] !== undefined) { where.push(`${column} IS ?`); values.push(query[key]!); }
     }
-    const filter = where.length ? `WHERE ${where.join(" AND ")}` : "";
     const order = recent ? "created_at DESC, number DESC" : "number";
     const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by,created_at
-      FROM tickets ${filter} ORDER BY ${order} LIMIT ?`)
+      FROM tickets WHERE ${where.join(" AND ")} ORDER BY ${order} LIMIT ?`)
       .bind(...values, query.limit).all<Row>();
     return results.map((row) => ({ number: row.number as number, key: row.key as string, title: row.title as string,
       status: row.status as Ticket["status"], assigneeId: row.assignee_id as string | null, areaId: row.area_id as string,
@@ -84,6 +83,9 @@ export class D1TicketRepository implements TicketRepository {
       statements.push(this.db.prepare(`INSERT INTO tickets(id,prefix,base_url,title,description,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by,created_at,updated_at)
         VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(t.id, t.prefix, t.baseUrl, t.title, t.description, t.status,
         t.assigneeId, t.areaId, t.type, Number(t.highlighted), t.prUrl, t.version, t.createdBy, t.createdAt, t.updatedAt));
+    } else if (m.deleted) {
+      statements.push(this.db.prepare("UPDATE tickets SET deleted_at=?,version=?,updated_at=? WHERE id=?")
+        .bind(m.at, t.version, t.updatedAt, t.id));
     } else {
       // The SQL guard rejects stale versions inside this transaction, even after a concurrent read.
       statements.push(this.db.prepare(`UPDATE tickets SET title=?,description=?,status=?,assignee_id=?,area_id=?,type=?,highlighted=?,pr_url=?,version=?,updated_at=? WHERE id=?`)
