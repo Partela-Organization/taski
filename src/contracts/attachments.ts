@@ -1,4 +1,4 @@
-export const attachmentContentTypes = ["image/jpeg", "image/png", "image/webp"] as const;
+export const attachmentContentTypes = ["image/jpeg", "image/png", "image/webp", "audio/webm", "audio/mp4", "audio/ogg"] as const;
 export type AttachmentContentType = typeof attachmentContentTypes[number];
 export const maxAttachmentBytes = 5 * 1024 * 1024;
 export const maxTicketAttachments = 10;

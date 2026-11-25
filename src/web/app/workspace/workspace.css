@@ -202,3 +202,9 @@
 @media (max-width: 760px) {
   .finished-group summary { min-height: 44px; }
 }
+
+.feedback-media { margin: 12px 0; }
+.feedback-media__actions, .feedback-media__item { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.feedback-media__item { margin-top: 8px; overflow-wrap: anywhere; }
+.feedback-media__item audio { max-width: 100%; }
+.feedback-media p { color: var(--error); }
