@@ -15,7 +15,7 @@ La implementación visual usa código propio y recursos redistribuibles con sus 
 
 ## Móvil
 
-Feedback es el punto de entrada. La lista resume título, tipo y autor; los metadatos completos viven en el detalle a pantalla completa. Compartir feedback requiere pocos campos y no obliga a comprender PRs o repositorios.
+Feedback es el punto de entrada. La lista en una columna muestra título, autor y fecha. **Nuevo feedback** abre el editor y los detalles se despliegan a demanda. El menú de cuenta reúne el tema y la salida. La guía MCP queda debajo de la navegación. La separación entre navegación, captura y contenido toma como referencia el [recorrido móvil de Notion](https://www.notion.com/help/workspaces-on-mobile).
 
 ## Resaltado
 

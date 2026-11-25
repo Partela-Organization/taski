@@ -20,13 +20,13 @@ export function TicketRow({ row, context, showArea, statusLabel }: {
   const area = project?.areas.find((entry) => entry.id === row.areaId)?.label ?? row.areaId;
   const prNumber = row.prUrl?.match(/\/pull\/(\d+)\/?$/)?.[1];
   const createdAt = Date.parse(row.createdAt ?? "");
-  return <li className={row.key === selected ? "ticket-row ticket-row--selected" : "ticket-row"}>
+  return <li className={row.key === selected ? "ticket-row ticket-row--selected" : "ticket-row"} data-feedback={feedback || undefined}>
     <span className="ticket-row__circle" aria-hidden="true">{row.status === "done" ? "✓" : ""}</span>
     <div className="ticket-row__body">
       <Button className="ticket-row__open" aria-current={row.key === selected ? "true" : undefined}
         onClick={() => onOpen(row.key)}><span className={row.highlighted ? "ticket-title-mark" : undefined}>{row.title}</span></Button>
       <div className="ticket-row__meta">
-        {feedback ? <span>{project?.typeLabels?.feedback ?? "Feedback"} · {author}</span> : <>
+        {feedback ? <span><span className="ticket-row__feedback-type">{project?.typeLabels?.feedback ?? "Feedback"} · </span><span>{author}</span></span> : <>
           <span className="ticket-key">{row.key}</span>
           {row.prUrl && <a href={row.prUrl} target="_blank" rel="noreferrer" aria-label={`Abrir PR de ${row.key}`}>{prNumber ? `PR #${prNumber}` : "PR"}</a>}
           {author && <span>{author}</span>}
