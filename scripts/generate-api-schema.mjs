@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { definitions } from "../src/adapters/api/contract.ts";
+import { attachmentContentTypes, maxAttachmentBytes, maxTicketAttachments } from "../src/contracts/attachments.ts";
 
 const components = {};
 for (const definition of definitions) {
@@ -34,6 +35,35 @@ for (const [method, path, name] of routes) {
   paths[path] ??= {}; paths[path][method] = entry;
 }
 components.Error = { type: "object", required: ["error"], properties: { error: { type: "object", required: ["code", "message"], properties: { code: { type: "string" }, message: { type: "string" } } } } };
+const attachmentId = { type: "string", pattern: "^[0-9a-f]{32}$" };
+components.Attachment = { type: "object", required: ["id", "name", "contentType", "size", "createdAt", "createdBy", "canRemove"], properties: {
+  id: attachmentId, name: { type: "string", maxLength: 180 }, contentType: { enum: attachmentContentTypes },
+  size: { type: "integer", minimum: 1, maximum: maxAttachmentBytes }, createdAt: { type: "string", format: "date-time" },
+  createdBy: { type: "string" }, canRemove: { type: "boolean" },
+} };
+const attachmentSchema = { $ref: "#/components/schemas/Attachment" };
+const attachmentError = { description: "Typed error; inspect error.code.",
+  content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } };
+const ticketKeyParameter = { name: "key", in: "path", required: true, schema: { type: "string" } };
+const attachmentParameter = { name: "id", in: "path", required: true, schema: attachmentId };
+const imageContent = Object.fromEntries(attachmentContentTypes.map((type) => [type, { schema: { type: "string", format: "binary" } }]));
+paths["/api/v1/tickets/{key}/attachments"] = { parameters: [ticketKeyParameter], get: {
+  operationId: "list_attachments",
+  responses: { 200: { description: "Available images and whether the installation has a storage binding.", content: { "application/json": {
+    schema: { type: "object", required: ["enabled", "items"], properties: {
+      enabled: { type: "boolean" }, items: { type: "array", maxItems: maxTicketAttachments, items: attachmentSchema },
+    } },
+  } } }, default: attachmentError },
+} };
+paths["/api/v1/tickets/{key}/attachments/{id}"] = { parameters: [ticketKeyParameter, attachmentParameter],
+  get: { operationId: "download_attachment", responses: { 200: { description: "Private original image.", content: imageContent }, default: attachmentError } },
+  put: { operationId: "upload_attachment", description: "Send raw bytes and reuse the same client-chosen ID when retrying the same file.",
+    parameters: [{ name: "X-Taski-Filename", in: "header", required: true, schema: { type: "string" }, description: "Original filename encoded with percent encoding." }],
+    requestBody: { required: true, description: `Up to ${maxAttachmentBytes} bytes.`, content: imageContent },
+    responses: { 200: { description: "Confirmed attachment.", content: { "application/json": { schema: attachmentSchema } } }, default: attachmentError },
+  },
+  delete: { operationId: "remove_attachment", responses: { 204: { description: "Removed by the uploader." }, default: attachmentError } },
+};
 paths["/api/v1/access"] = { get: { operationId: "get_access_options", security: [], responses: { 200: { description: "Public project/brand names and selectable configured members; no secrets or tickets" } } } };
 paths["/api/v1/session"] = {};
 for (const [method, operationId] of [["post", "create_session"], ["get", "get_session"], ["put", "change_member"], ["delete", "logout"]]) {
@@ -54,5 +84,5 @@ const target = new URL("../docs/api/openapi.json", import.meta.url);
 const serialized = JSON.stringify(document, null, 2) + "\n";
 if (process.argv.includes("--check")) {
   if (await readFile(target, "utf8") !== serialized) throw new Error("API schema changed; run npm run api:generate and review the diff");
-  console.log("OK: OpenAPI matches the eight operation contracts and access routes.");
+  console.log("OK: OpenAPI matches the operation contracts, attachments and access routes.");
 } else { await writeFile(target, serialized); console.log("Generated docs/api/openapi.json"); }

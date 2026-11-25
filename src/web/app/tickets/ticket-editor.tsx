@@ -4,6 +4,7 @@ import { Button, Field, StatusMessage } from "../../components.tsx";
 import { Conversation } from "./conversation.tsx";
 import type { ConversationDraft } from "./conversation.tsx";
 import { TicketAreaField } from "./ticket-area-field.tsx";
+import { TicketAttachments } from "./ticket-attachments.tsx";
 import { useTicketEdit } from "./use-ticket-edit.ts";
 import type { Draft } from "./use-ticket-edit.ts";
 
@@ -93,6 +94,7 @@ export function TicketEditor({ initial, project, client, drafts, conversations, 
     {conflict && <><p>Versión consultada: {server.ticket.title}. Tu título propuesto: {draft.edits.title}.</p><Button variant="secondary" disabled={editorBusy} onClick={() => void reload(true)}>Consultar versión actual y conservar borrador</Button></>}
     {!feedback && refresh}
     {notice && <StatusMessage title={notice} />}
+    <TicketAttachments client={client} ticketKey={key} />
     <Conversation result={server} client={client} cache={conversations} disabled={busy || !!draft.pending}
       management={feedback ? feedbackManagement : undefined} openManagement={drafts.has(key) || conversations.get(key)?.highlight !== undefined}
       onUpdated={acceptConversationUpdate} onMutationPending={setUpdatingConversation} />

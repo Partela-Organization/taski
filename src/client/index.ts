@@ -1,11 +1,18 @@
 import type { ActivityResult, CreateTicket, ListOptions, ListResult, ListView, Mutation, ProjectResult, Receipt, TicketResult, TicketView, UpdateTicket } from "../contracts/api.ts";
+import type { Attachment, AttachmentContentType, AttachmentList } from "../contracts/attachments.ts";
 export type * from "../contracts/api.ts";
+export * from "../contracts/attachments.ts";
 
 export interface FetchOptions {
   method: string; headers: Record<string, string>; credentials: "include"; body?: string;
 }
-export type FetchLike = (url: string, options: FetchOptions) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
-export interface ClientOptions { baseUrl: string; code?: string; memberId?: string; clientName?: string; fetch?: FetchLike }
+export interface FetchBytesOptions extends Omit<FetchOptions, "body"> {
+  body: Uint8Array<ArrayBuffer>;
+}
+interface FetchResult { ok: boolean; status: number; json(): Promise<unknown> }
+export type FetchLike = (url: string, options: FetchOptions) => Promise<FetchResult>;
+export type FetchBytesLike = (url: string, options: FetchBytesOptions) => Promise<FetchResult>;
+export interface ClientOptions { baseUrl: string; code?: string; memberId?: string; clientName?: string; fetch?: FetchLike; fetchBytes?: FetchBytesLike }
 
 export class TaskiClientError extends Error {
   readonly code: string; readonly status: number;
@@ -16,6 +23,7 @@ export class TaskiClient {
   #base: string;
   #headers: Record<string, string>;
   #fetch: FetchLike;
+  #fetchBytes: FetchBytesLike | undefined;
   constructor(options: ClientOptions) {
     if (!/^https?:\/\/[^\s/?#@]+(?:\/[^\s?#]*)?$/.test(options.baseUrl)) throw new Error("Expected an absolute base URL without credentials/query/fragment");
     if (options.code !== undefined && !options.memberId) throw new Error("memberId is required with a team code");
@@ -25,14 +33,18 @@ export class TaskiClient {
       this.#headers.authorization = `Bearer ${options.code}`;
       this.#headers["x-taski-member"] = options.memberId!;
     }
-    const native = (globalThis as unknown as { fetch?: FetchLike }).fetch;
+    const native = (globalThis as unknown as { fetch?: FetchLike & FetchBytesLike }).fetch;
     if (!options.fetch && !native) throw new Error("Provide a fetch-compatible transport");
     this.#fetch = options.fetch ?? ((url, init) => native!(url, init));
+    this.#fetchBytes = options.fetchBytes ?? (options.fetch || !native ? undefined : (url, init) => native(url, init));
   }
   private async request<T>(path: string, method = "GET", body?: unknown): Promise<T> {
     const options: FetchOptions = { method, headers: { ...this.#headers }, credentials: "include" };
     if (body !== undefined) options.body = JSON.stringify(body);
-    const response = await this.#fetch(`${this.#base}/api/v1/${path}`, options);
+    return this.readResponse<T>(await this.#fetch(this.apiUrl(path), options));
+  }
+  private apiUrl(path: string): string { return `${this.#base}/api/v1/${path}`; }
+  private async readResponse<T>(response: FetchResult): Promise<T> {
     if (response.status === 204) return undefined as T;
     let result: unknown;
     try { result = await response.json(); }
@@ -57,6 +69,17 @@ export class TaskiClient {
   createTicket(input: CreateTicket): Promise<Receipt> { return this.request("tickets", "POST", input); }
   updateTicket(key: string, input: UpdateTicket): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "PATCH", input); }
   addComment(key: string, input: Mutation & { body: string }): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}/comments`, "POST", input); }
+  listAttachments(key: string): Promise<AttachmentList> { return this.request(`tickets/${encodeURIComponent(key)}/attachments`); }
+  attachmentUrl(key: string, id: string): string { return this.apiUrl(`tickets/${encodeURIComponent(key)}/attachments/${encodeURIComponent(id)}`); }
+  async uploadAttachment(key: string, id: string, input: { name: string; contentType: AttachmentContentType; bytes: Uint8Array<ArrayBuffer> }): Promise<Attachment> {
+    if (!this.#fetchBytes) throw new Error("Provide fetchBytes for image uploads when using a custom transport");
+    return this.readResponse(await this.#fetchBytes(this.attachmentUrl(key, id), { method: "PUT", credentials: "include", body: input.bytes, headers: {
+      ...this.#headers, "content-type": input.contentType, "x-taski-filename": encodeURIComponent(input.name),
+    } }));
+  }
+  removeAttachment(key: string, id: string): Promise<void> {
+    return this.request(`tickets/${encodeURIComponent(key)}/attachments/${encodeURIComponent(id)}`, "DELETE");
+  }
   linkPullRequest(key: string, input: Mutation & { url: string }): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}/pull-request`, "PUT", input); }
   listActivity(options: { cursor?: string; limit?: number; ticketKey?: string } = {}): Promise<ActivityResult> { return this.request(`activity${this.query(options)}`); }
   accessOptions(): Promise<{ projectName: string; brandName: string; members: { id: string; name: string; defaultView: "work" | "feedback" }[] }> { return this.request("access"); }

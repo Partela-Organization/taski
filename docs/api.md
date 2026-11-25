@@ -48,6 +48,10 @@ Ejemplo de actualización (en un cliente que ya configuró su acceso):
 Un conflicto 409 exige releer/reconciliar; un reintento de transporte usa la misma clave y los mismos parámetros. No hacer reintentos ciegos con otra versión o clave. Las rutas no tienen CORS abierto; una UI futura usará el mismo origen o un proxy de desarrollo acotado.
 
 
+## Imágenes adjuntas
+
+Los [endpoints de adjuntos](attachments.md#api) permiten listar, subir y retirar imágenes, y descargar el original con el acceso de equipo habitual. Las subidas usan un cuerpo binario y un identificador idempotente por selección.
+
 ## Referencia manual a un PR
 
 Envía `changes.prUrl` en `PATCH /api/v1/tickets/{key}` para vincular o sustituir. Usa `null` para retirar. Puedes enviar `changes.status` en la misma operación. La ruta PUT de PR también vincula o sustituye. Ambas rutas usan la misma regla y registran el antes y después.

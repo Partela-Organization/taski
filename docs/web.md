@@ -71,6 +71,10 @@ La interfaz usa el tipo y el autor que devuelve la API. Feedback y tareas compar
 
 Para pruebas en dispositivos y con participantes, arranca la [demo temporal en la red local](verification/b7-accessibility.md#repetir-en-un-iphone-físico) y sigue el [recorrido de feedback](verification/b8-feedback.md).
 
+## Adjuntar imágenes
+
+Con el [almacenamiento de adjuntos](attachments.md) habilitado, abre un feedback o una tarea guardados y pulsa **Adjuntar imagen**. Selecciona un JPEG, PNG o WebP de hasta 5 MiB y pulsa **Subir imagen**. Desde el detalle puedes abrir el original o retirar las imágenes que subiste.
+
 ## Enlace manual a un PR B9-01
 
 Pega un enlace HTTPS en **Enlace al PR** y pulsa **Guardar cambios**. Puedes cambiar de estado en la misma edición. La fila y el detalle muestran el enlace confirmado. Para sustituirlo, edita el campo. Para retirarlo, déjalo vacío y guarda. La actividad muestra el valor anterior, el nuevo y el autor.
