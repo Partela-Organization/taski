@@ -61,7 +61,7 @@ El [spike experimental de B0](experiments/b0/README.md) sí puede ejecutarse con
 - [Referencias para explorar el diseño](docs/design-references.md)
 - [Dirección visual actual](docs/design-direction.md)
 - [Q2 · Imágenes, voz, sticky notes, WhatsApp y guía MCP en la web](docs/q2.md)
-- [Horizonte · documentos para lo que viene](docs/horizonte.md)
+- [Horizonte · documentos para lo que viene](docs/horizonte.md) y su [verificación](docs/verification/horizonte.md)
 - [Resumen y tracks · plan por bloques](docs/tracks.md) y su [verificación](docs/verification/tracks.md)
 - [Auditoría de Linear](docs/benchmarks/linear-baseline.md), [contrato candidato](docs/benchmarks/contract.md) y [protocolo comparativo](docs/benchmarks/protocol.md)
 
