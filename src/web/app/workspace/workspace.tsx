@@ -22,8 +22,10 @@ import { SummaryActions, SummaryView } from "../summary/summary-view.tsx";
 import { useSummary } from "../summary/use-summary.ts";
 import { SidebarTracks, TrackChips, TrackOverview } from "../summary/track-view.tsx";
 import { GoTo, GoToButton } from "./go-to.tsx";
+import { HorizonDocPage, HorizonList } from "../horizon/horizon.tsx";
+import { useHorizonList } from "../horizon/use-horizon.ts";
 import type { GoToHandle } from "./go-to.tsx";
-import { initialPlace, savePlace, trackFromPath, trackPath, views } from "./views.ts";
+import { horizonFromPath, initialPlace, placePath, savePlace, trackFromPath, views } from "./views.ts";
 import type { Place, View } from "./views.ts";
 import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
 
@@ -51,7 +53,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const compact = useCompactLayout();
   const place: Place = selection && selection.memberId === member?.id ? selection
     : member ? initialPlace(member.id, access) : { view: "team", trackId: "" };
-  const { view, trackId } = place;
+  const { view, trackId, docId } = place;
+  const horizonView = view === "horizon";
   const feedback = view === "feedback";
   const summaryView = view === "summary";
   const trackView = view === "track";
@@ -64,7 +67,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const currentTrack = trackView ? tracks.find((entry) => entry.id === trackId) : undefined;
   const unknownTrack = trackView && !!summary.summary && !currentTrack;
   const plans = { ...trackPlans, client, onExpired, refresh: () => { trackPlans.refresh(); summary.refresh(); } };
-  route.setBase(trackView ? trackPath(trackId) : "/");
+  route.setBase(placePath(place));
+  const horizon = useHorizonList(client, member?.id, onExpired);
   const feedbackDone = useFeedbackDone(client, (row, done) => {
     setDeletion(undefined);
     setNotice(done ? `«${row.title}» marcado como hecho.` : `«${row.title}» vuelve a estar abierto.`);
@@ -103,15 +107,18 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
     if (!member) return;
     function follow() {
       const fromPath = trackFromPath(location.pathname);
+      const doc = horizonFromPath(location.pathname);
       if (fromPath) setSelection({ memberId: member!.id, view: "track", trackId: fromPath });
-      else if (location.pathname === "/") setSelection((current) => current?.view === "track" ? { memberId: member!.id, view: "summary", trackId: "" } : current);
+      else if (doc !== undefined) setSelection({ memberId: member!.id, view: "horizon", trackId: "", ...(doc ? { docId: doc } : {}) });
+      else if (location.pathname === "/") setSelection((current) => current?.view === "track" || current?.view === "horizon"
+        ? { memberId: member!.id, view: "summary", trackId: "" } : current);
     }
     window.addEventListener("popstate", follow);
     return () => window.removeEventListener("popstate", follow);
   }, [member]);
 
   useEffect(() => {
-    if (member && selection?.memberId === member.id) savePlace(member.id, { view: selection.view, trackId: selection.trackId });
+    if (member && selection?.memberId === member.id) savePlace(member.id, { view: selection.view, trackId: selection.trackId, ...(selection.docId ? { docId: selection.docId } : {}) });
   }, [member, selection]);
 
   // Digits 1–9 open tracks in sidebar order, unless typing or a dialog is open.
@@ -188,10 +195,11 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
     document.getElementById("new-feedback")?.focus();
   };
   const account = { member, theme, onTheme, busy: signingOut || capture.busy || capture.recording, onSignOut: () => void signOut() };
-  const selectView = (next: View, nextArea = "") => {
+  const selectView = (next: View, nextArea = "", nextDoc?: string) => {
     const nextTrack = next === "track" ? nextArea : "";
-    setSelection({ memberId: member.id, view: next, trackId: nextTrack });
-    const base = next === "track" ? trackPath(nextTrack) : "/";
+    const nextPlace: Place = { view: next, trackId: nextTrack, ...(next === "horizon" && nextDoc ? { docId: nextDoc } : {}) };
+    setSelection({ memberId: member.id, ...nextPlace });
+    const base = placePath(nextPlace);
     route.setBase(base);
     // An open ticket keeps its link; closing it returns to the new place.
     if (!route.selected && location.pathname !== base) history.pushState(null, "", base);
@@ -217,17 +225,22 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       <main className="workspace" data-view={view}>
         {trackView && tracks.length > 0 && <TrackChips tracks={tracks} active={trackId}
           onOpen={(id) => selectView("track", id)} onSummary={() => selectView("summary")} />}
-        <div className="workspace-heading" data-feedback={feedback || undefined}>
+        {!(horizonView && docId) && <div className="workspace-heading" data-feedback={feedback || undefined}>
           <h1 ref={workspaceHeading} tabIndex={-1}>{heading}</h1>
           {mobileFeedback && !composingFeedback && !capture.attempt &&
             <Button id="new-feedback" variant="primary" onClick={compose}>
               <WorkspaceIcon name="plus" />Nuevo feedback
             </Button>}
           {summaryView && <SummaryActions model={{ ...summary, refresh: () => { summary.refresh(); trackPlans.refresh(); } }} />}
-          {!feedback && !summaryView && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
+          {!feedback && !summaryView && !horizonView && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
             <WorkspaceIcon name="plus" />Nueva tarea
           </Button>}
-        </div>
+        </div>}
+        {horizonView && !docId && <HorizonList client={client} items={horizon.items} error={horizon.error} project={list.project}
+          onOpen={(id) => selectView("horizon", "", id)} onRefresh={horizon.refresh} onExpired={onExpired} />}
+        {horizonView && docId && <HorizonDocPage key={docId} client={client} id={docId} project={list.project} onExpired={onExpired}
+          onBack={() => { horizon.refresh(); selectView("horizon"); }} onSaved={horizon.refresh}
+          onDeleted={() => { horizon.refresh(); selectView("horizon"); setNotice("Documento eliminado."); }} />}
         {deletion && <StatusMessage title={deletion.message} />}
         {notice && !deletion && <StatusMessage title={notice} />}
         {summaryView && signOutError && <StatusMessage tone="error" title={signOutError} />}
@@ -244,7 +257,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           onReview: () => selectView("review"),
           onFeedback: () => selectView("feedback"),
         }} />}
-        {!summaryView && !unknownTrack && <>
+        {!summaryView && !unknownTrack && !horizonView && <>
         {!feedback && !trackView && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
@@ -284,7 +297,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         </>}
       </main>
     </div>
-    <GoTo ref={goTo} client={client} tracks={tracks} project={list.project} onExpired={onExpired}
+    <GoTo ref={goTo} client={client} tracks={tracks} docs={horizon.items} onDoc={(id) => selectView("horizon", "", id)} project={list.project} onExpired={onExpired}
       onTrack={(id) => selectView("track", id)} onTicket={(key) => { setDeletion(undefined); void route.open(key); }} />
     <TicketPanel route={route} client={client} project={list.project} onSaved={() => { list.refresh(); summary.refresh(); }} onExpired={onExpired}
       onDeleted={(type, closed) => {

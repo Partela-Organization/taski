@@ -1,5 +1,8 @@
 const glyphs = {
   summary: "M4 20V11 M10 20V5 M16 20v-6 M21 20H3",
+  horizon: "M2 18h20 M6 18a6 6 0 0 1 12 0 M12 5v3 M4.9 9.9l2.1 2.1 M19.1 9.9 17 12 M5 21h14",
+  copy: "M9 9h11v11H9z M5 15H4V4h11v1",
+  upload: "M12 16V4 M7 9l5-5 5 5 M4 20h16",
   send: "m21 3-9.5 9.5 M21 3l-6.5 18-3-8.5L3 9.5z",
   team: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   mine: "M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2",

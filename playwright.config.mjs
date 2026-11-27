@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests/ui",
   projects: [
     { name: "chromium", testIgnore: "**/webkit.spec.mjs", use: { browserName: "chromium" } },
-    { name: "webkit", testMatch: ["**/webkit.spec.mjs", "**/feedback-integration.spec.mjs", "**/mcp-guide.spec.mjs"], use: { browserName: "webkit" } },
+    { name: "webkit", testMatch: ["**/webkit.spec.mjs", "**/feedback-integration.spec.mjs", "**/mcp-guide.spec.mjs", "**/horizon.spec.mjs"], use: { browserName: "webkit" } },
   ],
   fullyParallel: true,
   workers: 2,

@@ -9,7 +9,7 @@
   "assets": {
     "directory": "dist/app",
     "binding": "ASSETS",
-    "run_worker_first": ["/", "/api/*", "/mcp", "/health", "/t/*", "/track/*"]
+    "run_worker_first": ["/", "/api/*", "/mcp", "/health", "/t/*", "/track/*", "/horizonte", "/horizonte/*"]
   },
   "secrets": {
     "required": ["TASKI_INSTALLATION_JSON", "TASKI_TEAM_ACCESS_CODE"]
