@@ -40,7 +40,7 @@ Estado: núcleo persistente, acceso de equipo, API y cliente TypeScript disponib
 - [Contrato de ocho herramientas y ejemplos](benchmarks/contract.md)
 - [Protocolo comparativo, presupuestos y gate de B6](benchmarks/protocol.md)
 - [Q2 · Imágenes, voz, sticky notes, WhatsApp y guía MCP en la web](q2.md)
-- [Resumen y tracks · plan por bloques](tracks.md)
+- [Resumen y tracks · plan por bloques](tracks.md) y su [verificación](verification/tracks.md)
 
 ## Se entrega con cada bloque funcional
 

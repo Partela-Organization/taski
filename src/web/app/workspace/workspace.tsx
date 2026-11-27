@@ -58,7 +58,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const activeArea = feedback || summaryView ? "" : trackView ? trackId : area;
   const list = useTicketList(client, member?.id, view, activeArea, feedbackFilter, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
-  const trackPlans = useTrackPlans(client, member?.id);
+  const trackPlans = useTrackPlans(client, member?.id, `${view}:${trackId}`);
   const summary = useSummary(client, member?.id, `${view}:${trackId}`, onExpired);
   const tracks = summary.summary?.tracks ?? [];
   const currentTrack = trackView ? tracks.find((entry) => entry.id === trackId) : undefined;
@@ -223,7 +223,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
             <Button id="new-feedback" variant="primary" onClick={compose}>
               <WorkspaceIcon name="plus" />Nuevo feedback
             </Button>}
-          {summaryView && <SummaryActions model={summary} />}
+          {summaryView && <SummaryActions model={{ ...summary, refresh: () => { summary.refresh(); trackPlans.refresh(); } }} />}
           {!feedback && !summaryView && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
             <WorkspaceIcon name="plus" />Nueva tarea
           </Button>}

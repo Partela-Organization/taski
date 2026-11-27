@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TaskiClient, Track } from "../../../client/index.ts";
 
-/** Track plans (priority and target date) for the configured areas. A failed read hides plans without blocking the list. */
-export function useTrackPlans(client: TaskiClient, memberId: string | undefined) {
+/**
+ * Track plans (priority and target date) for the configured areas. A failed read hides plans without blocking the list.
+ * `place` changes reload them with the summary, so an edit starts from the version another session may have saved.
+ */
+export function useTrackPlans(client: TaskiClient, memberId: string | undefined, place = "") {
   const [tracks, setTracks] = useState<ReadonlyMap<string, Track>>(() => new Map());
   const [revision, setRevision] = useState(0);
   const generation = useRef(0);
@@ -14,7 +17,7 @@ export function useTrackPlans(client: TaskiClient, memberId: string | undefined)
       if (generation.current === id) setTracks(new Map(result.items.map((track) => [track.id, track])));
     }, () => { if (generation.current === id) setTracks(new Map()); });
     return () => { generation.current++; };
-  }, [client, memberId, revision]);
+  }, [client, memberId, place, revision]);
   return { tracks, refresh };
 }
 export type TrackPlans = ReturnType<typeof useTrackPlans> & { client: TaskiClient; onExpired: () => void };

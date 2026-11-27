@@ -2,7 +2,7 @@
 
 Un gestor de tareas e ideas para equipos pequeños, con API y MCP como interfaces principales. Diseñado para que personas, Claude Code y Codex trabajen sobre el mismo contexto.
 
-**Estado: API y MCP de tickets persistentes y auditados sobre Worker/D1 local, con sesiones de equipo y acceso para agentes.** Incluye comentarios atómicos, versiones, reintentos, configuración versionada y actividad incremental. Consulta la [API HTTP](docs/api.md), el [cliente TypeScript](docs/client.md) y el [MCP autenticado](docs/mcp.md). Hay [recorridos locales verificados en Claude Code y Codex](docs/verification/b6-agents.md), con versiones y límites registrados. La [web conectada](docs/web.md) incorpora lista, filtros y captura; el despliegue de producción se prepara en B11.
+**Estado: API y MCP de tickets persistentes y auditados sobre Worker/D1 local, con sesiones de equipo y acceso para agentes.** Incluye comentarios atómicos, versiones, reintentos, configuración versionada y actividad incremental. Consulta la [API HTTP](docs/api.md), el [cliente TypeScript](docs/client.md) y el [MCP autenticado](docs/mcp.md). Hay [recorridos locales verificados en Claude Code y Codex](docs/verification/b6-agents.md), con versiones y límites registrados. La [web conectada](docs/web.md) incorpora lista, filtros y captura, y abre en un [Resumen](docs/web.md#resumen) con el avance de cada track, sus fechas y el texto con barras para Telegram; el despliegue de producción se prepara en B11.
 
 B2 añade [configuración validada](docs/configuration.md) y una [base visual reutilizable](docs/ui.md). Para revisar sus componentes con datos ficticios, ejecuta `npm run ui` y abre `http://127.0.0.1:5173`. El preview es independiente de la [web conectada](docs/web.md), que arranca con `npm run app`.
 
@@ -61,7 +61,7 @@ El [spike experimental de B0](experiments/b0/README.md) sí puede ejecutarse con
 - [Referencias para explorar el diseño](docs/design-references.md)
 - [Dirección visual actual](docs/design-direction.md)
 - [Q2 · Imágenes, voz, sticky notes, WhatsApp y guía MCP en la web](docs/q2.md)
-- [Resumen y tracks · plan por bloques](docs/tracks.md)
+- [Resumen y tracks · plan por bloques](docs/tracks.md) y su [verificación](docs/verification/tracks.md)
 - [Auditoría de Linear](docs/benchmarks/linear-baseline.md), [contrato candidato](docs/benchmarks/contract.md) y [protocolo comparativo](docs/benchmarks/protocol.md)
 
 ## Licencia
