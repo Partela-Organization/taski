@@ -1,12 +1,12 @@
 import { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from "react";
-import type { ProjectResult, TaskiClient, TrackSummary, WorkSummary } from "../../../client/index.ts";
+import type { HorizonSummary, ProjectResult, TaskiClient, TrackSummary, WorkSummary } from "../../../client/index.ts";
 import { Button } from "../../components.tsx";
 import { operationError } from "../access/use-team-session.ts";
 import { healthLabels } from "../summary/format.ts";
 import { WorkspaceIcon } from "../shared/marks.tsx";
 
 export interface GoToHandle { open: () => void }
-type Result = { kind: "track"; track: TrackSummary } | { kind: "ticket"; ticket: WorkSummary };
+type Result = { kind: "track"; track: TrackSummary } | { kind: "doc"; doc: HorizonSummary } | { kind: "ticket"; ticket: WorkSummary };
 
 /** Accent- and case-insensitive match for track names typed in Spanish. */
 function normalize(text: string): string {
@@ -18,9 +18,9 @@ function normalize(text: string): string {
  * A native modal dialog provides the focus trap and Escape; the input follows the combobox pattern.
  */
 export const GoTo = forwardRef<GoToHandle, {
-  client: TaskiClient; tracks: readonly TrackSummary[]; project: ProjectResult["project"];
-  onTrack: (id: string) => void; onTicket: (key: string) => void; onExpired: () => void;
-}>(function GoTo({ client, tracks, project, onTrack, onTicket, onExpired }, ref) {
+  client: TaskiClient; tracks: readonly TrackSummary[]; docs?: readonly HorizonSummary[] | undefined; project: ProjectResult["project"];
+  onTrack: (id: string) => void; onTicket: (key: string) => void; onDoc?: (id: string) => void; onExpired: () => void;
+}>(function GoTo({ client, tracks, docs = [], project, onTrack, onTicket, onDoc, onExpired }, ref) {
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -58,7 +58,10 @@ export const GoTo = forwardRef<GoToHandle, {
 
   const wanted = normalize(term);
   const trackResults = tracks.filter((track) => !wanted || normalize(track.label).includes(wanted));
+  // Horizonte documents appear only when searching, so the palette opens on the short track list.
+  const docResults = wanted ? docs.filter((doc) => normalize(`${doc.title} ${doc.excerpt}`).includes(wanted)).slice(0, 5) : [];
   const results: Result[] = [...trackResults.map((track) => ({ kind: "track" as const, track })),
+    ...docResults.map((doc) => ({ kind: "doc" as const, doc })),
     ...tickets.map((ticket) => ({ kind: "ticket" as const, ticket }))];
   const selected = Math.min(active, Math.max(0, results.length - 1));
   const optionId = (index: number) => `${id}-option-${index}`;
@@ -68,12 +71,13 @@ export const GoTo = forwardRef<GoToHandle, {
     returnFocus.current = null;
     dialog.current?.close();
     if (result.kind === "track") onTrack(result.track.id);
+    else if (result.kind === "doc") onDoc?.(result.doc.id);
     else onTicket(result.ticket.key);
   }
 
   const statusLabel = (ticket: WorkSummary) => project?.statusLabels[ticket.status] ?? ticket.status;
   const announcement = !term ? `${trackResults.length} tracks` : searching ? "Buscando…"
-    : `${trackResults.length} ${trackResults.length === 1 ? "track" : "tracks"} y ${tickets.length} ${tickets.length === 1 ? "ticket" : "tickets"}`;
+    : `${trackResults.length} ${trackResults.length === 1 ? "track" : "tracks"}, ${docResults.length} ${docResults.length === 1 ? "documento" : "documentos"} y ${tickets.length} ${tickets.length === 1 ? "ticket" : "tickets"}`;
 
   const option = (result: Result, index: number) => {
     const isActive = index === selected;
@@ -86,6 +90,14 @@ export const GoTo = forwardRef<GoToHandle, {
         <span className="go-to__title">{track.label}</span>
         <span className="sidebar-tracks__bar" data-health={track.health} aria-hidden="true"><span style={{ width: `${track.percent}%` }} /></span>
         <span className="go-to__meta">{track.percent}% · {healthLabels[track.health]}</span>
+      </li>;
+    }
+    if (result.kind === "doc") {
+      const { doc } = result;
+      return <li key={`doc-${doc.id}`} {...common}>
+        <WorkspaceIcon name="horizon" />
+        <span className="go-to__title">{doc.title}</span>
+        <span className="go-to__meta">Horizonte</span>
       </li>;
     }
     const { ticket } = result;
@@ -104,7 +116,7 @@ export const GoTo = forwardRef<GoToHandle, {
       <WorkspaceIcon name="search" />
       <input ref={input} type="text" role="combobox" aria-expanded={results.length > 0} aria-controls={`${id}-list`}
         aria-activedescendant={results.length ? optionId(selected) : undefined} aria-autocomplete="list"
-        aria-label="Buscar track o ticket" placeholder="Busca un track, código o título…" value={query} autoComplete="off"
+        aria-label="Buscar track o ticket" placeholder="Busca un track, documento, código o título…" value={query} autoComplete="off"
         onChange={(event) => { setQuery(event.target.value); setActive(0); }}
         onKeyDown={(event) => {
           if (event.key === "ArrowDown") { event.preventDefault(); setActive(results.length ? (selected + 1) % results.length : 0); }
@@ -117,6 +129,10 @@ export const GoTo = forwardRef<GoToHandle, {
       {trackResults.length > 0 && <ul role="group" aria-labelledby={`${id}-tracks`}>
         <li role="presentation" id={`${id}-tracks`} className="go-to__group">Tracks</li>
         {results.map((result, index) => result.kind === "track" ? option(result, index) : null)}
+      </ul>}
+      {docResults.length > 0 && <ul role="group" aria-labelledby={`${id}-docs`}>
+        <li role="presentation" id={`${id}-docs`} className="go-to__group">Horizonte</li>
+        {results.map((result, index) => result.kind === "doc" ? option(result, index) : null)}
       </ul>}
       {tickets.length > 0 && <ul role="group" aria-labelledby={`${id}-tickets`}>
         <li role="presentation" id={`${id}-tickets`} className="go-to__group">Tareas y feedback</li>

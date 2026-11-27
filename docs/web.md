@@ -38,6 +38,25 @@ Al abrir una tarea, el panel usa su enlace `/t/…`; al cerrarlo con Escape vuel
 
 Las cifras salen del [resumen del servidor](api.md#resumen-del-proyecto) y no dependen de las páginas cargadas. **Actualizar** vuelve a consultarlo; también se actualiza al guardar o eliminar desde el panel. Por ejemplo, marca un track como P1 con fecha en tres días y deja una de sus cuatro tareas pendientes: aparecerá En riesgo en **Lo que toca ahora**.
 
+## Horizonte
+
+**Horizonte**, en la navegación, guarda lo que el proyecto hará más adelante: ideas, investigaciones y auditorías que todavía no son tareas. Ver el [plan](horizonte.md).
+
+- **Crear**: escribe un título, elige una plantilla (En blanco, Idea o Investigación) y pulsa **Crear**.
+- **Importar Markdown**: pega una nota o elige un archivo `.md`, por ejemplo del vault. Un `# Título` al principio se usa como título. Las tablas, las listas anidadas y las tareas se conservan.
+- **Lista**: los documentos se agrupan por estado (Explorando, Planificado, Idea y Archivado, que aparece plegado). Cada tarjeta muestra un extracto, el track, las tareas hechas y quién editó por última vez. **Track** filtra la lista.
+
+Un documento tiene dirección propia, `/horizonte/<id>`, que se puede recargar o compartir. Se abre en **Leer**, con negritas, enlaces y tablas, salvo que esté vacío; entonces abre en **Editar**. En Editar:
+
+- escribe `/` en una línea para elegir el tipo de bloque;
+- o usa los atajos `#`, `##`, `###`, `-`, `1.`, `[]`, `>`, ```` ``` ```` y `---`;
+- Enter crea el bloque siguiente;
+- Backspace al principio de un bloque lo convierte en texto o lo une al anterior;
+- Tab y Mayús+Tab cambian la sangría de las listas;
+- en código y tablas, Enter añade una línea.
+
+Los cambios se guardan solos con la versión que abriste; el estado de guardado aparece arriba. Si se pierde la respuesta, Taski reintenta el mismo cambio. Si otra persona o un agente guardó antes, conservas tu texto y eliges **Guardar mi versión encima** o **Descartar mis cambios**. **Copiar Markdown** copia el documento entero y **Eliminar** lo quita tras confirmar; el historial se conserva. Los documentos también aparecen en [Ir a…](#ir-a) al buscar por título.
+
 ## Espacio de trabajo
 
 La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Por defecto, las áreas de la instalación aparecen como secciones con su cantidad de entradas cargadas y cada fila muestra su estado. **Agrupar por** permite cambiar a secciones por estado. **Terminado** empieza plegado en ambas vistas. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.

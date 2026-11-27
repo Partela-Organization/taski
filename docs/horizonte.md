@@ -5,7 +5,7 @@ Horizonte reúne lo que el proyecto hará más adelante: ideas, investigaciones 
 | Bloque | Estado |
 | --- | --- |
 | H1 · Núcleo, API y MCP | Implementado: [Horizonte en la API](api.md#horizonte) y [MCP](mcp.md#catorce-herramientas) |
-| H2 · Sección en la web | Pendiente |
+| H2 · Sección en la web | Implementado: [Horizonte en la web](web.md#horizonte) |
 | H3 · Contenido y despliegue | Pendiente |
 | H4 · Verificación | Pendiente |
 

@@ -191,7 +191,8 @@ export function summarize(doc: HorizonDoc): HorizonSummary {
   const { blocks, ...rest } = doc;
   const first = blocks.find((block) => block.type === "p" || block.type === "quote")?.text ?? "";
   const plain = first.replace(/\*\*|__|`|\[\[|\]\]/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\s+/g, " ").trim();
-  const tasks = blocks.filter((block) => block.type === "todo");
+  // Empty task lines (for example, from a template) are not counted as pending work.
+  const tasks = blocks.filter((block) => block.type === "todo" && block.text.trim());
   return { ...rest, excerpt: plain.length > 180 ? `${plain.slice(0, 179)}…` : plain, blockCount: blocks.length,
     tasks: { done: tasks.filter((block) => block.done).length, total: tasks.length } };
 }

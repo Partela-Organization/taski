@@ -10,7 +10,7 @@ npm exec -- wrangler deploy --config wrangler.deploy.example.jsonc --dry-run
 node --test tests/hosted-runtime.test.mjs
 ```
 
-El Worker responde JSON en `/health`, `/api/v1/*` y `/mcp`. Sirve la web en `/` y en enlaces directos como `/t/EDIT-001` o `/track/content`. Una instalación existente debe añadir `"/track/*"` a `assets.run_worker_first` en su configuración privada; sin esa ruta, recargar la vista de un track devuelve 404. El cliente usa la API en el mismo origen. El Worker que sirve la web requiere una configuración explícita y responde 503 si falta o es inválida.
+El Worker responde JSON en `/health`, `/api/v1/*` y `/mcp`. Sirve la web en `/` y en enlaces directos como `/t/EDIT-001` o `/track/content`. También sirve `/horizonte` y `/horizonte/<id>`. Una instalación existente debe añadir `"/track/*"`, `"/horizonte"` y `"/horizonte/*"` a `assets.run_worker_first` en su configuración privada; sin esas rutas, recargar la vista de un track o un documento devuelve 404. El cliente usa la API en el mismo origen. El Worker que sirve la web requiere una configuración explícita y responde 503 si falta o es inválida.
 
 ## Preparar una instalación
 
