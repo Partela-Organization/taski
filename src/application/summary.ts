@@ -78,6 +78,6 @@ export class SummaryService {
     const heading = `${this.context.project.name} · ${new Intl.DateTimeFormat("es", { weekday: "short", day: "numeric", month: "short", timeZone: timezone }).format(new Date(now)).replace(/[.,]/g, "")}`;
     return { today, timezone, totals, feedbackOpen,
       closedLast7Days: { count: closed.length, items: closed.slice(0, recentItems) },
-      tracks, text: progressText(heading, tracks, totals.percent) };
+      tracks, text: progressText(heading, tracks, totals) };
   }
 }

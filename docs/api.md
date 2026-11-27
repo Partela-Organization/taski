@@ -95,15 +95,23 @@ El recibo devuelve `areaId`, la nueva versión y los campos cambiados. Una versi
 - `closedLast7Days`: tareas que pasaron a `done` en los últimos siete días y siguen terminadas, con las cinco más recientes.
 - `today` y `timezone`: la fecha usada para los cálculos, según la [zona horaria de la instalación](configuration.md#campos-del-esquema-1).
 
-`GET /api/v1/summary?format=text` devuelve solo `today` y `text`: una barra de diez caracteres por track, alineada en monoespaciado. Ejemplo con datos ficticios:
+`GET /api/v1/summary?format=text` devuelve solo `today` y `text`, en el estilo de los mensajes de Telegram del equipo:
+
+- la primera línea lleva el total;
+- después, una barra de diez caracteres por track con `% · terminadas/total`, y `⚠️` con la fecha si el track está vencido o en riesgo;
+- un track sin tareas muestra `—`;
+- al final, `▶` el siguiente paso del track más urgente y `•` dos más.
+
+Es texto plano: se pega tal cual. Ejemplo con datos ficticios:
 
 ```text
-Proyecto demo · vie 27 nov
+📋 Proyecto demo · vie 27 nov  ▓▓▓▓▓▓▓░░░ 69 % · 18/26
+Accesos y llaves  ▓▓▓▓▓▓▓▓░░ 83 % · 5/6 · ⚠️ venció 25 nov
+Pagos  ▓▓▓▓▓▓░░░░ 58 % · 7/12 · ⚠️ vence 1 dic
+Limpieza  ▓▓▓▓▓▓▓▓░░ 75 % · 6/8
+Comunicación  —
 
-Web     ▓▓▓▓▓▓▓▓░░  80%
-General ░░░░░░░░░░   0%
-
-Total   ▓▓▓▓▓▓▓░░░  69%
+▶ Accesos y llaves: Entregar copias de llaves a la unidad 4B
+• Pagos: Conciliar transferencias de noviembre
+• Limpieza: Confirmar turno del fin de semana
 ```
-
-Para conservar la alineación en Telegram, pega el texto dentro de un bloque de código.

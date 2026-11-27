@@ -27,5 +27,5 @@ export function plural(count: number, one: string, many: string): string {
   return `${count} ${count === 1 ? one : many}`;
 }
 
-/** Telegram renders a fenced block in monospace, which keeps the bars aligned. */
-export function telegramMessage(text: string): string { return `\`\`\`\n${text}\n\`\`\``; }
+/** The recap is already plain text in the team's Telegram style, so it is copied as is. */
+export function telegramMessage(text: string): string { return text; }

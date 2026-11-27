@@ -50,7 +50,7 @@ test("walkthrough: summary, tracks, Ir a… and feedback done on desktop and pho
 
   const text = (await (await api("summary?format=text")).json()).text;
   await page.getByRole("button", { name: "Copiar para Telegram" }).click();
-  expect(await page.evaluate(() => window.copiedRecap)).toBe("```\n" + text + "\n```");
+  expect(await page.evaluate(() => window.copiedRecap)).toBe(text);
 
   // Track by shortcut, plan editing, capture and the "Ir a…" palette.
   await page.keyboard.press("1");
