@@ -2,7 +2,7 @@
 
 Rutas implementadas sobre el mismo `TicketService` y repositorio D1 auditado, sin endpoints de SQL. Todos los tickets/actividad/proyecto exigen cookie de sesión o código Bearer y X-Taski-Member; ver [acceso](access.md). El [MCP](mcp.md) ya comparte este núcleo; la UI conectada se añade en B7.
 
-El [OpenAPI 3.1](api/openapi.json) se genera desde los diez contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
+El [OpenAPI 3.1](api/openapi.json) se genera desde los once contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
 
 | Método/ruta | Operación |
 | --- | --- |
@@ -15,6 +15,7 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los diez contratos compartido
 | POST /api/v1/tickets/{key}/comments | Añadir body con versión y clave de reintento. |
 | PUT /api/v1/tickets/{key}/pull-request | URL manual con versión y clave; no consulta GitHub. |
 | GET /api/v1/activity | Cambios desde cursor; filtro ticketKey opcional. |
+| GET /api/v1/summary | Resumen del proyecto por track, calculado en el servidor. `format=text` devuelve solo el texto con barras. |
 | GET /api/v1/areas | Tracks: áreas configuradas con prioridad, fecha límite y versión. |
 | PATCH /api/v1/areas/{areaId} | Cambiar prioridad y/o fecha límite con `expectedVersion` e `idempotencyKey`. |
 
@@ -80,3 +81,29 @@ Un track es un área de la configuración con un plan: prioridad 1 (alta), 2 (me
 ```
 
 El recibo devuelve `areaId`, la nueva versión y los campos cambiados. Una versión desactualizada devuelve `VERSION_CONFLICT`. Un área que no está en la configuración devuelve `UNKNOWN_AREA`. Una fecha inexistente, como `2026-02-30`, devuelve `INVALID_INPUT`. Enviar los mismos valores devuelve `EMPTY_UPDATE`. Personas y agentes pueden editar el plan, y cada cambio queda auditado.
+
+## Resumen del proyecto
+
+`GET /api/v1/summary` responde "¿cómo vamos?" en una sola lectura. Los conteos salen de D1 con todas las filas, no de las páginas de la lista, y omiten los tickets eliminados.
+
+- `tracks`: ordenados por prioridad, después por fecha límite (sin fecha al final) y después por orden de configuración. Cada track trae:
+  - `done`, `inReview`, `remaining`, `total` y `percent` (terminadas / total). Solo cuentan las tareas.
+  - `daysLeft` y `health`: `late` si la fecha pasó y quedan tareas, `risk` si quedan siete días o menos y falta al menos el 25%, `ok` si tiene fecha y no cumple lo anterior, y `none` si no tiene fecha.
+  - `next`: la tarea en curso más antigua; si no hay, una pendiente resaltada; si no, la pendiente más antigua.
+- `totals`: suma de todos los tracks.
+- `feedbackOpen`: feedback que no está terminado.
+- `closedLast7Days`: tareas que pasaron a `done` en los últimos siete días y siguen terminadas, con las cinco más recientes.
+- `today` y `timezone`: la fecha usada para los cálculos, según la [zona horaria de la instalación](configuration.md#campos-del-esquema-1).
+
+`GET /api/v1/summary?format=text` devuelve solo `today` y `text`: una barra de diez caracteres por track, alineada en monoespaciado. Ejemplo con datos ficticios:
+
+```text
+Proyecto demo · vie 27 nov
+
+Web     ▓▓▓▓▓▓▓▓░░  80%
+General ░░░░░░░░░░   0%
+
+Total   ▓▓▓▓▓▓▓░░░  69%
+```
+
+Para conservar la alineación en Telegram, pega el texto dentro de un bloque de código.

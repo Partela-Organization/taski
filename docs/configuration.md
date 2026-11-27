@@ -14,7 +14,7 @@ Para una [instalación alojada](deployment/cloudflare.md), el Worker admite el m
 
 ## Campos del esquema 1
 
-Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos están en [types.ts](../src/config/types.ts) y la comprobación de datos desconocidos en [schema.ts](../src/config/schema.ts).
+Todos son obligatorios salvo `timezone`; el preset demo muestra los valores iniciales. Los tipos están en [types.ts](../src/config/types.ts) y la comprobación de datos desconocidos en [schema.ts](../src/config/schema.ts).
 
 | Campo | Tipo / límites | Cambio y efecto |
 | --- | --- | --- |
@@ -25,6 +25,7 @@ Todos son obligatorios; el preset demo muestra los valores iniciales. Los tipos 
 | project.prefix | 2–8 letras mayúsculas/dígitos, letra inicial | Prefijo inicial de códigos. No se cambia libremente después de crear tickets. |
 | project.baseUrl | URL absoluta de hasta 300 caracteres | HTTPS; HTTP solo para localhost, 127.0.0.1 o ::1. Sin credenciales, query o fragmento. Se normaliza sin slash final; puede tener un subpath. |
 | locale | Literal `es` | Solo español implementado. No constituye un motor de traducciones. |
+| timezone | Zona IANA, opcional; `UTC` si se omite | Define "hoy" para el [resumen](api.md#resumen-del-proyecto): días restantes, tracks vencidos y cerradas en siete días. Por ejemplo, `America/Caracas`. Una zona inexistente produce error al validar. |
 | members | 1–50 objetos | id único y estable; name de 1–100 caracteres; defaultView `work` o `feedback`. Es preferencia de presentación, no un rol. |
 | areas | 1–50 objetos | id único y estable; label de 1–64 caracteres. |
 | defaultAreaId | ID de una de las áreas | Referencia validada; no puede apuntar a un área inexistente. |

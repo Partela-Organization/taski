@@ -58,3 +58,19 @@ export interface Track {
 export interface TrackList { items: Track[] }
 export interface UpdateTrack { expectedVersion: number; idempotencyKey: string; priority?: Priority; targetDate?: string | null }
 export interface TrackReceipt { areaId: string; version: number; changed: string[] }
+
+export type TrackHealth = "late" | "risk" | "ok" | "none";
+export interface TrackSummary {
+  id: string; label: string; priority: Priority; targetDate: string | null; daysLeft: number | null; health: TrackHealth;
+  done: number; inReview: number; remaining: number; total: number; percent: number;
+  next: { key: string; title: string; status: Status; assigneeId: string | null } | null;
+}
+/** Server-side recap. Counts cover tasks; feedback is reported separately. */
+export interface ProjectSummary {
+  today: string; timezone: string;
+  totals: { done: number; inReview: number; remaining: number; total: number; percent: number };
+  feedbackOpen: number;
+  closedLast7Days: { count: number; items: { key: string; title: string; areaId: string; closedAt: string }[] };
+  tracks: TrackSummary[];
+}
+export interface ProjectSummaryText { today: string; text: string }

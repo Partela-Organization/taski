@@ -9,10 +9,10 @@ export class ConfigurationError extends Error {
 
 const fail = (path: string, reason: string): never => { throw new ConfigurationError(path, reason); };
 
-function object(input: unknown, path: string, keys: readonly string[]): Record<string, unknown> {
+function object(input: unknown, path: string, keys: readonly string[], optional: readonly string[] = []): Record<string, unknown> {
   if (!input || typeof input !== "object" || Array.isArray(input)) return fail(path, "expected object");
   const value = input as Record<string, unknown>;
-  for (const key of Object.keys(value)) if (!keys.includes(key)) fail(`${path}.${key}`, "unknown field");
+  for (const key of Object.keys(value)) if (!keys.includes(key) && !optional.includes(key)) fail(`${path}.${key}`, "unknown field");
   for (const key of keys) if (!(key in value)) fail(`${path}.${key}`, "required field");
   return value;
 }
@@ -62,12 +62,15 @@ function freeze<T>(value: T): T {
 
 export function parseConfiguration(input: unknown): InstallationConfig {
   const value = object(input, "config", ["schemaVersion", "configVersion", "project", "locale", "members",
-    "areas", "defaultAreaId", "statusLabels", "typeLabels", "policy", "brand"]);
+    "areas", "defaultAreaId", "statusLabels", "typeLabels", "policy", "brand"], ["timezone"]);
   if (value.schemaVersion !== 1) fail("schemaVersion", "only schema version 1 is supported");
   if (typeof value.configVersion !== "number" || !Number.isSafeInteger(value.configVersion) || value.configVersion < 1) {
     fail("configVersion", "expected a positive safe integer; increment after changing configuration");
   }
   if (value.locale !== "es") fail("locale", "only es is implemented");
+  const timezone = value.timezone === undefined ? "UTC" : text(value.timezone, "timezone", 64);
+  try { new Intl.DateTimeFormat("en-US", { timeZone: timezone }); }
+  catch { fail("timezone", "expected an IANA time zone such as America/Caracas or UTC"); }
   const project = object(value.project, "project", ["id", "name", "prefix", "baseUrl"]);
   if (typeof project.prefix !== "string" || !/^[A-Z][A-Z0-9]{1,7}$/.test(project.prefix)) {
     fail("project.prefix", "expected 2–8 uppercase letters/digits, beginning with a letter");
@@ -105,7 +108,7 @@ export function parseConfiguration(input: unknown): InstallationConfig {
     }
   }
   return freeze({ schemaVersion: 1, configVersion: value.configVersion as number,
-    locale: "es", project: { id: id(project.id, "project.id"), name: text(project.name, "project.name"),
+    locale: "es", timezone, project: { id: id(project.id, "project.id"), name: text(project.name, "project.name"),
       prefix: project.prefix as string, baseUrl: baseUrl.toString().replace(/\/$/, "") },
     members, areas, defaultAreaId,
     statusLabels: labels(value.statusLabels, "statusLabels", ["todo", "in_progress", "in_review", "done"]),

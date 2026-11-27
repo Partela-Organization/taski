@@ -10,6 +10,7 @@ import { createTestHarness } from "wrangler";
 import { workflow, resumed } from "./mcp-agent-prompts.mjs";
 import { installation } from "../src/config/index.ts";
 import { demoPreset } from "../src/config/presets/demo.ts";
+import { parseConfiguration } from "../src/config/schema.ts";
 
 const args = process.argv.slice(2);
 const option = (key, fallback) => args.includes(key) ? args[args.indexOf(key) + 1] : fallback;
@@ -25,7 +26,7 @@ for (let n = 0; n < args.length; n++) {
 assert(["codex", "claude"].includes(clientName), "Use --client codex|claude");
 assert(["default", "eager", "deferred"].includes(loading), "Use --loading default|eager|deferred");
 assert(clientName !== "codex" || loading === "default", "Codex uses its observed default; no unsupported deferral flags");
-assert.deepEqual(installation, demoPreset, "Live evaluation requires the public demo preset, not an installation's configuration");
+assert.deepEqual(installation, parseConfiguration(demoPreset), "Live evaluation requires the public demo preset, not an installation's configuration");
 const temporary = await mkdtemp(path.join(tmpdir(), "taski-agent-"));
 console.error(`Fixture logs: ${temporary}`);
 const code = randomUUID();
@@ -201,7 +202,7 @@ try {
     const final = await request("get", { key: first.key });
     assert.equal(final.ticket.version, 5); assert.equal(final.comments.length, 3);
     const catalog = trace.flatMap((entry) => entry.responses).map((message) => message.result).find((value) => value?.tools);
-    assert.equal(catalog.tools.length, 10);
+    assert.equal(catalog.tools.length, 11);
     const objects = { catalog };
     for (const label of ["new", "resumed"]) {
       const results = trace.filter((entry) => entry.phase === label && entry.requests.some((message) => message.method === "tools/call"))

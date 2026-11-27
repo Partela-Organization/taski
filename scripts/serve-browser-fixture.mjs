@@ -7,8 +7,9 @@ import { extname } from "node:path";
 import { createTestHarness } from "wrangler";
 import { installation } from "../src/config/index.ts";
 import { demoPreset } from "../src/config/presets/demo.ts";
+import { parseConfiguration } from "../src/config/schema.ts";
 
-assert.deepEqual(installation, demoPreset, "Browser fixture requires the fictional demo configuration");
+assert.deepEqual(installation, parseConfiguration(demoPreset), "Browser fixture requires the fictional demo configuration");
 const args = process.argv.slice(2);
 const lan = args[0] === "--lan" && (args.length === 2 || args.length === 3);
 assert(!args.length || lan, "Use --lan followed by the computer's private IPv4 address and optional port");

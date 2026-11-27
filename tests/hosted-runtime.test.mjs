@@ -56,7 +56,7 @@ test("hosted UI serves direct ticket links alongside D1, API and MCP", async (t)
       requestInit: { headers: { authorization: `Bearer ${code}`, "x-taski-member": "lee" } },
       fetch: (input, init) => server.fetch(input, init),
     }));
-    assert.equal((await client.listTools()).tools.length, 10);
+    assert.equal((await client.listTools()).tools.length, 11);
     const project = await client.callTool({ name: "get_project", arguments: {} });
     assert.equal(project.structuredContent.project.prefix, "EDIT");
   } finally {

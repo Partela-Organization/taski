@@ -39,6 +39,7 @@ const project = object({ id: string, name: string, prefix: string, baseUrl: stri
 const priority = { enum: [1, 2, 3] };
 const targetDate = { type: ["string", "null"], pattern: "^\\d{4}-\\d{2}-\\d{2}$" };
 const planVersion = { type: "integer", minimum: 0 };
+const count = { type: "integer", minimum: 0 };
 const track = object({ id: string, label: string, priority, targetDate, version: planVersion, updatedBy: nullableString, updatedAt: nullableString },
   ["id", "label", "priority", "targetDate", "version", "updatedBy", "updatedAt"]);
 
@@ -75,6 +76,10 @@ export const definitions = [
     inputSchema: { ...object({ areaId: string, expectedVersion: planVersion, idempotencyKey: mutation.idempotencyKey, priority, targetDate },
       ["areaId", "expectedVersion", "idempotencyKey"]), anyOf: [{ required: ["priority"] }, { required: ["targetDate"] }] },
     outputSchema: object({ areaId: string, version: integer, changed: array(string) }, ["areaId", "version", "changed"]) },
+  { name: "get_summary", description: "Project recap in one call: per track (tasks only) progress, health late|risk|ok|none, days left and next step; totals, open feedback, tasks closed in 7 days. format=text returns only progress-bar text for chat.",
+    inputSchema: object({ format: { const: "text" } }),
+    outputSchema: object({ today: string, timezone: string, text: string, totals: looseObject, feedbackOpen: count,
+      closedLast7Days: looseObject, tracks: array(looseObject) }, ["today"]) },
 ] satisfies { name: OperationName; description: string; inputSchema: ReturnType<typeof object> & { anyOf?: unknown[] }; outputSchema: ReturnType<typeof object> }[];
 
 export const serverInstructions = "One project per installation. Reuse configVersion and activity cursors. Lists are summaries; fetch needed detail. Mutations are version checked, audited and idempotent. Agents normally finish in review. Errors are explicit; never claim a failed write was saved.";
