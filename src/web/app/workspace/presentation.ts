@@ -27,3 +27,19 @@ export function saveGrouping(grouping: Grouping): void {
   try { localStorage.setItem(groupingKey, grouping); }
   catch { /* The selection still works for this session. */ }
 }
+
+export type FeedbackFilter = "open" | "done" | "all";
+const feedbackFilterKey = "taski.feedbackFilter";
+
+export function readFeedbackFilter(): FeedbackFilter {
+  try {
+    const stored = localStorage.getItem(feedbackFilterKey);
+    if (stored === "done" || stored === "all") return stored;
+  } catch { /* The browser may restrict storage. */ }
+  return "open";
+}
+
+export function saveFeedbackFilter(filter: FeedbackFilter): void {
+  try { localStorage.setItem(feedbackFilterKey, filter); }
+  catch { /* The selection still works for this session. */ }
+}

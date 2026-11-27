@@ -25,7 +25,8 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
     const query: Record<string, unknown> = {};
     for (const [key, value] of url.searchParams) {
       if (key in query) throw new TaskiError("INVALID_INPUT", "Repeated query parameter");
-      query[key] = ["limit", "commentsLimit", "knownVersion"].includes(key) ? Number(value) : key === "assigneeId" && value === "~" ? null : value;
+      query[key] = ["limit", "commentsLimit", "knownVersion"].includes(key) ? Number(value) : key === "assigneeId" && value === "~" ? null
+        : key === "open" && value === "true" ? true : value;
     }
     let operation: OperationName | undefined, input: unknown = query, allow = "GET";
     if (parts.length === 3 && parts[2] === "project") operation = request.method === "GET" ? "get_project" : undefined;

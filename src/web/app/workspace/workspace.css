@@ -118,6 +118,26 @@
   display: grid; place-items: center; flex: none; width: 14px; height: 14px;
   border: 1px solid var(--line-strong); border-radius: 50%; color: var(--success); font-size: 10px;
 }
+.ticket-row__check {
+  position: relative; z-index: 1; display: grid; place-items: center; flex: none;
+  width: 32px; height: 32px; margin: -9px -9px -9px -9px; cursor: pointer;
+}
+.ticket-row__check input {
+  appearance: none; display: grid; place-content: center; width: 16px; height: 16px; margin: 0;
+  border: 1.5px solid var(--line-strong); border-radius: 4px; background: var(--surface); cursor: pointer;
+}
+.ticket-row__check input:hover { border-color: var(--muted); }
+.ticket-row__check input:checked { background: var(--success); border-color: var(--success); }
+.ticket-row__check input:checked::after {
+  content: ""; width: 7px; height: 4px; border-left: 2px solid var(--canvas); border-bottom: 2px solid var(--canvas);
+  transform: translateY(-1px) rotate(-45deg);
+}
+.ticket-row__check input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.ticket-row__check input:disabled { opacity: .55; cursor: progress; }
+@media (forced-colors: active) { .ticket-row__check input { appearance: auto; } .ticket-row__check input:checked::after { content: none; } }
+.ticket-row[data-done] .ticket-row__open { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+.ticket-row__done-state { color: var(--success); font-weight: 550; }
+.feedback-filter { width: fit-content; margin: 0 0 12px; }
 .ticket-row__body { min-width: 0; flex: 1; }
 .ticket-row__open.button {
   display: block; width: 100%; border: 0; padding: 2px 0; min-height: auto;

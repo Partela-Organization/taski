@@ -5,7 +5,7 @@ import type { Theme } from "../../theme.ts";
 import type { Member } from "../access/use-team-session.ts";
 import { Wordmark, WorkspaceIcon } from "../shared/marks.tsx";
 import { ThemeControl } from "../shared/theme-control.tsx";
-import type { Grouping, Presentation } from "./presentation.ts";
+import type { FeedbackFilter, Grouping, Presentation } from "./presentation.ts";
 import { views } from "./views.ts";
 import type { View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
@@ -109,5 +109,16 @@ export function WorkspaceToolbar({ search, onSearch, areas, area, onArea, onRefr
         <WorkspaceIcon name="refresh" />Actualizar
       </Button>
     </div>
+  </div>;
+}
+
+const feedbackFilters = [
+  { id: "open", label: "Abiertos" }, { id: "done", label: "Hechos" }, { id: "all", label: "Todos" },
+] as const;
+
+export function FeedbackFilterControl({ filter, onFilter }: { filter: FeedbackFilter; onFilter: (filter: FeedbackFilter) => void }) {
+  return <div className="presentation-control feedback-filter" role="group" aria-label="Mostrar feedback">
+    {feedbackFilters.map(({ id, label }) =>
+      <Button key={id} aria-pressed={filter === id} onClick={() => onFilter(id)}>{label}</Button>)}
   </div>;
 }

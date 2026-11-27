@@ -232,3 +232,41 @@ test("feedback creation uploads a selected image and a recorded voice note", asy
   await page.reload();
   await expect(panel.locator("audio")).toBeVisible();
 });
+
+test("feedback is checked as done, filtered and reopened with an audited person change", async ({ page }, testInfo) => {
+  const title = `Feedback para cerrar · ${testInfo.project.name}`;
+  await page.goto(app);
+  await enter(page, "Taylor");
+  await expect(page.getByRole("heading", { name: "Feedback", exact: true })).toBeVisible();
+  const created = await page.request.post(`${app}/api/v1/tickets`, { data: { type: "feedback", title, idempotencyKey: title } });
+  expect(created.ok()).toBe(true);
+  const { key } = await created.json();
+  const filters = page.getByRole("group", { name: "Mostrar feedback" });
+  await page.getByRole("button", { name: "Todos", exact: true }).click();
+  await filters.getByRole("button", { name: "Abiertos", exact: true }).click();
+  await expect(filters.getByRole("button", { name: "Abiertos", exact: true })).toHaveAttribute("aria-pressed", "true");
+
+  const check = page.getByRole("checkbox", { name: `Hecho · ${title}`, exact: true });
+  await expect(check).not.toBeChecked();
+  await check.click();
+  await expect(page.getByRole("status").filter({ hasText: `«${title}» marcado como hecho.` })).toBeVisible();
+  await expect(check).toHaveCount(0);
+
+  await filters.getByRole("button", { name: "Hechos", exact: true }).click();
+  await expect(check).toBeChecked();
+  await expect(page.locator(".tickets li").filter({ hasText: title })).toContainText("Hecho");
+  await page.screenshot({ path: testInfo.outputPath("feedback-done.png") });
+  await page.reload();
+  await expect(filters.getByRole("button", { name: "Hechos", exact: true })).toHaveAttribute("aria-pressed", "true");
+
+  await check.click();
+  await expect(page.getByRole("status").filter({ hasText: `«${title}» vuelve a estar abierto.` })).toBeVisible();
+  await expect(check).toHaveCount(0);
+  await filters.getByRole("button", { name: "Abiertos", exact: true }).click();
+  await expect(check).not.toBeChecked();
+
+  const activity = await (await page.request.get(`${app}/api/v1/activity?ticketKey=${key}`)).json();
+  const transitions = activity.items.filter((event) => event.changes.status?.before).map((event) => event.changes.status);
+  expect(transitions).toEqual([{ before: "todo", after: "done" }, { before: "done", after: "todo" }]);
+  expect(activity.items.every((event) => !event.changes.status?.before || (event.actor.kind === "person" && event.actor.memberId === "taylor"))).toBe(true);
+});

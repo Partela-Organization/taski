@@ -65,6 +65,10 @@ En móvil se abre Feedback al entrar. También es la vista inicial de quienes ti
 2. Usa **Copiar enlace** para enviárselo a otra persona del equipo. La conversación está debajo del aporte. Para responder, escribe en **Comentario** y pulsa **Enviar comentario**.
 3. Abre **Gestionar feedback** para cambiar el área, resaltar, revisar actividad o **Convertir en tarea**. La conversión conserva el área guardada, el enlace, el autor, la conversación y el historial.
 
+Cada aporte tiene una casilla **Hecho**. Márcala cuando el feedback esté atendido y desmárcala para reabrirlo. El cambio guarda el estado Terminado o Pendiente con la versión consultada y queda en la actividad con la persona que lo hizo. La casilla cambia solo cuando el servidor confirma. Si la respuesta se pierde, vuelve a pulsarla: el reintento usa la misma solicitud. Los agentes no pueden marcar feedback como hecho, igual que con las tareas.
+
+Usa **Abiertos**, **Hechos** o **Todos** encima de la lista. Abiertos es la opción inicial y la elección se guarda en el navegador. Por ejemplo, marca un aporte en Abiertos, pasa a Hechos para verlo tachado y desmárcalo allí si necesitas reabrirlo.
+
 La lista de Feedback muestra los aportes más recientes primero. **Ver más** amplía la lista y **Cargar más** trae la siguiente página cuando está disponible. Los filtros, grupos y tarjetas se usan desde las vistas de trabajo.
 
 En móvil, toca tu nombre en el encabezado para cambiar el tema o salir. **Conectar MCP** queda debajo de las pestañas. Si cierras el editor de Feedback, el borrador permanece mientras sigas en la misma sesión y pestaña.

@@ -12,8 +12,8 @@
   "fixtures": "20 create-and-assign calls; fixed epoch in isolated D1 only; no production data",
   "measured": {
     "catalog_with_instructions": {
-      "tokensProxy": 3134,
-      "utf8Bytes": 12524
+      "tokensProxy": 3145,
+      "utf8Bytes": 12571
     },
     "list_20": {
       "tokensProxy": 808,
@@ -35,8 +35,8 @@
       "utf8Bytes": 2080
     },
     "list_tickets": {
-      "tokensProxy": 410,
-      "utf8Bytes": 1616
+      "tokensProxy": 421,
+      "utf8Bytes": 1663
     },
     "get_ticket": {
       "tokensProxy": 591,

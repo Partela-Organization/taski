@@ -9,19 +9,30 @@ export interface TicketRowContext {
   project: ProjectResult["project"];
   selected?: string | undefined;
   onOpen: (key: string) => void;
+  /** Feedback only: confirmed done toggle and the keys still waiting for the server. */
+  onToggleDone?: ((row: WorkSummary) => void) | undefined;
+  pendingDone?: ReadonlySet<string> | undefined;
 }
 
 export function TicketRow({ row, context, showArea, statusLabel }: {
   row: WorkSummary; context: TicketRowContext; showArea: boolean; statusLabel?: string | undefined;
 }) {
-  const { feedback, project, selected, onOpen } = context;
+  const { feedback, project, selected, onOpen, onToggleDone, pendingDone } = context;
+  const done = row.status === "done";
+  const saving = pendingDone?.has(row.key) ?? false;
   const author = project?.members.find((member) => member.id === row.createdBy)?.name ?? row.createdBy;
   const assignee = project?.members.find((member) => member.id === row.assigneeId)?.name ?? row.assigneeId;
   const area = project?.areas.find((entry) => entry.id === row.areaId)?.label ?? row.areaId;
   const prNumber = row.prUrl?.match(/\/pull\/(\d+)\/?$/)?.[1];
   const createdAt = Date.parse(row.createdAt ?? "");
-  return <li className={row.key === selected ? "ticket-row ticket-row--selected" : "ticket-row"} data-feedback={feedback || undefined}>
-    <span className="ticket-row__circle" aria-hidden="true">{row.status === "done" ? "✓" : ""}</span>
+  return <li className={row.key === selected ? "ticket-row ticket-row--selected" : "ticket-row"} data-feedback={feedback || undefined}
+    data-done={feedback && done ? true : undefined}>
+    {feedback && onToggleDone
+      ? <label className="ticket-row__check" title={done ? "Marcar como abierto" : "Marcar como hecho"}>
+        <input type="checkbox" checked={done} disabled={saving} aria-busy={saving || undefined}
+          aria-label={`Hecho · ${row.title}`} onChange={() => onToggleDone(row)} />
+      </label>
+      : <span className="ticket-row__circle" aria-hidden="true">{done ? "✓" : ""}</span>}
     <div className="ticket-row__body">
       <Button className="ticket-row__open" aria-current={row.key === selected ? "true" : undefined}
         onClick={() => onOpen(row.key)}><span className={row.highlighted ? "ticket-title-mark" : undefined}>{row.title}</span></Button>
@@ -35,6 +46,8 @@ export function TicketRow({ row, context, showArea, statusLabel }: {
           <span className={`status-dot status-dot--${row.status}`} aria-hidden="true" />{statusLabel}
         </span>}
         {Number.isFinite(createdAt) && <time dateTime={row.createdAt}>{creationDate.format(createdAt)}</time>}
+        {feedback && onToggleDone && (saving ? <span className="ticket-row__done-state">Guardando…</span>
+          : done && <span className="ticket-row__done-state">Hecho</span>)}
       </div>
     </div>
     {(!feedback || showArea || assignee) && <div className="ticket-row__assignment">

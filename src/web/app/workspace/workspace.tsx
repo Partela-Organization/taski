@@ -10,14 +10,20 @@ import { WorkspaceIcon } from "../shared/marks.tsx";
 import { useCompactLayout } from "../shared/layout.ts";
 import { TicketPanel } from "../tickets/ticket-panel.tsx";
 import { useTicketRoute } from "../tickets/use-ticket-route.ts";
-import { readGrouping, readPresentation, saveGrouping, savePresentation } from "./presentation.ts";
+import { readFeedbackFilter, readGrouping, readPresentation, saveFeedbackFilter, saveGrouping, savePresentation } from "./presentation.ts";
+import type { FeedbackFilter } from "./presentation.ts";
 import { QuickCapture } from "./quick-capture.tsx";
+import { useFeedbackDone } from "./use-feedback-done.ts";
 import { useQuickCapture } from "./use-quick-capture.ts";
 import { TicketList } from "./ticket-list.tsx";
 import { useTicketList } from "./use-ticket-list.ts";
 import { initialView, views } from "./views.ts";
 import type { View } from "./views.ts";
-import { WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
+import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
+
+const emptyFeedback: Record<FeedbackFilter, string> = {
+  open: "No hay feedback abierto", done: "Todavía no hay feedback hecho", all: "Todavía no hay feedback",
+};
 
 export function Workspace({ client, access, member, theme, onTheme, onExpired, onSignOut }: {
   client: TaskiClient; access: Access | undefined; member: Member | undefined;
@@ -28,6 +34,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [search, setSearch] = useState("");
   const [presentation, setPresentation] = useState(readPresentation);
   const [grouping, setGrouping] = useState(readGrouping);
+  const [feedbackFilter, setFeedbackFilter] = useState<FeedbackFilter>(readFeedbackFilter);
+  const [notice, setNotice] = useState("");
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
   const [composingFeedback, setComposingFeedback] = useState(false);
@@ -37,8 +45,16 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
   const feedback = view === "feedback";
   const activeArea = feedback ? "" : area;
-  const list = useTicketList(client, member?.id, view, activeArea, onExpired);
+  const list = useTicketList(client, member?.id, view, activeArea, feedbackFilter, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
+  const feedbackDone = useFeedbackDone(client, (row, done) => {
+    setDeletion(undefined);
+    setNotice(done ? `«${row.title}» marcado como hecho.` : `«${row.title}» vuelve a estar abierto.`);
+    list.refresh();
+    if (route.selected === row.key) {
+      void client.getTicket(row.key, { view: "full", commentsLimit: 5 }).then(route.syncDetail, () => undefined);
+    }
+  }, onExpired);
   const capture = useQuickCapture(client, feedback, activeArea, (key) => {
     if (feedback) setComposingFeedback(false);
     setDeletion(undefined);
@@ -82,6 +98,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       setArea("");
       setSearch("");
       setDeletion(undefined);
+      setNotice("");
+      feedbackDone.reset();
     } catch (error) {
       setSignOutError(operationError(error, onExpired));
     } finally {
@@ -109,7 +127,9 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
       view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => {
         setSelection({ memberId: member.id, view: next });
         capture.clearError();
+        feedbackDone.clearError();
         setDeletion(undefined);
+        setNotice("");
       }} />
     <div className="app-center">
       <header className="workspace-header">
@@ -128,6 +148,10 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           </Button>}
         </div>
         {deletion && <StatusMessage title={deletion.message} />}
+        {notice && !deletion && <StatusMessage title={notice} />}
+        {feedbackDone.error && <StatusMessage tone="error" title={feedbackDone.error}>
+          <Button variant="secondary" onClick={() => { feedbackDone.clearError(); list.refresh(); }}>Actualizar lista</Button>
+        </StatusMessage>}
         {!feedback && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
@@ -138,13 +162,20 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           }} />}
         {(!mobileFeedback || composingFeedback || capture.attempt) &&
           <QuickCapture model={capture} feedback={feedback} onCancel={mobileFeedback ? cancelFeedback : undefined} />}
+        {feedback && <FeedbackFilterControl filter={feedbackFilter} onFilter={(next) => {
+          setFeedbackFilter(next);
+          saveFeedbackFilter(next);
+          setNotice("");
+          feedbackDone.clearError();
+        }} />}
         <TicketList key={`${view}:${activeArea}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
+          onToggleDone={feedback ? (row) => void feedbackDone.toggle(row) : undefined} pendingDone={feedbackDone.pending}
           search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => {
             setDeletion(undefined);
             void route.open(key);
           }} />
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
-        {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? "Todavía no hay feedback" : "No hay tickets en esta vista"} />}
+        {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? emptyFeedback[feedbackFilter] : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
           <Button variant="secondary" onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
         </StatusMessage>}
