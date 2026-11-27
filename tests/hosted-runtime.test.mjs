@@ -36,13 +36,14 @@ test("hosted UI serves direct ticket links alongside D1, API and MCP", async (t)
   const client = new Client({ name: "hosted-test", version: "1.0.0" }, { versionNegotiation: { mode: "legacy" } });
   try {
     await server.getWorker().applyD1Migrations("DB");
-    for (const path of ["/", "/t/EDIT-001"]) {
+    for (const path of ["/", "/t/EDIT-001", "/track/content"]) {
       const response = await server.fetch(path, { redirect: "manual" });
       assert.equal(response.status, 200);
       assert.match(await response.text(), /Taski fixture/);
     }
     assert.equal((await server.fetch("/fixture.js")).status, 200);
     assert.equal((await server.fetch("/t/EDIT-001", { method: "POST" })).status, 404);
+    assert.equal((await server.fetch("/track/Content")).status, 404);
     assert.equal((await server.fetch("/health")).status, 200);
     const access = await (await server.fetch("/api/v1/access")).json();
     assert.equal(access.brandName, studioPreset.brand.name);
