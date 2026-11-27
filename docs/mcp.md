@@ -64,9 +64,9 @@ JS
 
 Éxito esperado: ocho nombres en el orden de la tabla y `configVersion: 1` en el preset demo. El ejemplo solo lee. Las pruebas también ejecutan el recorrido con el protocolo `2026-07-28` fijado mediante `versionNegotiation: { mode: { pin: "2026-07-28" } }`. La compatibilidad legacy es sin sesión de transporte: cada petición se autentica, mientras D1 conserva datos y recibos entre peticiones.
 
-## Ocho herramientas
+## Diez herramientas
 
-Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato compartido](../src/adapters/api/contract.ts). Las entradas rechazan campos desconocidos. Las cuatro lecturas llevan `readOnlyHint: true`; las mutaciones requieren clave idempotente, y editar un ticket existente requiere `expectedVersion`.
+Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato compartido](../src/adapters/api/contract.ts). Las entradas rechazan campos desconocidos. Las cinco lecturas llevan `readOnlyHint: true`; las mutaciones requieren clave idempotente, y editar un ticket o un track existente requiere `expectedVersion`.
 
 | Herramienta | Entrada y resultado |
 | --- | --- |
@@ -78,6 +78,8 @@ Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato c
 | `add_comment` | `key`, versión, clave y `body`; recibo con `commentId`. |
 | `list_activity` | Cursor, límite y `ticketKey` opcional; cambios concretos, `nextCursor` y `hasMore`. |
 | `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada. Para retirar o combinar con estado usa `update_ticket` con `changes.prUrl`. Ver [regla compartida](api.md#referencia-manual-a-un-pr). |
+| `list_areas` | Sin argumentos. Tracks (áreas configuradas) con prioridad 1–3, `targetDate` y versión. Un track sin plan devuelve prioridad 2, sin fecha y versión 0. |
+| `update_area` | `areaId`, versión, clave y `priority` y/o `targetDate` (`YYYY-MM-DD` o `null`). Cambio auditado; recibo con `areaId`, versión y campos cambiados. Ver [tracks en la API](api.md#tracks-prioridad-y-fecha). |
 
 Ejemplos de argumentos ficticios, para un ticket cuya versión actual sea 1:
 
@@ -87,6 +89,12 @@ Ejemplos de argumentos ficticios, para un ticket cuya versión actual sea 1:
 
 ```json
 {"key":"DEMO-001","expectedVersion":1,"idempotencyKey":"avance-001","changes":{"status":"in_review"},"comment":"Listo para revisar"}
+```
+
+Para un track sin plan (versión 0), prioridad alta y fecha límite:
+
+```json
+{"areaId":"web","expectedVersion":0,"idempotencyKey":"plan-web-001","priority":1,"targetDate":"2026-12-05"}
 ```
 
 Consulta en la [API](api.md) las vistas, cursores, campos omitidos y recuperación incremental compartidos. Los límites de texto y las [reglas del núcleo](ticket-rules.md) también se aplican aquí. El cuerpo MCP admite hasta 1 MiB; no se trunca contenido para reducir su coste.
@@ -101,7 +109,7 @@ El SDK responde los errores de protocolo/esquema según MCP. Antes del transport
 
 ## Evidencia y reproducción
 
-`npm run check` ejecuta descubrimiento y las ocho herramientas con SDK cliente/servidor 2.4.0 sobre Worker/D1 emulado, en modo legacy y `2026-07-28`. Comprueba lectura cruzada HTTP/MCP, asignación, comentarios, PR, revisión, esquemas inválidos, límites, reintentos, conflictos y rollback de un fallo de auditoría. El Host rechazado se prueba directamente en la frontera porque el harness reescribe esa cabecera.
+`npm run check` ejecuta descubrimiento y las diez herramientas con SDK cliente/servidor 2.4.0 sobre Worker/D1 emulado, en modo legacy y `2026-07-28`. Comprueba lectura cruzada HTTP/MCP, asignación, comentarios, PR, revisión, esquemas inválidos, límites, reintentos, conflictos y rollback de un fallo de auditoría. El Host rechazado se prueba directamente en la frontera porque el harness reescribe esa cabecera.
 
 Para medir catálogo y respuestas recibidos por el SDK, instala también el entorno Python del [experimento B0](../experiments/b0/README.md) y ejecuta:
 
@@ -113,7 +121,7 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3145 | 12571 | 4000 |
+| `tools/list` completo + instrucciones | 3661 | 14544 | 4000 |
 | Resultado de listar 20 resúmenes | 808 | 2616 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 

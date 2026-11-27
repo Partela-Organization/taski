@@ -78,3 +78,37 @@ test("feedback done check keeps an uncertain request and retries it unchanged", 
   await page.getByRole("button", { name: "Hechos", exact: true }).click();
   await expect.poll(() => lists.some((search) => search.includes("status=done"))).toBe(true);
 });
+test("track plan keeps an uncertain request and retries it unchanged", async ({ page }) => {
+  const writes = [];
+  let track = { id: "general", label: "General", priority: 2, targetDate: null, version: 0, updatedBy: null, updatedAt: null };
+  await page.route("**/api/v1/**", async (route) => {
+    const req = route.request(), url = new URL(req.url());
+    const reply = (json, status = 200) => route.fulfill({ status, json });
+    if (url.pathname.endsWith("/access")) return reply({ projectName: "Demo", brandName: "Taski Demo", members: [member] });
+    if (url.pathname.endsWith("/session")) return reply({ member, identityAssurance: "self_selected" });
+    if (url.pathname.endsWith("/project")) return reply({ configVersion: 1, project: { name: "Demo", members: [member], areas: [{ id: "general", label: "General" }], statusLabels: { todo: "Pendiente" } } });
+    if (url.pathname.endsWith("/areas/general")) {
+      writes.push(req.postDataJSON());
+      if (writes.length === 1) return route.abort("failed");
+      track = { ...track, priority: 1, version: 1, updatedBy: "alex" };
+      return reply({ areaId: "general", version: 1, changed: ["priority"] });
+    }
+    if (url.pathname.endsWith("/areas")) return reply({ items: [track] });
+    return reply({ items: [row], nextCursor: null });
+  });
+  await page.addInitScript(() => localStorage.removeItem("taski.ticketGrouping"));
+  await page.goto("http://127.0.0.1:5174");
+  const area = page.getByRole("region", { name: "General", exact: true });
+  await area.getByRole("button", { name: "Editar prioridad y fecha de General" }).click();
+  const form = area.getByRole("form", { name: "Plan de General" });
+  await form.getByLabel("Prioridad").selectOption("1");
+  await form.getByRole("button", { name: "Guardar" }).click();
+  await expect(form.getByRole("alert")).toContainText("Guardar reintenta el mismo cambio");
+  await expect(form.getByLabel("Prioridad")).toBeDisabled();
+  await form.getByRole("button", { name: "Reintentar" }).click();
+  await expect(area.locator(".track-priority")).toContainText("P1");
+  expect(writes).toHaveLength(2);
+  expect(writes[1]).toEqual(writes[0]);
+  expect(writes[0]).toMatchObject({ expectedVersion: 0, priority: 1 });
+  expect(writes[0]).not.toHaveProperty("targetDate");
+});

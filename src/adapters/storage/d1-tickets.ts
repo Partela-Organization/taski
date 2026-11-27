@@ -11,7 +11,7 @@ function ticket(row: Row): Ticket {
     prUrl: row.pr_url as string | null, version: row.version as number, createdBy: row.created_by as string,
     createdAt: row.created_at as string, updatedAt: row.updated_at as string };
 }
-function auditActor(actor: Actor): string {
+export function auditActor(actor: Actor): string {
   const { completionFor: _grants, ...snapshot } = actor;
   return JSON.stringify(snapshot);
 }

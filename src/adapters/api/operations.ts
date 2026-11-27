@@ -2,8 +2,9 @@ import { TaskiError, canonical, integer, record, text } from "../../domain/ticke
 import type { Actor, Ticket, TicketSummary } from "../../domain/ticket.ts";
 import type { InstallationConfig } from "../../config/types.ts";
 import type { ListQuery, TicketService } from "../../application/tickets.ts";
+import type { AreaPlanService } from "../../application/areas.ts";
 
-export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request"] as const;
+export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request", "list_areas", "update_area"] as const;
 export type OperationName = typeof operationNames[number];
 
 function encode(value: Record<string, unknown>): string {
@@ -38,7 +39,10 @@ function full(t: Ticket) {
 export class Operations {
   readonly service: TicketService;
   readonly config: InstallationConfig;
-  constructor(service: TicketService, config: InstallationConfig) { this.service = service; this.config = config; }
+  readonly areas: AreaPlanService | undefined;
+  constructor(service: TicketService, config: InstallationConfig, areas?: AreaPlanService) {
+    this.service = service; this.config = config; this.areas = areas;
+  }
   async execute(name: OperationName, input: unknown, actor: Actor): Promise<Record<string, unknown>> {
     switch (name) {
       case "get_project": return this.project(input);
@@ -49,8 +53,20 @@ export class Operations {
       case "update_ticket": return { ...await this.service.update(input, actor) };
       case "add_comment": return { ...await this.service.addComment(input, actor) };
       case "link_pull_request": return { ...await this.service.linkPullRequest(input, actor) };
+      case "list_areas": return this.listAreas(input);
+      case "update_area": return { ...await this.trackPlans().update(input, actor) };
       default: throw new TaskiError("NOT_FOUND");
     }
+  }
+  private trackPlans(): AreaPlanService {
+    if (!this.areas) throw new TaskiError("NOT_FOUND");
+    return this.areas;
+  }
+  async listAreas(input: unknown) {
+    record(input, []);
+    const items = await this.trackPlans().list();
+    return { items: items.map(({ areaId, label, priority, targetDate, version, updatedBy, updatedAt }) =>
+      ({ id: areaId, label, priority, targetDate, version, updatedBy, updatedAt })) };
   }
   private async position() {
     await this.service.repository.initialize(this.config.project);

@@ -1,5 +1,6 @@
 import { TaskiError, canonical, integer, record, statuses, text } from "../domain/ticket.ts";
 import type { Activity, Actor, Comment, Receipt, Ticket, TicketChanges, TicketDraft, TicketSummary } from "../domain/ticket.ts";
+import { trustedActor } from "./actor.ts";
 
 export interface ProjectContext {
   readonly project: { readonly id: string; readonly prefix: string; readonly baseUrl: string };
@@ -43,15 +44,7 @@ export class TicketService {
   }
 
   private actor(actor: Actor): Actor {
-    const member = this.context.members.find((entry) => entry.id === actor.memberId);
-    if (!member) throw new TaskiError("UNKNOWN_MEMBER");
-    if (!["person", "agent"].includes(actor.kind) || !["web", "http", "mcp"].includes(actor.channel)) throw new TaskiError("INVALID_ACTOR");
-    text(actor.client, "client", 80);
-    const result: Actor = { memberId: member.id, name: member.name, kind: actor.kind,
-      channel: actor.channel, client: actor.client, identityAssurance: "self_selected" };
-    if (actor.completionFor) result.completionFor = actor.completionFor;
-    if (actor.authorizationRef) result.authorizationRef = text(actor.authorizationRef, "authorizationRef", 128);
-    return result;
+    return trustedActor(this.context.members, actor);
   }
 
   private changes(input: unknown): TicketChanges {

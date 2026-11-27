@@ -85,11 +85,31 @@
 .feedback-capture__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .ticket-group + .ticket-group { margin-top: 26px; }
 .ticket-group h2 { display: flex; align-items: center; gap: 7px; margin: 0 8px 9px; font-size: 10px; font-weight: 450; color: var(--muted); }
+.ticket-group__header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 8px; padding: 4px 6px 4px 10px;
+  min-height: 36px; box-sizing: border-box; border-radius: var(--radius); background: var(--sidebar);
+}
 .ticket-group--area h2 {
-  margin: 0 0 8px; padding: 7px 10px; border-radius: var(--radius); background: var(--sidebar);
+  flex: 1 1 auto; margin: 0; padding: 3px 0;
   font-size: 12px; font-weight: 600; color: var(--text); overflow-wrap: anywhere;
 }
-.ticket-group--area h2 .group-count { margin-left: auto; color: var(--muted); }
+.ticket-group--area h2 .group-count { margin-left: 4px; color: var(--muted); }
+.track-plan { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 11px; color: var(--muted); }
+.track-priority { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; letter-spacing: .02em; }
+.track-priority--1 { background: var(--button-bg); color: var(--button-ink); }
+.track-priority--2 { background: var(--selected); color: var(--text); border: 1px solid var(--line-strong); }
+.track-priority--3 { color: var(--muted); border: 1px solid var(--line-strong); }
+.track-plan__date time { color: var(--text); font-weight: 550; }
+.track-plan__edit.button { min-height: 28px; padding-inline: 8px; font-size: 11px; color: var(--muted); }
+.track-plan__edit.button:hover { color: var(--text); }
+.track-plan--editing { flex-basis: 100%; padding: 6px 0 4px; }
+.track-plan--editing label { font-size: 11px; }
+.track-plan--editing select, .track-plan--editing input {
+  min-height: 34px; padding-inline: 8px; border: 1px solid var(--line-strong); border-radius: var(--radius);
+  background: var(--surface); font-size: 12px; color: var(--text);
+}
+.track-plan--editing .button { min-height: 34px; font-size: 12px; }
+.track-plan__error { flex-basis: 100%; margin: 0; color: var(--error); font-size: 12px; }
 .ticket-group--area .finished-group { margin-top: 8px; }
 .ticket-group-more { margin-top: 8px; font-size: 11px; }
 .group-count { font: 9px var(--mono); margin-left: 3px; }
