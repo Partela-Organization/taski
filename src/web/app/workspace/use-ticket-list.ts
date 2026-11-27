@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ProjectResult, TaskiClient, WorkSummary } from "../../../client/index.ts";
 import { operationError } from "../access/use-team-session.ts";
+import type { FeedbackFilter } from "./presentation.ts";
 import type { View } from "./views.ts";
 
-export function useTicketList(client: TaskiClient, memberId: string | undefined, view: View, area: string, onExpired: () => void) {
+export function useTicketList(client: TaskiClient, memberId: string | undefined, view: View, area: string,
+  feedbackFilter: FeedbackFilter, onExpired: () => void) {
   const [project, setProject] = useState<ProjectResult["project"]>();
   const [rows, setRows] = useState<WorkSummary[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -31,6 +33,8 @@ export function useTicketList(client: TaskiClient, memberId: string | undefined,
           client.listTickets({ view: "work", order: "recent", limit: 20, type: view === "feedback" ? "feedback" : "task",
             ...(view === "mine" ? { assigneeId: memberId! } : {}),
             ...(view === "review" ? { status: "in_review" as const } : {}),
+            ...(view === "feedback" && feedbackFilter === "open" ? { open: true as const } : {}),
+            ...(view === "feedback" && feedbackFilter === "done" ? { status: "done" as const } : {}),
             ...(area ? { areaId: area } : {}) }),
         ]);
         if (generation.current !== id) return;
@@ -45,7 +49,7 @@ export function useTicketList(client: TaskiClient, memberId: string | undefined,
     }
     void load();
     return () => { generation.current++; };
-  }, [client, memberId, view, area, revision, onExpired]);
+  }, [client, memberId, view, area, feedbackFilter, revision, onExpired]);
 
   async function more() {
     if (!cursor || loading) return;

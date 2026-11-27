@@ -121,3 +121,42 @@ test("a team session can delete feedback once with version, retry and audit prot
   assert.equal(items[0].actor.memberId, "sam");
   assert.deepEqual(items[0].changes.deleted, { before: false, after: true });
 });
+
+test("open filter lists unfinished feedback; a person marks done and can reopen while agents stay in review", async () => {
+  const login = await server.fetch("/api/v1/session", { method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ code, memberId: "taylor" }) });
+  const cookie = login.headers.get("set-cookie").split(";")[0];
+  const person = (path, method, body) => server.fetch(`/api/v1/${path}`, { method,
+    headers: { cookie, "content-type": "application/json" }, body: JSON.stringify(body) });
+  const keys = [];
+  for (const title of ["Open feedback A", "Open feedback B", "Open feedback C"]) {
+    const created = await (await send("tickets", "POST", { title, type: "feedback", idempotencyKey: `open-${title}` })).json();
+    keys.push(created.key);
+  }
+  const agent = await send(`tickets/${keys[0]}`, "PATCH", { expectedVersion: 1, idempotencyKey: "agent-done", changes: { status: "done" } });
+  assert.equal((await agent.json()).error.code, "REVIEW_REQUIRED");
+  const done = { expectedVersion: 1, idempotencyKey: "person-done", changes: { status: "done" } };
+  const receipt = await (await person(`tickets/${keys[0]}`, "PATCH", done)).json();
+  assert.equal(receipt.version, 2);
+  assert.deepEqual(await (await person(`tickets/${keys[0]}`, "PATCH", done)).json(), receipt);
+
+  const listed = async (query) => (await (await send(`tickets?type=feedback&order=recent&${query}`)).json()).items.map((item) => item.key);
+  const open = await listed("open=true");
+  assert(open.includes(keys[1])); assert(!open.includes(keys[0]));
+  assert((await listed("status=done")).includes(keys[0]));
+  const first = await (await send("tickets?type=feedback&open=true&limit=1")).json();
+  const next = await (await send(`tickets?limit=1&cursor=${encodeURIComponent(first.nextCursor)}`)).json();
+  assert.equal(first.items.length, 1); assert.equal(next.items.length, 1); assert.equal(next.nextCursor, null);
+  assert.deepEqual([...first.items, ...next.items].map((item) => item.key).sort(), keys.slice(1).sort());
+  for (const query of ["open=false", "open=true&status=done"]) {
+    const invalid = await send(`tickets?type=feedback&${query}`);
+    assert.equal(invalid.status, 400); assert.equal((await invalid.json()).error.code, "INVALID_INPUT");
+  }
+
+  await person(`tickets/${keys[0]}`, "PATCH", { expectedVersion: 2, idempotencyKey: "person-reopen", changes: { status: "todo" } });
+  assert((await listed("open=true")).includes(keys[0]));
+  const history = await (await send(`activity?ticketKey=${keys[0]}`)).json();
+  const transitions = history.items.filter((event) => event.changes.status?.before);
+  assert.deepEqual(transitions.map((event) => event.changes.status), [{ before: "todo", after: "done" }, { before: "done", after: "todo" }]);
+  assert(transitions.every((event) => event.actor.kind === "person" && event.actor.memberId === "taylor"));
+});

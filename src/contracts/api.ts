@@ -20,7 +20,7 @@ export type TicketResult<V extends TicketView = "work"> = {
 };
 export type ListView = "summary" | "work";
 export interface ListOptions<V extends ListView = "summary"> {
-  limit?: number; cursor?: string; status?: Status; assigneeId?: string | null; areaId?: string;
+  limit?: number; cursor?: string; status?: Status; open?: true; assigneeId?: string | null; areaId?: string;
   type?: "task" | "feedback"; view?: V; order?: "recent";
 }
 export type ListResult<V extends ListView = "summary"> = {

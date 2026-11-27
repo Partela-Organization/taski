@@ -62,7 +62,7 @@
     "/api/v1/tickets": {
       "get": {
         "operationId": "list_tickets",
-        "description": "List compact summaries. Cursor retains filters. Use work view for UI metadata; fetch detail separately.",
+        "description": "List compact summaries. Cursor retains filters. open=true excludes done. Use work view for UI metadata; fetch detail separately.",
         "parameters": [
           {
             "name": "cursor",
@@ -95,6 +95,14 @@
                 "in_review",
                 "done"
               ]
+            }
+          },
+          {
+            "name": "open",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "const": true
             }
           },
           {
@@ -1287,6 +1295,9 @@
               "in_review",
               "done"
             ]
+          },
+          "open": {
+            "const": true
           },
           "assigneeId": {
             "type": [

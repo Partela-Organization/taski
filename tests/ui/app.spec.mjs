@@ -45,3 +45,36 @@ test("capture preserves uncertain writes and retries the identical operation bef
   await expect(page.getByLabel("Descripción", { exact: true })).toHaveValue("Contenido guardado");
   expect(writes).toHaveLength(2); expect(writes[1]).toEqual(writes[0]);
 });
+test("feedback done check keeps an uncertain request and retries it unchanged", async ({ page }) => {
+  const feedback = { ...row, key: "DEMO-010", title: "Idea abierta", type: "feedback", createdBy: "alex" };
+  const writes = [];
+  const lists = [];
+  await page.route("**/api/v1/**", async (route) => {
+    const req = route.request(), url = new URL(req.url());
+    const reply = (json, status = 200) => route.fulfill({ status, json });
+    if (url.pathname.endsWith("/access")) return reply({ projectName: "Demo", brandName: "Taski Demo", members: [{ ...member, defaultView: "feedback" }] });
+    if (url.pathname.endsWith("/session")) return reply({ member, identityAssurance: "self_selected" });
+    if (url.pathname.endsWith("/project")) return reply({ configVersion: 1, project: { name: "Demo", members: [member], areas: [{ id: "general", label: "General" }], statusLabels: { todo: "Pendiente" } } });
+    if (req.method() === "PATCH") {
+      writes.push(req.postDataJSON());
+      return writes.length === 1 ? route.abort("failed") : reply({ key: feedback.key, version: 2, changed: ["status"] });
+    }
+    lists.push(url.search);
+    return reply({ items: writes.length > 1 ? [] : [feedback], nextCursor: null });
+  });
+  await page.addInitScript(() => localStorage.removeItem("taski.feedbackFilter"));
+  await page.goto("http://127.0.0.1:5174");
+  const check = page.getByRole("checkbox", { name: "Hecho · Idea abierta", exact: true });
+  await expect(check).toBeVisible();
+  expect(lists.some((search) => search.includes("type=feedback") && search.includes("open=true"))).toBe(true);
+  await check.click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(check).not.toBeChecked();
+  await check.click();
+  await expect(page.getByRole("status").filter({ hasText: "«Idea abierta» marcado como hecho." })).toBeVisible();
+  expect(writes).toHaveLength(2);
+  expect(writes[1]).toEqual(writes[0]);
+  expect(writes[0]).toMatchObject({ expectedVersion: 1, changes: { status: "done" } });
+  await page.getByRole("button", { name: "Hechos", exact: true }).click();
+  await expect.poll(() => lists.some((search) => search.includes("status=done"))).toBe(true);
+});

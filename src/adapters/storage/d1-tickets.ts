@@ -55,6 +55,7 @@ export class D1TicketRepository implements TicketRepository {
     for (const [key, column] of [["status", "status"], ["assigneeId", "assignee_id"], ["areaId", "area_id"], ["type", "type"]] as const) {
       if (query[key] !== undefined) { where.push(`${column} IS ?`); values.push(query[key]!); }
     }
+    if (query.open) where.push("status != 'done'");
     const order = recent ? "created_at DESC, number DESC" : "number";
     const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by,created_at
       FROM tickets WHERE ${where.join(" AND ")} ORDER BY ${order} LIMIT ?`)

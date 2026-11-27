@@ -41,6 +41,10 @@
   .ticket-row[data-feedback] .ticket-row__circle,
   .ticket-row[data-feedback] .ticket-row__assignment,
   .ticket-row__feedback-type { display: none; }
+  .ticket-row[data-feedback] .ticket-row__check { width: 44px; height: 44px; margin: -12px -8px -12px -12px; }
+  .ticket-row[data-feedback] .ticket-row__check input { width: 22px; height: 22px; border-radius: 6px; }
+  .ticket-row[data-feedback] .ticket-row__check input:checked::after { width: 10px; height: 5px; }
+  .feedback-filter .button { min-height: 40px; font-size: 13px; padding-inline: 14px; }
   .ticket-row[data-feedback] .ticket-row__open.button { min-height: 0; padding: 0; font-size: 15px; line-height: 1.4; }
   .ticket-row[data-feedback] .ticket-row__meta { margin-top: 5px; font-size: 12px; gap: 4px 10px; }
 }

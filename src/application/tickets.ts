@@ -12,6 +12,8 @@ export interface Runtime { id(): string; now(): string; hash(value: string): Pro
 export interface ListQuery {
   limit: number; afterNumber: number; afterCreatedAt?: string; order?: "recent";
   status?: string; assigneeId?: string | null; areaId?: string; type?: string;
+  /** Excludes finished tickets; combine with type to list open feedback. */
+  open?: true;
 }
 export interface Mutation {
   create: boolean; operation: string; idempotencyKey: string; fingerprint: string;
@@ -119,7 +121,9 @@ export class TicketService {
     // One extra internal row detects a continuation; public adapters cap pages at 50.
     integer(query.limit, "limit", 51);
     if (!Number.isSafeInteger(query.afterNumber) || query.afterNumber < 0) throw new TaskiError("INVALID_INPUT", "Invalid position");
-    const { limit: _limit, afterNumber, afterCreatedAt, order, ...filters } = query;
+    const { limit: _limit, afterNumber, afterCreatedAt, order, open, ...filters } = query;
+    if (open !== undefined && open !== true) throw new TaskiError("INVALID_INPUT", "Invalid open filter: use true or omit it");
+    if (open && filters.status === "done") throw new TaskiError("INVALID_INPUT", "The open filter excludes done tickets");
     if (order !== undefined && order !== "recent") throw new TaskiError("INVALID_INPUT", "Invalid list order");
     if ((order === "recent" && afterNumber > 0) !== (afterCreatedAt !== undefined)
         || (afterCreatedAt !== undefined && !Number.isFinite(Date.parse(afterCreatedAt)))) {
