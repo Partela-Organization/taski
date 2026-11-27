@@ -13,3 +13,7 @@ Los recibos almacenan key/URL/versión/campos afectados y commentId cuando exist
 ## Tracks
 
 Cambiar la prioridad o la fecha de un track usa el mismo patrón en un solo `db.batch`: reserva de reintento, alta o edición de `area_plans`, evento en `area_activity` y recibo confirmado. La actividad de tickets exige un ticket, por eso los tracks tienen su propia tabla append-only con área, versión, snapshot del actor, hora del servidor y cambios antes/después. Dos primeras ediciones simultáneas de un track confirman una sola versión; la otra recibe `VERSION_CONFLICT`.
+
+## Horizonte
+
+Crear, editar o quitar un documento de Horizonte sigue el mismo `db.batch`: reserva de reintento, alta o edición en `horizon_docs`, evento en `horizon_activity` y recibo confirmado. Del contenido se registra el número de bloques antes y después, no el texto completo, para que el autoguardado no multiplique el tamaño del historial.

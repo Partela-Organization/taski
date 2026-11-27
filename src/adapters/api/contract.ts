@@ -43,6 +43,8 @@ const count = { type: "integer", minimum: 0 };
 const track = object({ id: string, label: string, priority, targetDate, version: planVersion, updatedBy: nullableString, updatedAt: nullableString },
   ["id", "label", "priority", "targetDate", "version", "updatedBy", "updatedAt"]);
 
+const horizonStatus = { enum: ["idea", "exploring", "planned", "archived"] };
+
 export const definitions = [
   { name: "get_project", description: "Read project configuration. Send knownVersion to omit unchanged members and labels.",
     inputSchema: object({ knownVersion: integer }),
@@ -80,6 +82,14 @@ export const definitions = [
     inputSchema: object({ format: { const: "text" } }),
     outputSchema: object({ today: string, timezone: string, text: string, totals: looseObject, feedbackOpen: count,
       closedLast7Days: looseObject, tracks: array(looseObject) }, ["today"]) },
+  { name: "list_horizon", description: "List Horizonte docs (future plans, ideas) with excerpt and task counts.",
+    inputSchema: object({ status: horizonStatus, areaId: string }), outputSchema: object({ items: array(looseObject) }, ["items"]) },
+  { name: "get_horizon", description: "Read a Horizonte doc as markdown (default) or blocks.",
+    inputSchema: object({ id: string, format: { enum: ["markdown", "blocks"] } }, ["id"]), outputSchema: object({ doc: looseObject }, ["doc"]) },
+  { name: "save_horizon", description: "Create (no id) or update (id, expectedVersion) a Horizonte doc from markdown or blocks; a leading '# Title' sets the title.",
+    inputSchema: object({ id: string, expectedVersion: integer, idempotencyKey: mutation.idempotencyKey, title: string,
+      status: horizonStatus, areaId: nullableString, markdown: { type: "string" }, blocks: array(looseObject) }, ["idempotencyKey"]),
+    outputSchema: object({ id: string, version: integer, changed: array(string) }, ["id", "version", "changed"]) },
 ] satisfies { name: OperationName; description: string; inputSchema: ReturnType<typeof object> & { anyOf?: unknown[] }; outputSchema: ReturnType<typeof object> }[];
 
 export const serverInstructions = "One project per installation. Reuse configVersion and activity cursors. Lists are summaries; fetch needed detail. Mutations are version checked, audited and idempotent. Agents normally finish in review. Errors are explicit; never claim a failed write was saved.";
@@ -89,4 +99,11 @@ export const deleteTicketDefinition = {
   description: "Remove a task or feedback from active views using a team session. Supply the current version and reuse the same idempotency key on retries.",
   inputSchema: object(mutation, Object.keys(mutation)),
   outputSchema: receipt,
+};
+
+export const deleteHorizonDefinition = {
+  name: "delete_horizon",
+  description: "Remove a Horizonte document using a team session. Supply the current version and reuse the same idempotency key on retries.",
+  inputSchema: object({ expectedVersion: integer, idempotencyKey: mutation.idempotencyKey, id: string }, ["id", "expectedVersion", "idempotencyKey"]),
+  outputSchema: object({ id: string, version: integer, changed: array(string) }, ["id", "version", "changed"]),
 };

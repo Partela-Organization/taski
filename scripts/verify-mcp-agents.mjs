@@ -202,7 +202,7 @@ try {
     const final = await request("get", { key: first.key });
     assert.equal(final.ticket.version, 5); assert.equal(final.comments.length, 3);
     const catalog = trace.flatMap((entry) => entry.responses).map((message) => message.result).find((value) => value?.tools);
-    assert.equal(catalog.tools.length, 11);
+    assert.equal(catalog.tools.length, 14);
     const objects = { catalog };
     for (const label of ["new", "resumed"]) {
       const results = trace.filter((entry) => entry.phase === label && entry.requests.some((message) => message.method === "tools/call"))

@@ -2,7 +2,7 @@
 
 Rutas implementadas sobre el mismo `TicketService` y repositorio D1 auditado, sin endpoints de SQL. Todos los tickets/actividad/proyecto exigen cookie de sesión o código Bearer y X-Taski-Member; ver [acceso](access.md). El [MCP](mcp.md) ya comparte este núcleo; la UI conectada se añade en B7.
 
-El [OpenAPI 3.1](api/openapi.json) se genera desde los once contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
+El [OpenAPI 3.1](api/openapi.json) se genera desde los catorce contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
 
 | Método/ruta | Operación |
 | --- | --- |
@@ -16,6 +16,11 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los once contratos compartido
 | PUT /api/v1/tickets/{key}/pull-request | URL manual con versión y clave; no consulta GitHub. |
 | GET /api/v1/activity | Cambios desde cursor; filtro ticketKey opcional. |
 | GET /api/v1/summary | Resumen del proyecto por track, calculado en el servidor. `format=text` devuelve solo el texto con barras. |
+| GET /api/v1/horizon | Documentos de Horizonte con extracto; filtros `status` y `areaId`. |
+| POST /api/v1/horizon | Crear un documento desde `markdown` o `blocks`. |
+| GET /api/v1/horizon/{id} | Documento en Markdown; `format=blocks` lo devuelve por bloques. |
+| PATCH /api/v1/horizon/{id} | Editar título, estado, track o contenido con `expectedVersion` e `idempotencyKey`. |
+| DELETE /api/v1/horizon/{id} | Quitar un documento con sesión web. |
 | GET /api/v1/areas | Tracks: áreas configuradas con prioridad, fecha límite y versión. |
 | PATCH /api/v1/areas/{areaId} | Cambiar prioridad y/o fecha límite con `expectedVersion` e `idempotencyKey`. |
 
@@ -115,3 +120,30 @@ Comunicación  —
 • Pagos: Conciliar transferencias de noviembre
 • Limpieza: Confirmar turno del fin de semana
 ```
+
+## Horizonte
+
+Documentos por bloques para planes, ideas e investigaciones. Ver el [plan](horizonte.md).
+
+Crea un documento con `POST /api/v1/horizon`:
+- `idempotencyKey` es obligatorio;
+- el contenido va en `markdown` o en `blocks`, nunca los dos;
+- `title`, `status` (`idea` por defecto) y `areaId` son opcionales;
+- un `# Título` al inicio del Markdown fija el título si no envías `title`.
+
+Ejemplo con datos ficticios:
+
+```json
+{"idempotencyKey":"idea-escaneo-001","areaId":"web","markdown":"# Escanear facturas\n\nGenerar el pedido desde una foto.\n\n- [ ] Probar con un comercio"}
+```
+
+`PATCH /api/v1/horizon/{id}` acepta los mismos campos más `expectedVersion`. Solo se registran los campos que cambian. Una versión desactualizada devuelve `VERSION_CONFLICT`, los mismos valores devuelven `EMPTY_UPDATE` y un track que no está en la configuración devuelve `UNKNOWN_AREA`.
+
+Cada bloque tiene:
+- `id` único (letras, dígitos, `_` o `-`);
+- `type`;
+- `text`, con hasta 20000 caracteres y una sola línea salvo en `p`, `quote`, `code` y `table`;
+- `indent` de 0 a 3, solo en listas y tareas;
+- `done`, solo en tareas.
+
+Un documento admite hasta 1000 bloques. `DELETE` exige una sesión web, como el borrado de tickets. La actividad guarda el actor, la hora y los campos cambiados; del contenido registra solo el número de bloques antes y después.

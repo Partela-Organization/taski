@@ -1,4 +1,4 @@
-import type { ActivityResult, CreateTicket, ListOptions, ListResult, ListView, Mutation, ProjectResult, ProjectSummary, ProjectSummaryText, Receipt, TicketResult, TicketView, TrackList, TrackReceipt, UpdateTicket, UpdateTrack } from "../contracts/api.ts";
+import type { ActivityResult, CreateTicket, ListOptions, ListResult, ListView, Mutation, HorizonDocResult, HorizonList, HorizonReceipt, HorizonStatus, ProjectResult, ProjectSummary, SaveHorizon, ProjectSummaryText, Receipt, TicketResult, TicketView, TrackList, TrackReceipt, UpdateTicket, UpdateTrack } from "../contracts/api.ts";
 import type { Attachment, AttachmentContentType, AttachmentList } from "../contracts/attachments.ts";
 export type * from "../contracts/api.ts";
 export * from "../contracts/attachments.ts";
@@ -69,6 +69,12 @@ export class TaskiClient {
   createTicket(input: CreateTicket): Promise<Receipt> { return this.request("tickets", "POST", input); }
   updateTicket(key: string, input: UpdateTicket): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "PATCH", input); }
   deleteTicket(key: string, input: Mutation): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "DELETE", input); }
+  listHorizon(filters: { status?: HorizonStatus; areaId?: string } = {}): Promise<HorizonList> { return this.request(`horizon${this.query(filters)}`); }
+  getHorizon(id: string): Promise<HorizonDocResult<"blocks">> { return this.request(`horizon/${encodeURIComponent(id)}${this.query({ format: "blocks" })}`); }
+  getHorizonMarkdown(id: string): Promise<HorizonDocResult<"markdown">> { return this.request(`horizon/${encodeURIComponent(id)}`); }
+  createHorizon(input: SaveHorizon): Promise<HorizonReceipt> { return this.request("horizon", "POST", input); }
+  updateHorizon(id: string, input: SaveHorizon & { expectedVersion: number }): Promise<HorizonReceipt> { return this.request(`horizon/${encodeURIComponent(id)}`, "PATCH", input); }
+  deleteHorizon(id: string, input: Mutation): Promise<HorizonReceipt> { return this.request(`horizon/${encodeURIComponent(id)}`, "DELETE", input); }
   getSummary(): Promise<ProjectSummary> { return this.request("summary"); }
   getSummaryText(): Promise<ProjectSummaryText> { return this.request(`summary${this.query({ format: "text" })}`); }
   listAreas(): Promise<TrackList> { return this.request("areas"); }
