@@ -9,6 +9,7 @@ test("browser uses real cookie sessions, D1 pagination and idempotent recovery a
   await expect(page.getByRole("alert")).toContainText("No se pudo entrar");
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   const loaded = page.locator(".workspace-footer");
   const general = page.getByRole("region", { name: "General", exact: true });
   await expect(loaded).toContainText("20 entradas cargadas");

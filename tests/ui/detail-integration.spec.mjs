@@ -4,6 +4,7 @@ test("stable routes preserve drafts across tasks and resolve real version confli
   await page.goto("http://127.0.0.1:5174/t/DEMO-016");
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Fixture 16");
   await page.getByLabel("Título", { exact: true }).fill("Borrador de la tarea");
   await page.getByLabel("Buscar entre los tickets cargados").fill("Fixture 17");

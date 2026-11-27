@@ -1,5 +1,6 @@
 @import "./workspace/workspace.css";
 @import "./mcp/mcp-guide.css";
+@import "./summary/summary.css";
 @import "./workspace/workspace-mobile.css";
 @import "./tickets/ticket-panel.css";
 @import "./tickets/ticket-attachments.css";

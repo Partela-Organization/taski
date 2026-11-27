@@ -8,6 +8,18 @@ Configura `.dev.vars` siguiendo [acceso](access.md), aplica `npm run db:migrate`
 
 El servidor Vite local reenvía `/api` al Worker de 8787. Reescribe únicamente el Origin exacto de su interfaz local; conserva otros orígenes para que el Worker los rechace. Es una composición de desarrollo: no configura CORS público ni despliega assets. El Worker sigue sirviendo API/MCP y salud; `dist/app` contiene el nuevo bundle y `dist/web` conserva el preview de componentes.
 
+## Resumen
+
+En escritorio, Taski abre en **Resumen**: un recap para ver en segundos cómo va el proyecto. Quien tiene Feedback como vista inicial y el teléfono siguen abriendo en Feedback; Resumen está en la navegación. Al recargar, la pestaña conserva la vista que elegiste.
+
+- **Lo que toca ahora** reúne los tracks vencidos o en riesgo con lo que falta y su siguiente paso, las tareas que esperan revisión y el feedback sin marcar como hecho. Cada aviso abre su track, Por revisar o Feedback.
+- **Cifras**: avance total, tareas cerradas en los últimos 7 días, tracks vencidos o en riesgo y próxima entrega.
+- **Tracks**: cada track con prioridad, fecha límite, días restantes, barra de progreso (terminado, por revisar y por hacer) y estado: Vencido, En riesgo, En camino o Sin fecha. **Prioridad** o **Fecha límite** cambia el orden y la elección se guarda en el navegador. El nombre abre las tareas del track y **Siguiente** abre la tarea en el panel.
+- **Así sale en Telegram** muestra el texto con barras. **Copiar para Telegram** lo copia dentro de un bloque de código para que Telegram conserve la alineación.
+- **Cerrado en los últimos 7 días** lista las últimas tareas terminadas.
+
+Las cifras salen del [resumen del servidor](api.md#resumen-del-proyecto) y no dependen de las páginas cargadas. **Actualizar** vuelve a consultarlo; también se actualiza al guardar o eliminar desde el panel. Por ejemplo, marca un track como P1 con fecha en tres días y deja una de sus cuatro tareas pendientes: aparecerá En riesgo en **Lo que toca ahora**.
+
 ## Espacio de trabajo
 
 La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Por defecto, las áreas de la instalación aparecen como secciones con su cantidad de entradas cargadas y cada fila muestra su estado. **Agrupar por** permite cambiar a secciones por estado. **Terminado** empieza plegado en ambas vistas. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.

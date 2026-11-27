@@ -7,7 +7,8 @@ Plan para que Taski sirva como recap rápido: ver cómo va cada track, qué venc
 | T1 · Check de hecho en feedback | Implementado: [web](web.md#compartir-feedback-b8-01) y filtro `open` de la [API](api.md) |
 | T2 · Prioridad y fecha por track | Implementado: [API](api.md#tracks-prioridad-y-fecha), [MCP](mcp.md#diez-herramientas) y encabezados de área en la [web](web.md#espacio-de-trabajo) |
 | T3 · Resumen en el núcleo | Implementado: [resumen en la API](api.md#resumen-del-proyecto), `get_summary` en [MCP](mcp.md#once-herramientas) y `timezone` en la [configuración](configuration.md#campos-del-esquema-1) |
-| T4–T7 | Pendientes |
+| T4 · Vista Resumen | Implementada: [Resumen en la web](web.md#resumen) |
+| T5–T7 | Pendientes |
 
 ## Conceptos
 
@@ -82,7 +83,7 @@ Hoy la lista pagina de 20 en 20, y las cifras no pueden calcularse en el navegad
 
 ## T4 · Vista Resumen en la web
 
-- **Vista**: `summary` en `views.ts`, primera en la navegación. `defaultView` acepta `"summary"`, que pasa a ser la vista inicial en escritorio; en el teléfono, Resumen y Feedback quedan como pestañas.
+- **Vista**: `summary` en `views.ts`, primera en la navegación y vista inicial en escritorio para `defaultView: work`. En el teléfono, Resumen y Feedback quedan como pestañas.
 - **Componentes** en `src/web/app/summary/`:
   - **Lo que toca ahora**: tracks vencidos y próximos con su siguiente paso, revisiones pendientes y feedback abierto. Cada elemento enlaza a su destino.
   - **Cifras**: avance total, cerradas esta semana, tracks en riesgo y próxima entrega.
@@ -121,4 +122,4 @@ Hoy la lista pagina de 20 en 20, y las cifras no pueden calcularse en el navegad
 
 1. Resuelto en T2: los agentes pueden cambiar prioridad y fecha de un track, con auditoría.
 2. Umbral de **En riesgo**: la propuesta es siete días y 25% pendiente. Una alternativa es comparar el ritmo de la última semana con lo que falta.
-3. ¿Resumen pasa a ser la vista inicial de todos en escritorio, o solo de quien lo elija en `defaultView`?
+3. Resuelto en T4: Resumen es la vista inicial en escritorio para quien tiene `defaultView: work`. Quien tiene `feedback` y el teléfono siguen abriendo en Feedback. La pestaña recuerda la vista elegida al recargar.

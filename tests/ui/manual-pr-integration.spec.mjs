@@ -5,6 +5,7 @@ test("manual PR is validated, saved with state, displayed and auditable after re
   await page.goto(`${origin}/t/DEMO-020`);
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   const panel = page.getByRole("region", { name: "Fixture 20", exact: true });
   const field = panel.getByLabel("Enlace al PR");
   const save = panel.getByRole("button", { name: "Guardar cambios" });

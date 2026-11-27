@@ -30,7 +30,7 @@ export function useTicketList(client: TaskiClient, memberId: string | undefined,
       try {
         const [config, page] = await Promise.all([
           client.getProject(),
-          client.listTickets({ view: "work", order: "recent", limit: 20, type: view === "feedback" ? "feedback" : "task",
+          view === "summary" ? Promise.resolve({ items: [], nextCursor: null }) : client.listTickets({ view: "work", order: "recent", limit: 20, type: view === "feedback" ? "feedback" : "task",
             ...(view === "mine" ? { assigneeId: memberId! } : {}),
             ...(view === "review" ? { status: "in_review" as const } : {}),
             ...(view === "feedback" && feedbackFilter === "open" ? { open: true as const } : {}),

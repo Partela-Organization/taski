@@ -1,4 +1,6 @@
 const glyphs = {
+  summary: "M4 20V11 M10 20V5 M16 20v-6 M21 20H3",
+  send: "m21 3-9.5 9.5 M21 3l-6.5 18-3-8.5L3 9.5z",
   team: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
   mine: "M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2",
   review: "M8 4H5v17h14V4h-3 M8 2h8v5H8z M8 13l3 3 5-5",
