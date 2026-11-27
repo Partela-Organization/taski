@@ -25,3 +25,7 @@ La documentación se desarrolla y comprueba durante cada bloque. B12 consolida y
 ## Q2 · Posterior a v0.1
 
 Imágenes y notas de voz en R2, sticky notes de escritorio, feedback automático desde un bot de WhatsApp conectado al MCP y una guía web para conectar clientes MCP. Ver [alcance de Q2](q2.md). La fase sigue a v0.1 y tiene su propio [backlog](https://github.com/Partela-Organization/taski/milestone/14).
+
+## Resumen y tracks
+
+Taski funciona como recap rápido: un [Resumen](web.md#resumen) con lo que toca hacer, cifras y barras de progreso por track; prioridad y fecha por track; navegación por track con teclas y ⌘K; y un check de hecho en feedback. Ver el [plan por bloques](tracks.md) y la [verificación](verification/tracks.md). Quedan pendientes con el equipo la prueba en iPhone físico y confirmar el formato del texto para Telegram.

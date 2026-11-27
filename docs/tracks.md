@@ -10,7 +10,7 @@ Plan para que Taski sirva como recap rápido: ver cómo va cada track, qué venc
 | T4 · Vista Resumen | Implementada: [Resumen en la web](web.md#resumen) |
 | T5 · Navegación por track | Implementada: [tracks en la web](web.md#tracks) |
 | T6 · Ir a… (⌘K) | Implementado: [búsqueda `query`](api.md#cursores-y-contexto-conocido) y [paleta en la web](web.md#ir-a) |
-| T7 | Pendiente |
+| T7 · Validación y entrega | Recorrido automático y capturas en la [verificación](verification/tracks.md). Pendiente con el equipo: iPhone físico, formato de Telegram y despliegue. |
 
 ## Conceptos
 

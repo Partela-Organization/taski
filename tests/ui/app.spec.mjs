@@ -120,3 +120,25 @@ test("track plan keeps an uncertain request and retries it unchanged", async ({ 
   expect(writes[0]).toMatchObject({ expectedVersion: 0, priority: 1 });
   expect(writes[0]).not.toHaveProperty("targetDate");
 });
+test("a first page that races with another write is requested again instead of showing an error", async ({ page }) => {
+  let lists = 0;
+  await page.route("**/api/v1/**", async (route) => {
+    const req = route.request(), url = new URL(req.url());
+    const reply = (json, status = 200) => route.fulfill({ status, json });
+    if (url.pathname.endsWith("/access")) return reply({ projectName: "Demo", brandName: "Taski Demo", members: [member] });
+    if (url.pathname.endsWith("/session")) return reply({ member, identityAssurance: "self_selected" });
+    if (url.pathname.endsWith("/project")) return reply({ configVersion: 1, project: { name: "Demo", members: [member], areas: [{ id: "general", label: "General" }], statusLabels: { todo: "Pendiente" } } });
+    if (url.pathname.endsWith("/summary")) return summaryReply(url, reply);
+    if (url.pathname.endsWith("/areas")) return reply({ items: [] });
+    if (url.pathname.endsWith("/tickets")) {
+      lists++;
+      if (lists === 1) return reply({ error: { code: "INVALID_CURSOR", message: "List changed; retry the query" } }, 400);
+    }
+    return reply({ items: [row], nextCursor: null });
+  });
+  await page.goto("http://127.0.0.1:5174");
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Primera tarea", exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(lists).toBe(2);
+});

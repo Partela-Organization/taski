@@ -1,8 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ProjectResult, TaskiClient, WorkSummary } from "../../../client/index.ts";
+import { TaskiClientError } from "../../../client/index.ts";
+import type { ListOptions, ListResult, ProjectResult, TaskiClient, WorkSummary } from "../../../client/index.ts";
 import { operationError } from "../access/use-team-session.ts";
 import type { FeedbackFilter } from "./presentation.ts";
 import type { View } from "./views.ts";
+
+/**
+ * A first page fails with INVALID_CURSOR when another write lands while it is read. Nothing was written,
+ * so the same request is repeated a few times before reporting an error.
+ */
+async function firstPage(client: TaskiClient, options: ListOptions<"work">): Promise<ListResult<"work">> {
+  for (let attempt = 1; ; attempt++) {
+    try { return await client.listTickets(options); }
+    catch (error) {
+      if (attempt >= 3 || !(error instanceof TaskiClientError) || error.code !== "INVALID_CURSOR") throw error;
+    }
+  }
+}
 
 export function useTicketList(client: TaskiClient, memberId: string | undefined, view: View, area: string,
   feedbackFilter: FeedbackFilter, onExpired: () => void) {
@@ -30,7 +44,7 @@ export function useTicketList(client: TaskiClient, memberId: string | undefined,
       try {
         const [config, page] = await Promise.all([
           client.getProject(),
-          view === "summary" ? Promise.resolve({ items: [], nextCursor: null }) : client.listTickets({ view: "work", order: "recent", limit: 20, type: view === "feedback" ? "feedback" : "task",
+          view === "summary" ? Promise.resolve({ items: [], nextCursor: null }) : firstPage(client, { view: "work", order: "recent", limit: 20, type: view === "feedback" ? "feedback" : "task",
             ...(view === "mine" ? { assigneeId: memberId! } : {}),
             ...(view === "review" ? { status: "in_review" as const } : {}),
             ...(view === "feedback" && feedbackFilter === "open" ? { open: true as const } : {}),
