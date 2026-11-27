@@ -5,6 +5,7 @@ export function appearanceChecks() {
     await page.goto("http://127.0.0.1:5174");
     await page.getByLabel("Código del equipo").fill("browser-fixture-only");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
     const list = page.getByRole("button", { name: "Lista", exact: true });
     const cards = page.getByRole("button", { name: "Tarjetas", exact: true });
     const area = page.getByLabel("Área", { exact: true });
@@ -68,6 +69,7 @@ export function appearanceChecks() {
     await page.goto("http://127.0.0.1:5174/t/DEMO-018");
     await page.getByLabel("Código del equipo").fill("browser-fixture-only");
     await page.getByRole("button", { name: "Entrar", exact: true }).click();
+    await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
     const panel = page.getByRole("region", { name: "Fixture 18", exact: true });
     await expect(panel).toBeVisible();
     await expect(panel).not.toHaveAttribute("aria-modal");

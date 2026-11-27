@@ -18,7 +18,9 @@ import { useQuickCapture } from "./use-quick-capture.ts";
 import { TicketList } from "./ticket-list.tsx";
 import { useTicketList } from "./use-ticket-list.ts";
 import { useTrackPlans } from "./use-track-plans.ts";
-import { initialView, views } from "./views.ts";
+import { SummaryActions, SummaryView } from "../summary/summary-view.tsx";
+import { useSummary } from "../summary/use-summary.ts";
+import { initialView, saveView, views } from "./views.ts";
 import type { View } from "./views.ts";
 import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
 
@@ -45,10 +47,12 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const compact = useCompactLayout();
   const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
   const feedback = view === "feedback";
-  const activeArea = feedback ? "" : area;
+  const summaryView = view === "summary";
+  const activeArea = feedback || summaryView ? "" : area;
   const list = useTicketList(client, member?.id, view, activeArea, feedbackFilter, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
   const trackPlans = useTrackPlans(client, member?.id);
+  const summary = useSummary(client, member?.id, summaryView, onExpired);
   const feedbackDone = useFeedbackDone(client, (row, done) => {
     setDeletion(undefined);
     setNotice(done ? `«${row.title}» marcado como hecho.` : `«${row.title}» vuelve a estar abierto.`);
@@ -123,16 +127,19 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
     document.getElementById("new-feedback")?.focus();
   };
   const account = { member, theme, onTheme, busy: signingOut || capture.busy || capture.recording, onSignOut: () => void signOut() };
+  const selectView = (next: View, nextArea = "") => {
+    setSelection({ memberId: member.id, view: next });
+    saveView(member.id, next);
+    if (next === "team") setArea(nextArea);
+    capture.clearError();
+    feedbackDone.clearError();
+    setDeletion(undefined);
+    setNotice("");
+  };
   return <div className="app" data-detail={route.selected ? "open" : undefined}>
     <WorkspaceSidebar brand={brandName} project={projectName} members={list.project?.members ?? access?.members ?? []}
       account={compact ? <WorkspaceMobileAccount {...account} /> : null}
-      view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => {
-        setSelection({ memberId: member.id, view: next });
-        capture.clearError();
-        feedbackDone.clearError();
-        setDeletion(undefined);
-        setNotice("");
-      }} />
+      view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => selectView(next, area)} />
     <div className="app-center">
       <header className="workspace-header">
         {!compact && <WorkspaceTopbar project={projectName} {...account} />}
@@ -145,15 +152,24 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
             <Button id="new-feedback" variant="primary" onClick={compose}>
               <WorkspaceIcon name="plus" />Nuevo feedback
             </Button>}
-          {!feedback && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
+          {summaryView && <SummaryActions model={summary} />}
+          {!feedback && !summaryView && <Button variant="primary" disabled={capture.busy || !!capture.attempt} onClick={() => document.getElementById("capture-title")?.focus()}>
             <WorkspaceIcon name="plus" />Nueva tarea
           </Button>}
         </div>
         {deletion && <StatusMessage title={deletion.message} />}
         {notice && !deletion && <StatusMessage title={notice} />}
+        {summaryView && signOutError && <StatusMessage tone="error" title={signOutError} />}
         {feedbackDone.error && <StatusMessage tone="error" title={feedbackDone.error}>
           <Button variant="secondary" onClick={() => { feedbackDone.clearError(); list.refresh(); }}>Actualizar lista</Button>
         </StatusMessage>}
+        {summaryView && <SummaryView model={summary} project={list.project} navigation={{
+          onOpenTrack: (areaId) => selectView("team", areaId),
+          onOpenTicket: (key) => { setDeletion(undefined); void route.open(key); },
+          onReview: () => selectView("review"),
+          onFeedback: () => selectView("feedback"),
+        }} />}
+        {!summaryView && <>
         {!feedback && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
@@ -189,12 +205,14 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
           </div>
           {list.hasMore && <Button variant="secondary" disabled={list.loading} onClick={() => void list.more()}>Cargar más</Button>}
         </footer>}
+        </>}
       </main>
     </div>
-    <TicketPanel route={route} client={client} project={list.project} onSaved={list.refresh} onExpired={onExpired}
+    <TicketPanel route={route} client={client} project={list.project} onSaved={() => { list.refresh(); summary.refresh(); }} onExpired={onExpired}
       onDeleted={(type, closed) => {
         setDeletion({ message: type === "feedback" ? "Feedback eliminado." : "Tarea eliminada.", closed });
         list.refresh();
+        summary.refresh();
       }} />
   </div>;
 }

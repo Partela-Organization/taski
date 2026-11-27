@@ -15,6 +15,7 @@ for (const type of ["task", "feedback"]) {
     if (isFeedback) await page.setViewportSize({ width: 320, height: 700 });
     await page.goto(app);
     await enter(page, "Alex");
+    if (!isFeedback) await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
     const heading = page.getByRole("heading", { name: isFeedback ? "Feedback" : "Trabajo del equipo", exact: true });
     await expect(heading).toBeVisible();
     const created = await page.request.post(`${app}/api/v1/tickets`, { data: { type, title, idempotencyKey: title } });

@@ -5,6 +5,7 @@ test("conversation paginates real comments/activity, audits reversible highlight
   await page.goto("http://127.0.0.1:5174/t/DEMO-005");
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   await expect(page.getByLabel("Título", { exact: true })).toHaveValue("Fixture 05");
   const url = "http://127.0.0.1:5174/api/v1/tickets/DEMO-005";
   let version = (await (await context.request.get(url)).json()).ticket.version;

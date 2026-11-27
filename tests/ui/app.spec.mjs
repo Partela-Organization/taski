@@ -1,6 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 const member = { id: "alex", name: "Alex" };
+const summary = { today: "2026-11-27", timezone: "UTC", totals: { done: 0, inReview: 0, remaining: 1, total: 1, percent: 0 },
+  feedbackOpen: 0, closedLast7Days: { count: 0, items: [] }, tracks: [] };
+const summaryReply = (url, reply) => reply(url.search.includes("format=text") ? { today: summary.today, text: "Demo · vie 27 nov" } : summary);
 const row = { key: "DEMO-001", title: "Primera tarea", status: "todo", assigneeId: "alex", highlighted: false, version: 1, areaId: "general", type: "task", prUrl: null };
 async function setup(page, create) {
   const requests = [];
@@ -11,11 +14,14 @@ async function setup(page, create) {
     if (url.pathname.endsWith("/session")) return reply({ member, identityAssurance: "self_selected" });
     if (url.pathname.endsWith("/project")) return reply({ configVersion: 1, project: { name: "Demo", members: [member], areas: [{ id: "general", label: "General" }], statusLabels: { todo: "Pendiente" } } });
     if (url.pathname.endsWith("/activity")) return reply({ items: [], nextCursor: "fixture-cursor", hasMore: false });
+    if (url.pathname.endsWith("/summary")) return summaryReply(url, reply);
+    if (url.pathname.endsWith("/areas")) return reply({ items: [] });
     if (req.method() === "POST") return create(route);
     if (url.pathname.endsWith("/tickets/DEMO-002")) return reply({ ticket: { ...row, key: "DEMO-002", title: "Nueva tarea", description: "Contenido guardado" }, comments: [], nextCommentsCursor: null });
     return reply({ items: [row], nextCursor: null });
   });
   await page.goto("http://127.0.0.1:5174");
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   await expect(page.getByRole("button", { name: "Primera tarea", exact: true })).toBeVisible();
   return requests;
 }
@@ -94,10 +100,12 @@ test("track plan keeps an uncertain request and retries it unchanged", async ({ 
       return reply({ areaId: "general", version: 1, changed: ["priority"] });
     }
     if (url.pathname.endsWith("/areas")) return reply({ items: [track] });
+    if (url.pathname.endsWith("/summary")) return summaryReply(url, reply);
     return reply({ items: [row], nextCursor: null });
   });
   await page.addInitScript(() => localStorage.removeItem("taski.ticketGrouping"));
   await page.goto("http://127.0.0.1:5174");
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   const area = page.getByRole("region", { name: "General", exact: true });
   await area.getByRole("button", { name: "Editar prioridad y fecha de General" }).click();
   const form = area.getByRole("form", { name: "Plan de General" });

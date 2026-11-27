@@ -78,7 +78,7 @@ test("summary aggregates every task per track, independent of list pages", async
   const text = await call("summary?format=text");
   assert.deepEqual(Object.keys(text).sort(), ["text", "today"]);
   const lines = text.text.split("\n");
-  assert.match(lines[0], /^Proyecto demo · /);
+  assert.match(lines[0], /^Proyecto demo · [a-zé]{3} \d{1,2} [a-z]{3}$/);
   assert.deepEqual(lines.slice(1), ["", "Web     ▓▓▓▓▓▓▓▓░░  80%", "General ░░░░░░░░░░   0%", "", "Total   ▓▓▓▓▓▓▓░░░  69%"]);
   const invalid = await server.fetch("/api/v1/summary?format=json", { headers: agent });
   assert.equal(invalid.status, 400);

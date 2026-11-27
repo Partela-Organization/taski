@@ -8,6 +8,7 @@ test("a track's priority and target date are edited from its area heading and au
   await page.getByRole("radio", { name: "Sam", exact: true }).check();
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Trabajo del equipo", exact: true })).toBeVisible();
   const title = `Tarea con plan · ${testInfo.project.name}`;
   expect((await page.request.post(`${app}/api/v1/tickets`, { data: { title, areaId: "web", idempotencyKey: title } })).ok()).toBe(true);
@@ -49,6 +50,7 @@ test("a stale track plan asks to review the current values", async ({ page }, te
   await page.getByRole("radio", { name: "Alex", exact: true }).check();
   await page.getByLabel("Código del equipo").fill("browser-fixture-only");
   await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Trabajo del equipo", exact: true })).toBeVisible();
   const title = `Tarea general con conflicto de plan · ${testInfo.project.name}`;
   expect((await page.request.post(`${app}/api/v1/tickets`, { data: { title, idempotencyKey: title } })).ok()).toBe(true);

@@ -75,7 +75,7 @@ export class SummaryService {
     const totals = { done: sum("done"), inReview: sum("inReview"), remaining: sum("remaining"), total: sum("total"), percent: 0 };
     totals.percent = percent(totals.done, totals.total);
     const feedbackOpen = counts.filter((row) => row.type === "feedback" && row.status !== "done").reduce((value, row) => value + row.count, 0);
-    const heading = `${this.context.project.name} · ${new Intl.DateTimeFormat("es", { weekday: "short", day: "numeric", month: "short", timeZone: timezone }).format(new Date(now))}`;
+    const heading = `${this.context.project.name} · ${new Intl.DateTimeFormat("es", { weekday: "short", day: "numeric", month: "short", timeZone: timezone }).format(new Date(now)).replace(/[.,]/g, "")}`;
     return { today, timezone, totals, feedbackOpen,
       closedLast7Days: { count: closed.length, items: closed.slice(0, recentItems) },
       tracks, text: progressText(heading, tracks, totals.percent) };
