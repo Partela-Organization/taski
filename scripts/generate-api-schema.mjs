@@ -1,9 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { definitions, deleteTicketDefinition } from "../src/adapters/api/contract.ts";
+import { definitions, deleteHorizonDefinition, deleteTicketDefinition } from "../src/adapters/api/contract.ts";
 import { attachmentContentTypes, maxAttachmentBytes, maxTicketAttachments } from "../src/contracts/attachments.ts";
 
 const components = {};
-const httpDefinitions = [...definitions, deleteTicketDefinition];
+const httpDefinitions = [...definitions, deleteTicketDefinition, deleteHorizonDefinition];
 for (const definition of httpDefinitions) {
   components[`${definition.name}Input`] = definition.inputSchema;
   components[`${definition.name}Output`] = definition.outputSchema;
@@ -15,6 +15,8 @@ const routes = [
   ["patch", "/api/v1/tickets/{key}", "update_ticket"], ["post", "/api/v1/tickets/{key}/comments", "add_comment"],
   ["delete", "/api/v1/tickets/{key}", "delete_ticket"],
   ["get", "/api/v1/activity", "list_activity"], ["put", "/api/v1/tickets/{key}/pull-request", "link_pull_request"],
+  ["get", "/api/v1/horizon", "list_horizon"], ["get", "/api/v1/horizon/{id}", "get_horizon"],
+  ["post", "/api/v1/horizon", "save_horizon"], ["patch", "/api/v1/horizon/{id}", "save_horizon"], ["delete", "/api/v1/horizon/{id}", "delete_horizon"],
   ["get", "/api/v1/summary", "get_summary"], ["get", "/api/v1/areas", "list_areas"], ["patch", "/api/v1/areas/{areaId}", "update_area"],
 ];
 for (const [method, path, name] of routes) {
@@ -29,13 +31,16 @@ for (const [method, path, name] of routes) {
   if (method === "get") for (const [name, schema] of Object.entries(input.properties)) {
     parameters.push({ name, in: "query", required: input.required.includes(name), schema });
   }
-  const entry = { operationId: name, description: definition.description, parameters,
+  // save_horizon serves both creation (POST, no id/version) and update (PATCH); OpenAPI needs distinct operation IDs.
+  if (name === "save_horizon" && method === "post") { delete input.properties.id; delete input.properties.expectedVersion; }
+  if (name === "save_horizon" && method === "patch") input.required = [...input.required, "expectedVersion"];
+  const entry = { operationId: name === "save_horizon" && method === "patch" ? "update_horizon" : name, description: definition.description, parameters,
     responses: { [method === "post" && name === "create_ticket" ? "201" : "200"]: {
       description: "Confirmed result", content: { "application/json": { schema: { $ref: `#/components/schemas/${name}Output` } } },
     }, default: { description: "Typed error; inspect error.code. 401/403 access, 409 conflict, 429 rate limit, 503 configuration, 500 unconfirmed internal failure.",
       content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } } } } };
   if (method !== "get") entry.requestBody = { required: true, content: { "application/json": { schema: input } } };
-  if (name === "delete_ticket") entry.security = [{ TeamCookie: [] }];
+  if (name === "delete_ticket" || name === "delete_horizon") entry.security = [{ TeamCookie: [] }];
   paths[path] ??= {}; paths[path][method] = entry;
 }
 components.Error = { type: "object", required: ["error"], properties: { error: { type: "object", required: ["code", "message"], properties: { code: { type: "string" }, message: { type: "string" } } } } };

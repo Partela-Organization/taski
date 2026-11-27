@@ -14,7 +14,7 @@ def size(value):
 catalog = size({"instructions": data["instructions"], **data["catalog"]})
 per_tool = {tool["name"]: size(tool) for tool in data["catalog"]["tools"]}
 measurements = {"catalog_with_instructions": catalog, "list_20": size(data["list"]), "create_receipt": size(data["receipt"])}
-budgets = {"catalog_with_instructions": 4000, "list_20": 1600, "create_receipt": 200}
+budgets = {"catalog_with_instructions": 4500, "list_20": 1600, "create_receipt": 200}
 report = {"kind": "proxy_not_agent_usage", "encoding": "o200k_base", "tiktoken": version("tiktoken"),
           "sdk": data["sdk"], "protocol": "legacy stateless Streamable HTTP",
           "serialization": "json.dumps ensure_ascii=False sort_keys=True separators=(',', ':')",

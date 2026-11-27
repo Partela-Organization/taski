@@ -12,8 +12,8 @@
   "fixtures": "20 create-and-assign calls; fixed epoch in isolated D1 only; no production data",
   "measured": {
     "catalog_with_instructions": {
-      "tokensProxy": 3894,
-      "utf8Bytes": 15480
+      "tokensProxy": 4396,
+      "utf8Bytes": 17527
     },
     "list_20": {
       "tokensProxy": 808,
@@ -25,7 +25,7 @@
     }
   },
   "budgets": {
-    "catalog_with_instructions": 4000,
+    "catalog_with_instructions": 4500,
     "list_20": 1600,
     "create_receipt": 200
   },
@@ -73,6 +73,18 @@
     "get_summary": {
       "tokensProxy": 210,
       "utf8Bytes": 850
+    },
+    "list_horizon": {
+      "tokensProxy": 131,
+      "utf8Bytes": 555
+    },
+    "get_horizon": {
+      "tokensProxy": 115,
+      "utf8Bytes": 487
+    },
+    "save_horizon": {
+      "tokensProxy": 256,
+      "utf8Bytes": 1002
     }
   },
   "deferred_loading": "per-tool sizes only; see B6-03 client discovery reports; exact model-visible schemas are not exposed",

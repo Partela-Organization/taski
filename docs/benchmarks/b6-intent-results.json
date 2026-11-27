@@ -24,11 +24,11 @@
       "utf8Bytes": 325
     },
     "full_read": {
-      "tokensProxy": 353,
+      "tokensProxy": 354,
       "utf8Bytes": 1047
     },
     "work_read": {
-      "tokensProxy": 299,
+      "tokensProxy": 297,
       "utf8Bytes": 954
     },
     "ordinary_update_receipt": {
@@ -48,11 +48,11 @@
       "utf8Bytes": 1491
     },
     "recovery_full_read": {
-      "tokensProxy": 486,
+      "tokensProxy": 484,
       "utf8Bytes": 1275
     },
     "older_comments": {
-      "tokensProxy": 266,
+      "tokensProxy": 264,
       "utf8Bytes": 852
     },
     "long_create_input": {
@@ -72,7 +72,7 @@
       "utf8Bytes": 472
     },
     "long_full_read": {
-      "tokensProxy": 10169,
+      "tokensProxy": 10167,
       "utf8Bytes": 46474
     }
   },

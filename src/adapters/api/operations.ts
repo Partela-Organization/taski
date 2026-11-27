@@ -4,8 +4,10 @@ import type { InstallationConfig } from "../../config/types.ts";
 import type { ListQuery, TicketService } from "../../application/tickets.ts";
 import type { AreaPlanService } from "../../application/areas.ts";
 import type { SummaryService } from "../../application/summary.ts";
+import type { HorizonService } from "../../application/horizon.ts";
+import { blocksToMarkdown } from "../../domain/horizon.ts";
 
-export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request", "list_areas", "update_area", "get_summary"] as const;
+export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request", "list_areas", "update_area", "get_summary", "list_horizon", "get_horizon", "save_horizon"] as const;
 export type OperationName = typeof operationNames[number];
 
 function encode(value: Record<string, unknown>): string {
@@ -42,8 +44,9 @@ export class Operations {
   readonly config: InstallationConfig;
   readonly areas: AreaPlanService | undefined;
   readonly recap: SummaryService | undefined;
-  constructor(service: TicketService, config: InstallationConfig, areas?: AreaPlanService, recap?: SummaryService) {
-    this.service = service; this.config = config; this.areas = areas; this.recap = recap;
+  readonly horizon: HorizonService | undefined;
+  constructor(service: TicketService, config: InstallationConfig, areas?: AreaPlanService, recap?: SummaryService, horizon?: HorizonService) {
+    this.service = service; this.config = config; this.areas = areas; this.recap = recap; this.horizon = horizon;
   }
   async execute(name: OperationName, input: unknown, actor: Actor): Promise<Record<string, unknown>> {
     switch (name) {
@@ -58,12 +61,26 @@ export class Operations {
       case "list_areas": return this.listAreas(input);
       case "update_area": return { ...await this.trackPlans().update(input, actor) };
       case "get_summary": return this.summary(input);
+      case "list_horizon": return { items: await this.documents().list(input) };
+      case "get_horizon": return this.horizonDoc(input);
+      case "save_horizon": return { ...await this.documents().save(input, actor) };
       default: throw new TaskiError("NOT_FOUND");
     }
   }
   private trackPlans(): AreaPlanService {
     if (!this.areas) throw new TaskiError("NOT_FOUND");
     return this.areas;
+  }
+  private documents(): HorizonService {
+    if (!this.horizon) throw new TaskiError("NOT_FOUND");
+    return this.horizon;
+  }
+  /** Markdown by default (compact for agents); the web asks for blocks to edit them. */
+  async horizonDoc(input: unknown) {
+    const args = record(input, ["id", "format"]);
+    if (args.format !== undefined && args.format !== "markdown" && args.format !== "blocks") throw new TaskiError("INVALID_INPUT", "Invalid format: use markdown or blocks");
+    const { blocks, ...doc } = await this.documents().get(args.id);
+    return { doc: args.format === "blocks" ? { ...doc, blocks } : { ...doc, markdown: blocksToMarkdown(doc.title, blocks) } };
   }
   async summary(input: unknown) {
     const args = record(input, ["format"]);

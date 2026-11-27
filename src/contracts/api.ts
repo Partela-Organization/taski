@@ -74,3 +74,22 @@ export interface ProjectSummary {
   tracks: TrackSummary[];
 }
 export interface ProjectSummaryText { today: string; text: string }
+
+export type HorizonStatus = "idea" | "exploring" | "planned" | "archived";
+export type HorizonBlockType = "p" | "h1" | "h2" | "h3" | "li" | "ol" | "todo" | "quote" | "code" | "table" | "divider";
+/** One block of a Horizonte document; inline formatting stays as Markdown in `text`. */
+export interface HorizonBlock { id: string; type: HorizonBlockType; text: string; indent?: number; done?: boolean }
+export interface HorizonMeta {
+  id: string; title: string; status: HorizonStatus; areaId: string | null; version: number;
+  createdBy: string; createdAt: string; updatedBy: string; updatedAt: string;
+}
+export interface HorizonSummary extends HorizonMeta { excerpt: string; blockCount: number; tasks: { done: number; total: number } }
+export interface HorizonList { items: HorizonSummary[] }
+export interface HorizonDocResult<F extends "markdown" | "blocks" = "blocks"> {
+  doc: HorizonMeta & (F extends "blocks" ? { blocks: HorizonBlock[] } : { markdown: string });
+}
+export interface SaveHorizon {
+  idempotencyKey: string; expectedVersion?: number; title?: string; status?: HorizonStatus; areaId?: string | null;
+  markdown?: string; blocks?: HorizonBlock[];
+}
+export interface HorizonReceipt { id: string; version: number; changed: string[] }

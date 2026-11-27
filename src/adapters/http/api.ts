@@ -4,6 +4,8 @@ import type { OperationName } from "../api/operations.ts";
 import { TicketService } from "../../application/tickets.ts";
 import { AreaPlanService } from "../../application/areas.ts";
 import { SummaryService } from "../../application/summary.ts";
+import { HorizonService } from "../../application/horizon.ts";
+import { D1HorizonRepository } from "../storage/d1-horizon.ts";
 import { D1SummaryRepository } from "../storage/d1-summary.ts";
 import { D1AreaPlanRepository } from "../storage/d1-area-plans.ts";
 import { D1TicketRepository } from "../storage/d1-tickets.ts";
@@ -26,7 +28,8 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
       return await attachments(request, new D1Attachments(env.DB), env.ATTACHMENTS, ticket, parts[5], actor);
     }
     const areas = new AreaPlanService(new D1AreaPlanRepository(env.DB), config, runtime);
-    const operations = new Operations(tickets, config, areas, new SummaryService(new D1SummaryRepository(env.DB), areas, config, runtime));
+    const horizon = new HorizonService(new D1HorizonRepository(env.DB), config, runtime);
+    const operations = new Operations(tickets, config, areas, new SummaryService(new D1SummaryRepository(env.DB), areas, config, runtime), horizon);
     const query: Record<string, unknown> = {};
     for (const [key, value] of url.searchParams) {
       if (key in query) throw new TaskiError("INVALID_INPUT", "Repeated query parameter");
@@ -37,6 +40,21 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
     if (parts.length === 3 && parts[2] === "project") operation = request.method === "GET" ? "get_project" : undefined;
     else if (parts.length === 3 && parts[2] === "activity") operation = request.method === "GET" ? "list_activity" : undefined;
     else if (parts.length === 3 && parts[2] === "summary") operation = request.method === "GET" ? "get_summary" : undefined;
+    else if (parts.length === 3 && parts[2] === "horizon") {
+      allow = "GET, POST";
+      if (request.method === "GET") operation = "list_horizon";
+      else if (request.method === "POST") { operation = "save_horizon"; input = await jsonBody(request, 1048576); }
+    } else if (parts.length === 4 && parts[2] === "horizon") {
+      allow = "GET, PATCH, DELETE";
+      if (request.method === "GET") { operation = "get_horizon"; input = { ...query, id: parts[3] }; }
+      else if (request.method === "PATCH") {
+        operation = "save_horizon";
+        input = { ...record(await jsonBody(request, 1048576), ["expectedVersion", "idempotencyKey", "title", "status", "areaId", "markdown", "blocks"]), id: parts[3] };
+      } else if (request.method === "DELETE") {
+        const body = record(await jsonBody(request), ["expectedVersion", "idempotencyKey"]);
+        return Response.json(await horizon.delete({ ...body, id: parts[3] }, actor), { headers: { "cache-control": "no-store" } });
+      }
+    }
     else if (parts.length === 3 && parts[2] === "areas") operation = request.method === "GET" ? "list_areas" : undefined;
     else if (parts.length === 4 && parts[2] === "areas") {
       allow = "PATCH";

@@ -31,7 +31,7 @@ try {
     title: `Revisar formulario ${n + 1}`, assigneeId: "sam", idempotencyKey: `fixture-${n}`,
   } });
   const list = await client.callTool({ name: "list_tickets", arguments: {} });
-  assert.equal(catalog.tools.length, 11);
+  assert.equal(catalog.tools.length, 14);
   assert(!receipt.isError && !list.isError);
   assert.equal(list.structuredContent.items.length, 20);
   assert.equal(list.structuredContent.nextCursor, null);
