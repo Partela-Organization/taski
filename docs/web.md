@@ -15,7 +15,7 @@ En escritorio, Taski abre en **Resumen**: un recap para ver en segundos cómo va
 - **Lo que toca ahora** reúne los tracks vencidos o en riesgo con lo que falta y su siguiente paso, las tareas que esperan revisión y el feedback sin marcar como hecho. Cada aviso abre su track, Por revisar o Feedback.
 - **Cifras**: avance total, tareas cerradas en los últimos 7 días, tracks vencidos o en riesgo y próxima entrega.
 - **Tracks**: cada track con prioridad, fecha límite, días restantes, barra de progreso (terminado, por revisar y por hacer) y estado: Vencido, En riesgo, En camino o Sin fecha. **Prioridad** o **Fecha límite** cambia el orden y la elección se guarda en el navegador. El nombre abre las tareas del track y **Siguiente** abre la tarea en el panel.
-- **Así sale en Telegram** muestra el texto con barras. **Copiar para Telegram** lo copia dentro de un bloque de código para que Telegram conserve la alineación.
+- **Así sale en Telegram** muestra el texto con barras. **Copiar para Telegram** lo copia como texto plano, con el mismo formato de barras (`▓▓▓░░░░░░░ 30 % · 3/10`) y marcadores (`⚠️`, `▶`) que los avisos del equipo.
 - **Cerrado en los últimos 7 días** lista las últimas tareas terminadas.
 
 ### Tracks

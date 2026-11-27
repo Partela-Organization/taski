@@ -21,7 +21,7 @@ const summary = {
     track("comunicacion", "Comunicación", 3, null, null, "none", 3, 0, 2, null),
   ],
 };
-const text = "Proyecto demo · vie 27 nov\n\nAccesos y llaves ▓▓▓▓▓▓▓▓░░  83%\n\nTotal            ▓▓▓▓▓▓▓░░░  68%";
+const text = "📋 Proyecto demo · vie 27 nov  ▓▓▓▓▓▓▓░░░ 68 % · 21/31\nAccesos y llaves  ▓▓▓▓▓▓▓▓░░ 83 % · 5/6 · ⚠️ venció 25 nov\n\n▶ Accesos y llaves: Entregar copias de llaves a la unidad 4B";
 
 test("summary shows reminders, figures and track bars, sorts and copies the Telegram recap", async ({ page }, testInfo) => {
   const requests = [];
@@ -85,7 +85,7 @@ test("summary shows reminders, figures and track bars, sorts and copies the Tele
   await expect(page.locator(".summary-telegram")).toHaveText(text);
   await page.getByRole("button", { name: "Copiar para Telegram" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Copiado. Pégalo en Telegram." })).toBeVisible();
-  expect(await page.evaluate(() => window.copiedRecap)).toBe("```\n" + text + "\n```");
+  expect(await page.evaluate(() => window.copiedRecap)).toBe(text);
   const closed = page.getByRole("region", { name: "Cerrado en los últimos 7 días" });
   await expect(closed).toContainText("Registrar pagos atrasados de octubre");
   await expect(closed).toContainText("y 5 más");
@@ -117,7 +117,7 @@ test("summary is the desktop landing view and opens tracks, review and feedback 
   const api = await (await page.request.get(`${app}/api/v1/summary`)).json();
   const general = api.tracks.find((entry) => entry.id === "general");
   await expect(tracks.getByRole("img", { name: new RegExp(`^${general.percent}% terminado`) }).first()).toBeVisible();
-  await expect(page.locator(".summary-telegram")).toContainText("Total");
+  await expect(page.locator(".summary-telegram")).toContainText("📋 Proyecto demo");
 
   await tracks.getByRole("button", { name: "General", exact: true }).click();
   await expect(page).toHaveURL(`${app}/track/general`);

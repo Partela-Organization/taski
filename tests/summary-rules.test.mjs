@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { daysBetween, localDate, percent, progressBar, progressText, trackHealth } from "../src/domain/summary.ts";
+import { daysBetween, localDate, percent, progressBar, progressLine, progressText, trackHealth } from "../src/domain/summary.ts";
 import { parseConfiguration } from "../src/config/schema.ts";
 import { demoPreset } from "../src/config/presets/demo.ts";
 
@@ -32,20 +32,33 @@ test("calendar arithmetic is per local day and ignores DST", () => {
   assert.equal(localDate("2026-11-28T01:30:00.000Z", "UTC"), "2026-11-28");
 });
 
-test("progress text aligns one bar per track plus total", () => {
+test("progress text follows the team's Telegram style", () => {
   assert.equal(percent(7, 12), 58); assert.equal(percent(0, 0), 0);
   assert.equal(progressBar(0), "░░░░░░░░░░"); assert.equal(progressBar(54), "▓▓▓▓▓░░░░░"); assert.equal(progressBar(100), "▓▓▓▓▓▓▓▓▓▓");
-  const text = progressText("Proyecto demo · vie 27 nov", [{ label: "Pagos", percent: 58 }, { label: "Reparto por unidad", percent: 40 }], 54);
+  // Same line as `tg pendientes`: bar, space before %, done/total.
+  assert.equal(progressLine(2, 18), "▓░░░░░░░░░ 11 % · 2/18");
+  assert.equal(progressLine(0, 0), "—");
+  const track = (label, health, targetDate, done, total, next) => ({ label, health, targetDate, done, total, next: next ? { title: next } : null });
+  const text = progressText("Proyecto demo · vie 27 nov", [
+    track("Accesos y llaves", "late", "2026-11-25", 5, 6, "Entregar copias de llaves a la unidad 4B"),
+    track("Pagos", "risk", "2026-12-01", 7, 12, "Conciliar transferencias de noviembre"),
+    track("Limpieza", "ok", "2026-12-12", 6, 8, "Confirmar turno del fin de semana"),
+    track("Comunicación", "none", null, 0, 0, null),
+  ], { done: 18, total: 26 });
   assert.equal(text, [
-    "Proyecto demo · vie 27 nov",
+    "📋 Proyecto demo · vie 27 nov  ▓▓▓▓▓▓▓░░░ 69 % · 18/26",
+    "Accesos y llaves  ▓▓▓▓▓▓▓▓░░ 83 % · 5/6 · ⚠️ venció 25 nov",
+    "Pagos  ▓▓▓▓▓▓░░░░ 58 % · 7/12 · ⚠️ vence 1 dic",
+    "Limpieza  ▓▓▓▓▓▓▓▓░░ 75 % · 6/8",
+    "Comunicación  —",
     "",
-    "Pagos              ▓▓▓▓▓▓░░░░  58%",
-    "Reparto por unidad ▓▓▓▓░░░░░░  40%",
-    "",
-    "Total              ▓▓▓▓▓░░░░░  54%",
+    "▶ Accesos y llaves: Entregar copias de llaves a la unidad 4B",
+    "• Pagos: Conciliar transferencias de noviembre",
+    "• Limpieza: Confirmar turno del fin de semana",
   ].join("\n"));
-  const long = progressText("H", [{ label: "Un track con un nombre demasiado largo", percent: 100 }], 100).split("\n")[2];
-  assert.equal(long, "Un track con un nombr… ▓▓▓▓▓▓▓▓▓▓ 100%");
+  const long = progressText("H", [track("Mantenimiento", "ok", "2026-12-19", 0, 3, "Pedir presupuesto de la bomba de agua del edificio norte y del sur")], { done: 0, total: 3 });
+  assert.equal(long.split("\n").at(-1), "▶ Mantenimiento: Pedir presupuesto de la bomba de agua del …");
+  assert.equal(progressText("H", [track("Web", "ok", null, 1, 1, null)], { done: 1, total: 1 }).split("\n").length, 2);
 });
 
 test("timezone is optional, defaults to UTC and must be an IANA zone", () => {

@@ -78,8 +78,15 @@ test("summary aggregates every task per track, independent of list pages", async
   const text = await call("summary?format=text");
   assert.deepEqual(Object.keys(text).sort(), ["text", "today"]);
   const lines = text.text.split("\n");
-  assert.match(lines[0], /^Proyecto demo · [a-zé]{3} \d{1,2} [a-z]{3}$/);
-  assert.deepEqual(lines.slice(1), ["", "Web     ▓▓▓▓▓▓▓▓░░  80%", "General ░░░░░░░░░░   0%", "", "Total   ▓▓▓▓▓▓▓░░░  69%"]);
+  const short = (date) => new Intl.DateTimeFormat("es", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${date}T00:00:00Z`)).replace(/\./g, "");
+  assert.match(lines[0], /^📋 Proyecto demo · [a-zé]{3} \d{1,2} [a-z]{3} {2}▓▓▓▓▓▓▓░░░ 69 % · 20\/29$/);
+  assert.deepEqual(lines.slice(1), [
+    `Web  ▓▓▓▓▓▓▓▓░░ 80 % · 20/25 · ⚠️ venció ${short(day(-2))}`,
+    `General  ░░░░░░░░░░ 0 % · 0/4 · ⚠️ vence ${short(day(3))}`,
+    "",
+    "▶ Web: Web pendiente resaltada",
+    "• General: General en curso",
+  ]);
   const invalid = await server.fetch("/api/v1/summary?format=json", { headers: agent });
   assert.equal(invalid.status, 400);
 });
@@ -96,6 +103,6 @@ test("MCP get_summary returns the same recap and a compact text form", async () 
   assert(!full.isError, JSON.stringify(full));
   assert.deepEqual(full.structuredContent, await call("summary"));
   const text = await client.callTool({ name: "get_summary", arguments: { format: "text" } });
-  assert.match(text.structuredContent.text, /Total {3}▓▓▓▓▓▓▓░░░ {2}69%/);
+  assert.match(text.structuredContent.text, /▓▓▓▓▓▓▓░░░ 69 % · 20\/29/);
   await client.close();
 });

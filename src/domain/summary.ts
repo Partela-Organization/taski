@@ -46,13 +46,37 @@ export function progressBar(value: number, width = 10): string {
   return "▓".repeat(filled) + "░".repeat(width - filled);
 }
 
-/** Monospace lines for chat recaps: one bar per track and a total. */
-export function progressText(heading: string, tracks: readonly { label: string; percent: number }[], total: number): string {
-  const rows = [...tracks.map((track) => ({ label: track.label, value: track.percent })), { label: "Total", value: total }];
-  const width = Math.min(22, Math.max(...rows.map((row) => row.label.length)));
-  const line = (row: { label: string; value: number }) => {
-    const label = row.label.length > width ? `${row.label.slice(0, width - 1)}…` : row.label.padEnd(width);
-    return `${label} ${progressBar(row.value)} ${String(row.value).padStart(3)}%`;
-  };
-  return [heading, "", ...tracks.map((track) => line({ label: track.label, value: track.percent })), "", line(rows.at(-1)!)].join("\n");
+export interface RecapTrack {
+  label: string; health: TrackHealth; targetDate: string | null; done: number; total: number;
+  next: { title: string } | null;
+}
+
+/** `▓▓▓░░░░░░░ 30 % · 3/10`, the line format the team already sends to Telegram; `—` when there is nothing to count. */
+export function progressLine(done: number, total: number): string {
+  if (total === 0) return "—";
+  return `${progressBar(done / total * 100)} ${percent(done, total)} % · ${done}/${total}`;
+}
+
+const shortDate = new Intl.DateTimeFormat("es", { day: "numeric", month: "short", timeZone: "UTC" });
+function short(date: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return shortDate.format(Date.UTC(year!, month! - 1, day!)).replace(/\./g, "");
+}
+function clip(text: string, max = 58): string { return text.length > max ? `${text.slice(0, max - 1)}…` : text; }
+
+/**
+ * Plain-text recap in the team's Telegram style: total in the heading, one bar per track, ⚠️ on late or at-risk
+ * tracks, then ▶ the next step of the most urgent tracks. Emojis are markers only, as in the team's bot.
+ */
+export function progressText(heading: string, tracks: readonly RecapTrack[], totals: { done: number; total: number }): string {
+  const lines = [`📋 ${heading}  ${progressLine(totals.done, totals.total)}`];
+  for (const track of tracks) {
+    const flag = track.health === "late" ? ` · ⚠️ venció ${short(track.targetDate!)}`
+      : track.health === "risk" ? ` · ⚠️ vence ${short(track.targetDate!)}` : "";
+    lines.push(`${track.label}  ${progressLine(track.done, track.total)}${flag}`);
+  }
+  const urgent = (track: RecapTrack) => track.health === "late" || track.health === "risk" ? 0 : 1;
+  const next = tracks.filter((track) => track.next).sort((a, b) => urgent(a) - urgent(b)).slice(0, 3);
+  if (next.length) lines.push("", ...next.map((track, index) => `${index ? "•" : "▶"} ${clip(`${track.label}: ${track.next!.title}`)}`));
+  return lines.join("\n");
 }
