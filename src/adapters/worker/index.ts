@@ -43,7 +43,7 @@ export default {
     }
     if (path.startsWith("/api/v1/")) return api(request, env, installation);
     if (env.ASSETS && (request.method === "GET" || request.method === "HEAD")
-        && (path === "/" || /^\/t\/[A-Za-z0-9_-]+$/.test(path))) {
+        && (path === "/" || /^\/t\/[A-Za-z0-9_-]+$/.test(path) || /^\/track\/[a-z][a-z0-9_-]{0,47}$/.test(path))) {
       return env.ASSETS.fetch(new Request(new URL("/", request.url), request));
     }
     if (path !== "/health") {
