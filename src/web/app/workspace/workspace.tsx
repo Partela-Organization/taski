@@ -20,8 +20,9 @@ import { useTicketList } from "./use-ticket-list.ts";
 import { useTrackPlans } from "./use-track-plans.ts";
 import { SummaryActions, SummaryView } from "../summary/summary-view.tsx";
 import { useSummary } from "../summary/use-summary.ts";
-import { initialView, saveView, views } from "./views.ts";
-import type { View } from "./views.ts";
+import { SidebarTracks, TrackChips, TrackOverview } from "../summary/track-view.tsx";
+import { initialPlace, savePlace, trackFromPath, trackPath, views } from "./views.ts";
+import type { Place, View } from "./views.ts";
 import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
 
 const emptyFeedback: Record<FeedbackFilter, string> = {
@@ -32,7 +33,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   client: TaskiClient; access: Access | undefined; member: Member | undefined;
   theme: Theme; onTheme: (theme: Theme) => void; onExpired: () => void; onSignOut: () => Promise<void>;
 }) {
-  const [selection, setSelection] = useState<{ memberId: string; view: View }>();
+  const [selection, setSelection] = useState<Place & { memberId: string }>();
   const [area, setArea] = useState("");
   const [search, setSearch] = useState("");
   const [presentation, setPresentation] = useState(readPresentation);
@@ -45,18 +46,27 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [deletion, setDeletion] = useState<{ message: string; closed: boolean }>();
   const workspaceHeading = useRef<HTMLHeadingElement>(null);
   const compact = useCompactLayout();
-  const view = selection && selection.memberId === member?.id ? selection.view : member ? initialView(member.id, access) : "team";
+  const place: Place = selection && selection.memberId === member?.id ? selection
+    : member ? initialPlace(member.id, access) : { view: "team", trackId: "" };
+  const { view, trackId } = place;
   const feedback = view === "feedback";
   const summaryView = view === "summary";
-  const activeArea = feedback || summaryView ? "" : area;
+  const trackView = view === "track";
+  const activeArea = feedback || summaryView ? "" : trackView ? trackId : area;
   const list = useTicketList(client, member?.id, view, activeArea, feedbackFilter, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
   const trackPlans = useTrackPlans(client, member?.id);
-  const summary = useSummary(client, member?.id, summaryView, onExpired);
+  const summary = useSummary(client, member?.id, `${view}:${trackId}`, onExpired);
+  const tracks = summary.summary?.tracks ?? [];
+  const currentTrack = trackView ? tracks.find((entry) => entry.id === trackId) : undefined;
+  const unknownTrack = trackView && !!summary.summary && !currentTrack;
+  const plans = { ...trackPlans, client, onExpired, refresh: () => { trackPlans.refresh(); summary.refresh(); } };
+  route.setBase(trackView ? trackPath(trackId) : "/");
   const feedbackDone = useFeedbackDone(client, (row, done) => {
     setDeletion(undefined);
     setNotice(done ? `«${row.title}» marcado como hecho.` : `«${row.title}» vuelve a estar abierto.`);
     list.refresh();
+    summary.refresh();
     if (route.selected === row.key) {
       void client.getTicket(row.key, { view: "full", commentsLimit: 5 }).then(route.syncDetail, () => undefined);
     }
@@ -65,6 +75,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
     if (feedback) setComposingFeedback(false);
     setDeletion(undefined);
     list.refresh();
+    summary.refresh();
     void route.open(key);
   }, onExpired);
   const brand = list.project?.brand;
@@ -80,9 +91,44 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   useEffect(() => {
     if (!member) return;
     setSelection((current) => current?.memberId === member.id ? current : {
-      memberId: member.id, view: initialView(member.id, access),
+      memberId: member.id, ...initialPlace(member.id, access),
     });
   }, [member, access]);
+
+  // Back/forward between "/" and "/track/:areaId" follows the address bar. Ticket links keep the current place.
+  useEffect(() => {
+    if (!member) return;
+    function follow() {
+      const fromPath = trackFromPath(location.pathname);
+      if (fromPath) setSelection({ memberId: member!.id, view: "track", trackId: fromPath });
+      else if (location.pathname === "/") setSelection((current) => current?.view === "track" ? { memberId: member!.id, view: "summary", trackId: "" } : current);
+    }
+    window.addEventListener("popstate", follow);
+    return () => window.removeEventListener("popstate", follow);
+  }, [member]);
+
+  useEffect(() => {
+    if (member && selection?.memberId === member.id) savePlace(member.id, { view: selection.view, trackId: selection.trackId });
+  }, [member, selection]);
+
+  // Digits 1–9 open tracks in sidebar order, unless typing or a dialog is open.
+  const shortcutTracks = useRef<string[]>([]);
+  shortcutTracks.current = (summary.summary?.tracks ?? []).slice(0, 9).map((entry) => entry.id);
+  const openTrack = useRef<(id: string) => void>(() => undefined);
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.repeat || event.metaKey || event.ctrlKey || event.altKey || !/^[1-9]$/.test(event.key)) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable=''], [contenteditable='true']")) return;
+      if (document.querySelector("dialog[open], [aria-modal='true']")) return;
+      const id = shortcutTracks.current[Number(event.key) - 1];
+      if (!id) return;
+      event.preventDefault();
+      openTrack.current(id);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     if (!accentLight || !accentDark) return;
@@ -116,7 +162,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   if (!member) return null;
 
   const error = signOutError || list.error;
-  const heading = views.find(({ id }) => id === view)?.heading;
+  const heading = trackView ? currentTrack?.label ?? list.project?.areas.find((entry) => entry.id === trackId)?.label ?? trackId
+    : views.find(({ id }) => id === view)?.heading;
   const mobileFeedback = compact && feedback;
   const compose = () => {
     flushSync(() => setComposingFeedback(true));
@@ -128,24 +175,33 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   };
   const account = { member, theme, onTheme, busy: signingOut || capture.busy || capture.recording, onSignOut: () => void signOut() };
   const selectView = (next: View, nextArea = "") => {
-    setSelection({ memberId: member.id, view: next });
-    saveView(member.id, next);
+    const nextTrack = next === "track" ? nextArea : "";
+    setSelection({ memberId: member.id, view: next, trackId: nextTrack });
+    const base = next === "track" ? trackPath(nextTrack) : "/";
+    route.setBase(base);
+    // An open ticket keeps its link; closing it returns to the new place.
+    if (!route.selected && location.pathname !== base) history.pushState(null, "", base);
     if (next === "team") setArea(nextArea);
     capture.clearError();
     feedbackDone.clearError();
     setDeletion(undefined);
     setNotice("");
   };
+  openTrack.current = (id) => { if (!capture.busy && !capture.recording && !capture.attempt) selectView("track", id); };
   return <div className="app" data-detail={route.selected ? "open" : undefined}>
     <WorkspaceSidebar brand={brandName} project={projectName} members={list.project?.members ?? access?.members ?? []}
       account={compact ? <WorkspaceMobileAccount {...account} /> : null}
-      view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => selectView(next, area)} />
+      view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => selectView(next, area)}
+      tracks={!compact && <SidebarTracks tracks={tracks} active={trackView ? trackId : undefined}
+        disabled={capture.busy || capture.recording || !!capture.attempt} onOpen={(id) => selectView("track", id)} />} />
     <div className="app-center">
       <header className="workspace-header">
         {!compact && <WorkspaceTopbar project={projectName} {...account} />}
         <McpGuide baseUrl={list.project?.baseUrl} memberId={member.id} />
       </header>
       <main className="workspace" data-view={view}>
+        {trackView && tracks.length > 0 && <TrackChips tracks={tracks} active={trackId}
+          onOpen={(id) => selectView("track", id)} onSummary={() => selectView("summary")} />}
         <div className="workspace-heading" data-feedback={feedback || undefined}>
           <h1 ref={workspaceHeading} tabIndex={-1}>{heading}</h1>
           {mobileFeedback && !composingFeedback && !capture.attempt &&
@@ -160,17 +216,21 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         {deletion && <StatusMessage title={deletion.message} />}
         {notice && !deletion && <StatusMessage title={notice} />}
         {summaryView && signOutError && <StatusMessage tone="error" title={signOutError} />}
+        {trackView && currentTrack && <TrackOverview track={currentTrack} plans={plans} />}
+        {unknownTrack && <StatusMessage tone="error" title="Este track no está en la configuración de la instalación.">
+          <Button variant="secondary" onClick={() => selectView("summary")}>Volver al resumen</Button>
+        </StatusMessage>}
         {feedbackDone.error && <StatusMessage tone="error" title={feedbackDone.error}>
           <Button variant="secondary" onClick={() => { feedbackDone.clearError(); list.refresh(); }}>Actualizar lista</Button>
         </StatusMessage>}
         {summaryView && <SummaryView model={summary} project={list.project} navigation={{
-          onOpenTrack: (areaId) => selectView("team", areaId),
+          onOpenTrack: (areaId) => selectView("track", areaId),
           onOpenTicket: (key) => { setDeletion(undefined); void route.open(key); },
           onReview: () => selectView("review"),
           onFeedback: () => selectView("feedback"),
         }} />}
-        {!summaryView && <>
-        {!feedback && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
+        {!summaryView && !unknownTrack && <>
+        {!feedback && !trackView && <WorkspaceToolbar search={search} onSearch={setSearch} areas={list.project?.areas ?? []}
           area={area} onArea={setArea} onRefresh={list.refresh} grouping={grouping} onGrouping={(next) => {
             setGrouping(next);
             saveGrouping(next);
@@ -188,8 +248,9 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         }} />}
         <TicketList key={`${view}:${activeArea}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
           onToggleDone={feedback ? (row) => void feedbackDone.toggle(row) : undefined} pendingDone={feedbackDone.pending}
-          plans={feedback ? undefined : { ...trackPlans, client, onExpired }}
-          search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => {
+          plans={feedback || trackView ? undefined : plans} hideArea={trackView}
+          search={feedback || trackView ? "" : search} presentation={trackView ? "list" : presentation}
+          grouping={trackView ? "status" : grouping} onOpen={(key) => {
             setDeletion(undefined);
             void route.open(key);
           }} />

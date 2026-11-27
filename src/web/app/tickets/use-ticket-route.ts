@@ -14,6 +14,8 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
   const drafts = useRef(new Map<string, Draft>());
   const conversations = useRef(new Map<string, ConversationDraft>());
   const generation = useRef(0);
+  // Where closing the panel returns: the list ("/") or a track view ("/track/:areaId").
+  const base = useRef("/");
 
   const clear = useCallback(() => {
     generation.current++;
@@ -24,7 +26,7 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
 
   const close = useCallback(() => {
     clear();
-    if (location.pathname !== "/") history.pushState(null, "", "/");
+    if (location.pathname !== base.current) history.pushState(null, "", base.current);
   }, [clear]);
 
   const open = useCallback(async (key: string, navigate = true) => {
@@ -85,8 +87,9 @@ export function useTicketRoute(client: TaskiClient, memberId: string | undefined
     conversations.current.delete(key);
     if (location.pathname !== ticketPath(key)) return false;
     clear();
-    history.replaceState(null, "", "/");
+    history.replaceState(null, "", base.current);
     return true;
   }
-  return { selected, detail, error, syncDetail, drafts: drafts.current, conversations: conversations.current, open, close, reset, remove };
+  function setBase(path: string) { base.current = path; }
+  return { selected, detail, error, syncDetail, drafts: drafts.current, conversations: conversations.current, open, close, reset, remove, setBase };
 }

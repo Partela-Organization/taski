@@ -26,7 +26,7 @@ function TicketRows({ rows, context, grouping, label, searching }: {
   const hidden = rows.length - visible.length;
   return <>
     <ul className="tickets">{visible.map((row) =>
-      <TicketRow key={row.key} row={row} context={context} showArea={grouping === "status"}
+      <TicketRow key={row.key} row={row} context={context} showArea={grouping === "status" && !context.hideArea}
         statusLabel={grouping === "area" ? statusLabel(context.project, row.status) : undefined} />,
     )}</ul>
     {hidden > 0 && <Button variant="secondary" className="ticket-group-more" aria-label={`Ver más de ${label}`}

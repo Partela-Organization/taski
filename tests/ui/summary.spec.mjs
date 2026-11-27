@@ -120,8 +120,10 @@ test("summary is the desktop landing view and opens tracks, review and feedback 
   await expect(page.locator(".summary-telegram")).toContainText("Total");
 
   await tracks.getByRole("button", { name: "General", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Trabajo del equipo" })).toBeVisible();
-  await expect(page.getByLabel("Área", { exact: true })).toHaveValue("general");
+  await expect(page).toHaveURL(`${app}/track/general`);
+  await expect(page.getByRole("heading", { name: "General", level: 1 })).toBeVisible();
+  await page.getByRole("button", { name: "Todo el equipo", exact: true }).click();
+  await expect(page).toHaveURL(`${app}/`);
   await page.reload();
   await expect(page.getByRole("heading", { name: "Trabajo del equipo" })).toBeVisible();
 
