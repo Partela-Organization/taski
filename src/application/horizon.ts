@@ -117,4 +117,3 @@ export class HorizonService {
       changes: { deleted: { before: false, after: true } } });
   }
 }
-
