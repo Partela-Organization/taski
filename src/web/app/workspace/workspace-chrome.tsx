@@ -10,12 +10,13 @@ import { views } from "./views.ts";
 import type { NavigationView, View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
 
-export function WorkspaceSidebar({ brand, project, members, view, disabled, onView, account, tracks }: {
+export function WorkspaceSidebar({ brand, project, members, view, disabled, onView, account, tracks, search }: {
   brand: string; project: string; members: Member[]; view: View; disabled: boolean; onView: (view: NavigationView) => void;
-  account?: ReactNode; tracks?: ReactNode;
+  account?: ReactNode; tracks?: ReactNode; search?: ReactNode;
 }) {
   return <aside className="app-sidebar">
     <div className="sidebar-heading"><Wordmark name={brand} />{account}</div>
+    {search}
     <p className="sidebar-project">{project}</p>
     <nav aria-label="Vistas">{views.map(({ id, label }) =>
       <Button key={id} aria-pressed={view === id} disabled={disabled} onClick={() => onView(id)}>

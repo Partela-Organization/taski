@@ -56,6 +56,12 @@ export class D1TicketRepository implements TicketRepository {
       if (query[key] !== undefined) { where.push(`${column} IS ?`); values.push(query[key]!); }
     }
     if (query.open) where.push("status != 'done'");
+    if (query.query !== undefined) {
+      // LIKE wildcards in the text are literal; SQLite LIKE ignores ASCII case.
+      const pattern = `%${query.query.trim().replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
+      where.push("(title LIKE ? ESCAPE '\\' OR key LIKE ? ESCAPE '\\')");
+      values.push(pattern, pattern);
+    }
     const order = recent ? "created_at DESC, number DESC" : "number";
     const { results } = await this.db.prepare(`SELECT number,key,title,status,assignee_id,area_id,type,highlighted,pr_url,version,created_by,created_at
       FROM tickets WHERE ${where.join(" AND ")} ORDER BY ${order} LIMIT ?`)

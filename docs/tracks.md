@@ -9,7 +9,8 @@ Plan para que Taski sirva como recap rápido: ver cómo va cada track, qué venc
 | T3 · Resumen en el núcleo | Implementado: [resumen en la API](api.md#resumen-del-proyecto), `get_summary` en [MCP](mcp.md#once-herramientas) y `timezone` en la [configuración](configuration.md#campos-del-esquema-1) |
 | T4 · Vista Resumen | Implementada: [Resumen en la web](web.md#resumen) |
 | T5 · Navegación por track | Implementada: [tracks en la web](web.md#tracks) |
-| T6–T7 | Pendientes |
+| T6 · Ir a… (⌘K) | Implementado: [búsqueda `query`](api.md#cursores-y-contexto-conocido) y [paleta en la web](web.md#ir-a) |
+| T7 | Pendiente |
 
 ## Conceptos
 

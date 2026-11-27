@@ -30,6 +30,10 @@ La vista de un track tiene su propia dirección, por ejemplo `/track/web`, que s
 - la captura en una línea: la tarea se crea en ese track;
 - las tareas del track por estado, con Terminado plegado.
 
+### Ir a…
+
+Pulsa ⌘K en Mac o Ctrl+K en otros sistemas, o **Buscar o ir a…** en la barra lateral (el icono de búsqueda en el teléfono). Escribe parte del nombre de un track, un código como `DEMO-018` o palabras del título. Los tracks se filtran al instante y sin importar tildes. Las tareas y el feedback se buscan en todo el proyecto. Muévete con ↑ y ↓ y pulsa Enter para abrir; Escape cierra y devuelve el foco a donde estabas. Por ejemplo, ⌘K, "pag" y Enter abre el track Pagos.
+
 Al abrir una tarea, el panel usa su enlace `/t/…`; al cerrarlo con Escape vuelves al track. **Atrás** del navegador vuelve al track anterior. Por ejemplo, pulsa `2`, escribe "Conciliar transferencias" en la captura y pulsa Enter: la tarea queda en ese track y su barra se actualiza.
 
 Las cifras salen del [resumen del servidor](api.md#resumen-del-proyecto) y no dependen de las páginas cargadas. **Actualizar** vuelve a consultarlo; también se actualiza al guardar o eliminar desde el panel. Por ejemplo, marca un track como P1 con fecha en tres días y deja una de sus cuatro tareas pendientes: aparecerá En riesgo en **Lo que toca ahora**.
@@ -44,7 +48,7 @@ Usa **Lista** o **Tarjetas** en la barra del espacio de trabajo. Por ejemplo, fi
 
 ## Uso y límites
 
-Las vistas consultan la API en páginas de 20 entradas y muestran las más recientes primero dentro de cada grupo. La fecha es la de creación. **Cargar más** permanece disponible al pie mientras el servidor tenga otra página. Cada área o estado muestra hasta diez entradas al inicio. **Ver más** amplía ese grupo entre los tickets ya cargados. Por ejemplo, filtra por Web, pulsa **Cargar más** para traer otra página y luego **Ver más de Web** para desplegarla. Cambiar filtros descarta páginas anteriores. La búsqueda por código o título se limita a las páginas cargadas y muestra todas sus coincidencias. **Actualizar lista** vuelve a consultar el servidor.
+Las vistas consultan la API en páginas de 20 entradas y muestran las más recientes primero dentro de cada grupo. La fecha es la de creación. **Cargar más** permanece disponible al pie mientras el servidor tenga otra página. Cada área o estado muestra hasta diez entradas al inicio. **Ver más** amplía ese grupo entre los tickets ya cargados. Por ejemplo, filtra por Web, pulsa **Cargar más** para traer otra página y luego **Ver más de Web** para desplegarla. Cambiar filtros descarta páginas anteriores. La búsqueda por código o título se limita a las páginas cargadas y muestra todas sus coincidencias. Para buscar en todo el proyecto, usa [Ir a…](#ir-a). **Actualizar lista** vuelve a consultar el servidor.
 
 Escribe un título y pulsa **Añadir** o Enter para crear. La lista se actualiza y se abre el detalle recuperado del servidor después del recibo de creación. El panel permite editar los campos principales, con descripción completa y cinco comentarios recientes. No se representa una escritura como guardada antes de confirmar la respuesta.
 

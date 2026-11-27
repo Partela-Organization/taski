@@ -21,6 +21,8 @@ import { useTrackPlans } from "./use-track-plans.ts";
 import { SummaryActions, SummaryView } from "../summary/summary-view.tsx";
 import { useSummary } from "../summary/use-summary.ts";
 import { SidebarTracks, TrackChips, TrackOverview } from "../summary/track-view.tsx";
+import { GoTo, GoToButton } from "./go-to.tsx";
+import type { GoToHandle } from "./go-to.tsx";
 import { initialPlace, savePlace, trackFromPath, trackPath, views } from "./views.ts";
 import type { Place, View } from "./views.ts";
 import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
@@ -45,6 +47,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const [composingFeedback, setComposingFeedback] = useState(false);
   const [deletion, setDeletion] = useState<{ message: string; closed: boolean }>();
   const workspaceHeading = useRef<HTMLHeadingElement>(null);
+  const goTo = useRef<GoToHandle>(null);
   const compact = useCompactLayout();
   const place: Place = selection && selection.memberId === member?.id ? selection
     : member ? initialPlace(member.id, access) : { view: "team", trackId: "" };
@@ -115,6 +118,17 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const shortcutTracks = useRef<string[]>([]);
   shortcutTracks.current = (summary.summary?.tracks ?? []).slice(0, 9).map((entry) => entry.id);
   const openTrack = useRef<(id: string) => void>(() => undefined);
+  // ⌘K / Ctrl+K opens "Ir a…" from anywhere, including text fields.
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.key.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return;
+      if (document.querySelector("dialog[open]:not(.go-to)")) return;
+      event.preventDefault();
+      goTo.current?.open();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (event.defaultPrevented || event.repeat || event.metaKey || event.ctrlKey || event.altKey || !/^[1-9]$/.test(event.key)) return;
@@ -190,7 +204,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   openTrack.current = (id) => { if (!capture.busy && !capture.recording && !capture.attempt) selectView("track", id); };
   return <div className="app" data-detail={route.selected ? "open" : undefined}>
     <WorkspaceSidebar brand={brandName} project={projectName} members={list.project?.members ?? access?.members ?? []}
-      account={compact ? <WorkspaceMobileAccount {...account} /> : null}
+      account={compact ? <><GoToButton compact onOpen={() => goTo.current?.open()} /><WorkspaceMobileAccount {...account} /></> : null}
+      search={compact ? null : <GoToButton compact={false} onOpen={() => goTo.current?.open()} />}
       view={view} disabled={capture.busy || capture.recording || !!capture.attempt} onView={(next) => selectView(next, area)}
       tracks={!compact && <SidebarTracks tracks={tracks} active={trackView ? trackId : undefined}
         disabled={capture.busy || capture.recording || !!capture.attempt} onOpen={(id) => selectView("track", id)} />} />
@@ -269,6 +284,8 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         </>}
       </main>
     </div>
+    <GoTo ref={goTo} client={client} tracks={tracks} project={list.project} onExpired={onExpired}
+      onTrack={(id) => selectView("track", id)} onTicket={(key) => { setDeletion(undefined); void route.open(key); }} />
     <TicketPanel route={route} client={client} project={list.project} onSaved={() => { list.refresh(); summary.refresh(); }} onExpired={onExpired}
       onDeleted={(type, closed) => {
         setDeletion({ message: type === "feedback" ? "Feedback eliminado." : "Tarea eliminada.", closed });

@@ -26,7 +26,7 @@ function nonnegative(value: unknown): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 0) throw new TaskiError("INVALID_CURSOR");
   return value;
 }
-const listFields = ["status", "open", "assigneeId", "areaId", "type", "view", "order"] as const;
+const listFields = ["status", "open", "query", "assigneeId", "areaId", "type", "view", "order"] as const;
 function checkEpoch(cursor: Record<string, unknown>, epoch: string): void {
   if (cursor.epoch !== epoch) throw new TaskiError("CURSOR_EXPIRED", "Resynchronize project, ticket pages and activity from a fresh cursor");
 }
