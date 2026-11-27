@@ -71,7 +71,7 @@ Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato c
 | Herramienta | Entrada y resultado |
 | --- | --- |
 | `get_project` | `knownVersion` opcional; configuración y cursor actual. Si coincide, omite `project` con `notModified: true`. |
-| `list_tickets` | Filtros, `limit` y cursor. 20 resúmenes por defecto, máximo 50. Usa `order: "recent"` para ordenar por fecha de creación. `view: "work"` añade metadatos de UI y, con ese orden, la fecha de creación. |
+| `list_tickets` | Filtros, `limit` y cursor. 20 resúmenes por defecto, máximo 50. Usa `order: "recent"` para ordenar por fecha de creación y `query` para buscar por código o título en todo el proyecto. `view: "work"` añade metadatos de UI y, con ese orden, la fecha de creación. |
 | `get_ticket` | `key`; `view: "work"` incluye descripción completa y cinco comentarios recientes. `full` añade identidad/fechas; los comentarios anteriores se paginan. |
 | `create_ticket` | `title`, `idempotencyKey` y campos opcionales; permite crear y asignar juntos. Devuelve recibo. |
 | `update_ticket` | `key`, versión, clave y `changes`, `descriptionPatch` y/o `comment`; escritura atómica y recibo. |
@@ -122,7 +122,7 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3871 | 15395 | 4000 |
+| `tools/list` completo + instrucciones | 3894 | 15480 | 4000 |
 | Resultado de listar 20 resúmenes | 808 | 2616 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 

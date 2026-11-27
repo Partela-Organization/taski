@@ -160,3 +160,26 @@ test("open filter lists unfinished feedback; a person marks done and can reopen 
   assert.deepEqual(transitions.map((event) => event.changes.status), [{ before: "todo", after: "done" }, { before: "done", after: "todo" }]);
   assert(transitions.every((event) => event.actor.kind === "person" && event.actor.memberId === "taylor"));
 });
+
+test("query finds tickets by code or title across pages, ignoring ASCII case and treating wildcards literally", async () => {
+  const made = [];
+  for (const title of ["Conciliar transferencias", "Revisar CONCILIACIÓN anual", "Descuento 100% aplicado", "Descuento 100 aplicado", "Otra cosa"]) {
+    made.push(await (await send("tickets", "POST", { title, idempotencyKey: `query-${title}` })).json());
+  }
+  const keys = async (query) => (await (await send(`tickets?query=${encodeURIComponent(query)}&limit=50`)).json()).items.map((item) => item.title);
+  assert.deepEqual((await keys("concilia")).sort(), ["Conciliar transferencias", "Revisar CONCILIACIÓN anual"]);
+  assert.deepEqual(await keys("100%"), ["Descuento 100% aplicado"]);
+  assert.deepEqual(await keys("_"), []);
+  assert.deepEqual(await keys(made[4].key), ["Otra cosa"]);
+  assert.deepEqual(await keys(`  ${made[4].key.toLowerCase()} `), ["Otra cosa"]);
+
+  const first = await (await send(`tickets?query=descuento&limit=1`)).json();
+  assert.equal(first.items.length, 1);
+  const next = await (await send(`tickets?limit=1&cursor=${encodeURIComponent(first.nextCursor)}`)).json();
+  assert.equal(next.items.length, 1); assert.equal(next.nextCursor, null);
+  assert.match(next.items[0].title, /^Descuento/);
+  for (const query of ["", "   ", "x".repeat(101)]) {
+    const invalid = await send(`tickets?query=${encodeURIComponent(query)}`);
+    assert.equal(invalid.status, 400, JSON.stringify(query));
+  }
+});

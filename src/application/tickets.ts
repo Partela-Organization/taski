@@ -15,6 +15,8 @@ export interface ListQuery {
   status?: string; assigneeId?: string | null; areaId?: string; type?: string;
   /** Excludes finished tickets; combine with type to list open feedback. */
   open?: true;
+  /** Case-insensitive (ASCII) substring of the code or title, across every page. */
+  query?: string;
 }
 export interface Mutation {
   create: boolean; operation: string; idempotencyKey: string; fingerprint: string;
@@ -114,7 +116,10 @@ export class TicketService {
     // One extra internal row detects a continuation; public adapters cap pages at 50.
     integer(query.limit, "limit", 51);
     if (!Number.isSafeInteger(query.afterNumber) || query.afterNumber < 0) throw new TaskiError("INVALID_INPUT", "Invalid position");
-    const { limit: _limit, afterNumber, afterCreatedAt, order, open, ...filters } = query;
+    const { limit: _limit, afterNumber, afterCreatedAt, order, open, query: search, ...filters } = query;
+    if (search !== undefined && (typeof search !== "string" || !search.trim() || search.length > 100)) {
+      throw new TaskiError("INVALID_INPUT", "Invalid query: expected 1–100 characters");
+    }
     if (open !== undefined && open !== true) throw new TaskiError("INVALID_INPUT", "Invalid open filter: use true or omit it");
     if (open && filters.status === "done") throw new TaskiError("INVALID_INPUT", "The open filter excludes done tickets");
     if (order !== undefined && order !== "recent") throw new TaskiError("INVALID_INPUT", "Invalid list order");
