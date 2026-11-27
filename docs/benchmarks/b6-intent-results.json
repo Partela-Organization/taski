@@ -24,15 +24,15 @@
       "utf8Bytes": 325
     },
     "full_read": {
-      "tokensProxy": 358,
+      "tokensProxy": 349,
       "utf8Bytes": 1047
     },
     "work_read": {
-      "tokensProxy": 302,
+      "tokensProxy": 295,
       "utf8Bytes": 954
     },
     "ordinary_update_receipt": {
-      "tokensProxy": 75,
+      "tokensProxy": 70,
       "utf8Bytes": 193
     },
     "pr_state_receipt": {
@@ -40,19 +40,19 @@
       "utf8Bytes": 135
     },
     "patch_progress_receipt": {
-      "tokensProxy": 75,
+      "tokensProxy": 74,
       "utf8Bytes": 198
     },
     "activity_pages": {
-      "tokensProxy": 527,
+      "tokensProxy": 521,
       "utf8Bytes": 1491
     },
     "recovery_full_read": {
-      "tokensProxy": 486,
+      "tokensProxy": 475,
       "utf8Bytes": 1275
     },
     "older_comments": {
-      "tokensProxy": 269,
+      "tokensProxy": 262,
       "utf8Bytes": 852
     },
     "long_create_input": {

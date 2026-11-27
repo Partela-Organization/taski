@@ -64,9 +64,9 @@ JS
 
 Éxito esperado: ocho nombres en el orden de la tabla y `configVersion: 1` en el preset demo. El ejemplo solo lee. Las pruebas también ejecutan el recorrido con el protocolo `2026-07-28` fijado mediante `versionNegotiation: { mode: { pin: "2026-07-28" } }`. La compatibilidad legacy es sin sesión de transporte: cada petición se autentica, mientras D1 conserva datos y recibos entre peticiones.
 
-## Diez herramientas
+## Once herramientas
 
-Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato compartido](../src/adapters/api/contract.ts). Las entradas rechazan campos desconocidos. Las cinco lecturas llevan `readOnlyHint: true`; las mutaciones requieren clave idempotente, y editar un ticket o un track existente requiere `expectedVersion`.
+Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato compartido](../src/adapters/api/contract.ts). Las entradas rechazan campos desconocidos. Las seis lecturas llevan `readOnlyHint: true`; las mutaciones requieren clave idempotente, y editar un ticket o un track existente requiere `expectedVersion`.
 
 | Herramienta | Entrada y resultado |
 | --- | --- |
@@ -79,6 +79,7 @@ Los esquemas de entrada/salida se publican en `tools/list`, desde el [contrato c
 | `list_activity` | Cursor, límite y `ticketKey` opcional; cambios concretos, `nextCursor` y `hasMore`. |
 | `link_pull_request` | `key`, versión, clave y `url`; referencia manual auditada. Para retirar o combinar con estado usa `update_ticket` con `changes.prUrl`. Ver [regla compartida](api.md#referencia-manual-a-un-pr). |
 | `list_areas` | Sin argumentos. Tracks (áreas configuradas) con prioridad 1–3, `targetDate` y versión. Un track sin plan devuelve prioridad 2, sin fecha y versión 0. |
+| `get_summary` | `format` opcional. Recap por track con progreso, estado, días restantes y siguiente paso; totales, feedback abierto y tareas cerradas en siete días. `format: "text"` devuelve solo el texto con barras. Ver [resumen en la API](api.md#resumen-del-proyecto). |
 | `update_area` | `areaId`, versión, clave y `priority` y/o `targetDate` (`YYYY-MM-DD` o `null`). Cambio auditado; recibo con `areaId`, versión y campos cambiados. Ver [tracks en la API](api.md#tracks-prioridad-y-fecha). |
 
 Ejemplos de argumentos ficticios, para un ticket cuya versión actual sea 1:
@@ -109,7 +110,7 @@ El SDK responde los errores de protocolo/esquema según MCP. Antes del transport
 
 ## Evidencia y reproducción
 
-`npm run check` ejecuta descubrimiento y las diez herramientas con SDK cliente/servidor 2.4.0 sobre Worker/D1 emulado, en modo legacy y `2026-07-28`. Comprueba lectura cruzada HTTP/MCP, asignación, comentarios, PR, revisión, esquemas inválidos, límites, reintentos, conflictos y rollback de un fallo de auditoría. El Host rechazado se prueba directamente en la frontera porque el harness reescribe esa cabecera.
+`npm run check` ejecuta descubrimiento y las once herramientas con SDK cliente/servidor 2.4.0 sobre Worker/D1 emulado, en modo legacy y `2026-07-28`. Comprueba lectura cruzada HTTP/MCP, asignación, comentarios, PR, revisión, esquemas inválidos, límites, reintentos, conflictos y rollback de un fallo de auditoría. El Host rechazado se prueba directamente en la frontera porque el harness reescribe esa cabecera.
 
 Para medir catálogo y respuestas recibidos por el SDK, instala también el entorno Python del [experimento B0](../experiments/b0/README.md) y ejecuta:
 
@@ -121,7 +122,7 @@ Sin argumentos imprime una medición nueva. `--write` actualiza el [informe vers
 
 | Artefacto medido | Tokens proxy | Bytes UTF-8 | Presupuesto proxy |
 | --- | --- | --- | --- |
-| `tools/list` completo + instrucciones | 3661 | 14544 | 4000 |
+| `tools/list` completo + instrucciones | 3871 | 15395 | 4000 |
 | Resultado de listar 20 resúmenes | 808 | 2616 | 1600 |
 | Recibo de crear/asignar | 63 | 200 | 200 |
 

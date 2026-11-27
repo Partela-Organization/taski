@@ -3,6 +3,8 @@ import { Operations } from "../api/operations.ts";
 import type { OperationName } from "../api/operations.ts";
 import { TicketService } from "../../application/tickets.ts";
 import { AreaPlanService } from "../../application/areas.ts";
+import { SummaryService } from "../../application/summary.ts";
+import { D1SummaryRepository } from "../storage/d1-summary.ts";
 import { D1AreaPlanRepository } from "../storage/d1-area-plans.ts";
 import { D1TicketRepository } from "../storage/d1-tickets.ts";
 import { TeamAccess } from "../access/team-access.ts";
@@ -23,7 +25,8 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
       const ticket = await tickets.get(parts[3]!);
       return await attachments(request, new D1Attachments(env.DB), env.ATTACHMENTS, ticket, parts[5], actor);
     }
-    const operations = new Operations(tickets, config, new AreaPlanService(new D1AreaPlanRepository(env.DB), config, runtime));
+    const areas = new AreaPlanService(new D1AreaPlanRepository(env.DB), config, runtime);
+    const operations = new Operations(tickets, config, areas, new SummaryService(new D1SummaryRepository(env.DB), areas, config, runtime));
     const query: Record<string, unknown> = {};
     for (const [key, value] of url.searchParams) {
       if (key in query) throw new TaskiError("INVALID_INPUT", "Repeated query parameter");
@@ -33,6 +36,7 @@ export async function api(request: Request, env: AccessEnvironment & { ATTACHMEN
     let operation: OperationName | undefined, input: unknown = query, allow = "GET";
     if (parts.length === 3 && parts[2] === "project") operation = request.method === "GET" ? "get_project" : undefined;
     else if (parts.length === 3 && parts[2] === "activity") operation = request.method === "GET" ? "list_activity" : undefined;
+    else if (parts.length === 3 && parts[2] === "summary") operation = request.method === "GET" ? "get_summary" : undefined;
     else if (parts.length === 3 && parts[2] === "areas") operation = request.method === "GET" ? "list_areas" : undefined;
     else if (parts.length === 4 && parts[2] === "areas") {
       allow = "PATCH";

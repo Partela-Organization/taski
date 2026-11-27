@@ -766,6 +766,44 @@
         }
       }
     },
+    "/api/v1/summary": {
+      "get": {
+        "operationId": "get_summary",
+        "description": "Project recap in one call: per track (tasks only) progress, health late|risk|ok|none, days left and next step; totals, open feedback, tasks closed in 7 days. format=text returns only progress-bar text for chat.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "const": "text"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confirmed result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_summaryOutput"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Typed error; inspect error.code. 401/403 access, 409 conflict, 429 rate limit, 503 configuration, 500 unconfirmed internal failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/areas": {
       "get": {
         "operationId": "list_areas",
@@ -2400,6 +2438,53 @@
           "areaId",
           "version",
           "changed"
+        ],
+        "additionalProperties": false
+      },
+      "get_summaryInput": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "const": "text"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "get_summaryOutput": {
+        "type": "object",
+        "properties": {
+          "today": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "totals": {
+            "type": "object"
+          },
+          "feedbackOpen": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "closedLast7Days": {
+            "type": "object"
+          },
+          "tracks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": [
+          "today"
         ],
         "additionalProperties": false
       },

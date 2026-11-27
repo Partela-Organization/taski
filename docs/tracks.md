@@ -6,7 +6,8 @@ Plan para que Taski sirva como recap rápido: ver cómo va cada track, qué venc
 | --- | --- |
 | T1 · Check de hecho en feedback | Implementado: [web](web.md#compartir-feedback-b8-01) y filtro `open` de la [API](api.md) |
 | T2 · Prioridad y fecha por track | Implementado: [API](api.md#tracks-prioridad-y-fecha), [MCP](mcp.md#diez-herramientas) y encabezados de área en la [web](web.md#espacio-de-trabajo) |
-| T3–T7 | Pendientes |
+| T3 · Resumen en el núcleo | Implementado: [resumen en la API](api.md#resumen-del-proyecto), `get_summary` en [MCP](mcp.md#once-herramientas) y `timezone` en la [configuración](configuration.md#campos-del-esquema-1) |
+| T4–T7 | Pendientes |
 
 ## Conceptos
 
@@ -65,8 +66,8 @@ Entrega el valor más inmediato y no requiere migraciones.
 
 Hoy la lista pagina de 20 en 20, y las cifras no pueden calcularse en el navegador con páginas parciales.
 
-- **Configuración**: `timezone` de la instalación (por ejemplo, `America/Caracas`) para calcular "hoy", "vencido" y "esta semana". Requiere ampliar el esquema y subir `configVersion`.
-- **Repositorio**: `summary()` agrega con `GROUP BY area_id, type, status` las filas con `deleted_at IS NULL`, y cuenta las tareas cerradas en los últimos siete días a partir de `activity` (cambios de estado hacia `done`).
+- **Configuración**: `timezone` de la instalación (por ejemplo, `America/Caracas`) para calcular "hoy", "vencido" y "esta semana". Es opcional y usa `UTC` por defecto, para que las instalaciones existentes sigan validando sin cambios.
+- **Repositorio**: agrega con `GROUP BY area_id, type, status` las filas con `deleted_at IS NULL`, y cuenta las tareas cerradas en los últimos siete días a partir de `activity` (cambios de estado hacia `done` que siguen terminadas).
 - **Siguiente paso de cada track**: la tarea `in_progress` más antigua; si no hay, una `todo` resaltada; si no, la `todo` más antigua.
 - **Dominio**: funciones puras que se prueban sin plataforma:
   - `trackHealth(plan, counts, today)` devuelve el estado del track.

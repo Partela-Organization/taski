@@ -3,8 +3,9 @@ import type { Actor, Ticket, TicketSummary } from "../../domain/ticket.ts";
 import type { InstallationConfig } from "../../config/types.ts";
 import type { ListQuery, TicketService } from "../../application/tickets.ts";
 import type { AreaPlanService } from "../../application/areas.ts";
+import type { SummaryService } from "../../application/summary.ts";
 
-export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request", "list_areas", "update_area"] as const;
+export const operationNames = ["get_project", "list_tickets", "get_ticket", "create_ticket", "update_ticket", "add_comment", "list_activity", "link_pull_request", "list_areas", "update_area", "get_summary"] as const;
 export type OperationName = typeof operationNames[number];
 
 function encode(value: Record<string, unknown>): string {
@@ -40,8 +41,9 @@ export class Operations {
   readonly service: TicketService;
   readonly config: InstallationConfig;
   readonly areas: AreaPlanService | undefined;
-  constructor(service: TicketService, config: InstallationConfig, areas?: AreaPlanService) {
-    this.service = service; this.config = config; this.areas = areas;
+  readonly recap: SummaryService | undefined;
+  constructor(service: TicketService, config: InstallationConfig, areas?: AreaPlanService, recap?: SummaryService) {
+    this.service = service; this.config = config; this.areas = areas; this.recap = recap;
   }
   async execute(name: OperationName, input: unknown, actor: Actor): Promise<Record<string, unknown>> {
     switch (name) {
@@ -55,12 +57,23 @@ export class Operations {
       case "link_pull_request": return { ...await this.service.linkPullRequest(input, actor) };
       case "list_areas": return this.listAreas(input);
       case "update_area": return { ...await this.trackPlans().update(input, actor) };
+      case "get_summary": return this.summary(input);
       default: throw new TaskiError("NOT_FOUND");
     }
   }
   private trackPlans(): AreaPlanService {
     if (!this.areas) throw new TaskiError("NOT_FOUND");
     return this.areas;
+  }
+  async summary(input: unknown) {
+    const args = record(input, ["format"]);
+    if (args.format !== undefined && args.format !== "text") throw new TaskiError("INVALID_INPUT", "Invalid format: use text or omit it");
+    if (!this.recap) throw new TaskiError("NOT_FOUND");
+    await this.service.repository.initialize(this.config.project);
+    const result = await this.recap.summary();
+    if (args.format === "text") return { today: result.today, text: result.text };
+    const { text: _text, ...structured } = result;
+    return structured;
   }
   async listAreas(input: unknown) {
     record(input, []);

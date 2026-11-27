@@ -8,6 +8,8 @@ export interface InstallationConfig {
     readonly baseUrl: string;
   };
   readonly locale: "es";
+  /** IANA time zone used for "today", deadlines and weekly counts. Optional in input; parsed configs default to UTC. */
+  readonly timezone?: string;
   readonly members: readonly {
     readonly id: string;
     readonly name: string;

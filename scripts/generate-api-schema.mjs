@@ -15,7 +15,7 @@ const routes = [
   ["patch", "/api/v1/tickets/{key}", "update_ticket"], ["post", "/api/v1/tickets/{key}/comments", "add_comment"],
   ["delete", "/api/v1/tickets/{key}", "delete_ticket"],
   ["get", "/api/v1/activity", "list_activity"], ["put", "/api/v1/tickets/{key}/pull-request", "link_pull_request"],
-  ["get", "/api/v1/areas", "list_areas"], ["patch", "/api/v1/areas/{areaId}", "update_area"],
+  ["get", "/api/v1/summary", "get_summary"], ["get", "/api/v1/areas", "list_areas"], ["patch", "/api/v1/areas/{areaId}", "update_area"],
 ];
 for (const [method, path, name] of routes) {
   const definition = httpDefinitions.find((entry) => entry.name === name);

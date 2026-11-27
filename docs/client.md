@@ -16,7 +16,7 @@ Para agentes o scripts, construye el cliente con `code`, `memberId` y `clientNam
 
 Métodos: getProject, listTickets, getTicket, createTicket, updateTicket, addComment, listActivity y linkPullRequest; más accessOptions/login/changeMember/logout para sesiones web. login envía el código y no lo retiene; la cookie queda a cargo del navegador. Node no mantiene cookie jar automáticamente: para scripts se recomienda acceso por cabeceras o un transporte que lo gestione explícitamente.
 
-`client.listAreas()` devuelve los [tracks](api.md#tracks-prioridad-y-fecha) y `client.updateArea(areaId, { expectedVersion, idempotencyKey, priority, targetDate })` cambia su plan.
+`client.getSummary()` devuelve el [resumen del proyecto](api.md#resumen-del-proyecto) y `client.getSummaryText()` su texto con barras. `client.listAreas()` devuelve los [tracks](api.md#tracks-prioridad-y-fecha) y `client.updateArea(areaId, { expectedVersion, idempotencyKey, priority, targetDate })` cambia su plan.
 
 Desde una sesión web, `client.deleteTicket(key, { expectedVersion, idempotencyKey })` quita una tarea o feedback de las vistas activas y devuelve su recibo.
 
