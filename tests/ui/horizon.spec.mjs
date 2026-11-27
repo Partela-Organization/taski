@@ -58,6 +58,7 @@ test("a document is created from a template, written with block shortcuts and au
   const explorando = page.getByRole("region", { name: "Explorando" });
   await expect(explorando.getByRole("button", { name: title })).toBeVisible();
   await expect(explorando).toContainText("1/1 tareas");
+  await page.screenshot({ path: testInfo.outputPath("horizon-list.png"), fullPage: true });
   await page.getByLabel("Track", { exact: true }).selectOption("general");
   await expect(explorando).toHaveCount(0);
 });

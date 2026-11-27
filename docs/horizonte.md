@@ -6,8 +6,8 @@ Horizonte reúne lo que el proyecto hará más adelante: ideas, investigaciones 
 | --- | --- |
 | H1 · Núcleo, API y MCP | Implementado: [Horizonte en la API](api.md#horizonte) y [MCP](mcp.md#catorce-herramientas) |
 | H2 · Sección en la web | Implementado: [Horizonte en la web](web.md#horizonte) |
-| H3 · Contenido y despliegue | Pendiente |
-| H4 · Verificación | Pendiente |
+| H3 · Contenido y despliegue | Desplegado: migración `0010` aplicada y Worker publicado. Primeros documentos listos para importar con clave idempotente. |
+| H4 · Verificación | Recorrido y capturas en la [verificación](verification/horizonte.md) |
 
 ## Conceptos
 
