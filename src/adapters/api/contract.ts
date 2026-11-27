@@ -36,6 +36,12 @@ const project = object({ id: string, name: string, prefix: string, baseUrl: stri
   statusLabels: labels, typeLabels: labels, policy: object({ agentsCanComplete: boolean }, ["agentsCanComplete"]) },
   ["id", "name", "prefix", "baseUrl", "locale", "brand", "members", "areas", "defaultAreaId", "statusLabels", "typeLabels", "policy"]);
 
+const priority = { enum: [1, 2, 3] };
+const targetDate = { type: ["string", "null"], pattern: "^\\d{4}-\\d{2}-\\d{2}$" };
+const planVersion = { type: "integer", minimum: 0 };
+const track = object({ id: string, label: string, priority, targetDate, version: planVersion, updatedBy: nullableString, updatedAt: nullableString },
+  ["id", "label", "priority", "targetDate", "version", "updatedBy", "updatedAt"]);
+
 export const definitions = [
   { name: "get_project", description: "Read project configuration. Send knownVersion to omit unchanged members and labels.",
     inputSchema: object({ knownVersion: integer }),
@@ -63,6 +69,12 @@ export const definitions = [
       ["seq", "ticketKey", "ticketVersion", "actor", "changes", "createdAt"])), nextCursor: string, hasMore: boolean }, ["items", "nextCursor", "hasMore"]) },
   { name: "link_pull_request", description: "Set a manual PR URL; does not query GitHub. Use update_ticket to combine PR and status.",
     inputSchema: object({ ...mutation, url: string }, [...Object.keys(mutation), "url"]), outputSchema: receipt },
+  { name: "list_areas", description: "List tracks (configured areas) with priority 1-3 (1 highest), targetDate YYYY-MM-DD or null, and version. Unplanned tracks report priority 2, no date and version 0.",
+    inputSchema: object({}), outputSchema: object({ items: array(track) }, ["items"]) },
+  { name: "update_area", description: "Set a track's priority and/or targetDate (null clears it). Supply expectedVersion from list_areas; reuse idempotencyKey on retries.",
+    inputSchema: { ...object({ areaId: string, expectedVersion: planVersion, idempotencyKey: mutation.idempotencyKey, priority, targetDate },
+      ["areaId", "expectedVersion", "idempotencyKey"]), anyOf: [{ required: ["priority"] }, { required: ["targetDate"] }] },
+    outputSchema: object({ areaId: string, version: integer, changed: array(string) }, ["areaId", "version", "changed"]) },
 ] satisfies { name: OperationName; description: string; inputSchema: ReturnType<typeof object> & { anyOf?: unknown[] }; outputSchema: ReturnType<typeof object> }[];
 
 export const serverInstructions = "One project per installation. Reuse configVersion and activity cursors. Lists are summaries; fetch needed detail. Mutations are version checked, audited and idempotent. Agents normally finish in review. Errors are explicit; never claim a failed write was saved.";

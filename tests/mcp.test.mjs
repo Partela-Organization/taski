@@ -137,3 +137,21 @@ test("MCP rejects missing auth, cross-origin requests and invalid input without 
   assert(invalid.isError);
   assert.equal(payload(await client.callTool({ name: "list_tickets", arguments: {} })).items.length, count);
 });
+
+test("MCP agents read tracks and set priority and target date with version checks", async () => {
+  const client = await connect();
+  const tools = (await client.listTools()).tools;
+  assert.equal(tools.find((t) => t.name === "list_areas").annotations.readOnlyHint, true);
+  assert.equal(tools.find((t) => t.name === "update_area").annotations.readOnlyHint, false);
+  const before = payload(await client.callTool({ name: "list_areas", arguments: {} }));
+  const web = before.items.find((item) => item.id === "web");
+  const receipt = payload(await client.callTool({ name: "update_area", arguments: {
+    areaId: "web", expectedVersion: web.version, idempotencyKey: "mcp-plan", priority: 1, targetDate: "2026-12-19",
+  } }));
+  assert.equal(receipt.version, web.version + 1);
+  const after = payload(await client.callTool({ name: "list_areas", arguments: {} }));
+  assert.deepEqual(after.items.find((item) => item.id === "web"), { ...web, priority: 1, targetDate: "2026-12-19",
+    version: receipt.version, updatedBy: "alex", updatedAt: after.items.find((item) => item.id === "web").updatedAt });
+  const stale = await client.callTool({ name: "update_area", arguments: { areaId: "web", expectedVersion: web.version, idempotencyKey: "mcp-stale", priority: 3 } });
+  assert.equal(stale.isError, true); assert.match(stale.content[0].text, /VERSION_CONFLICT/);
+});

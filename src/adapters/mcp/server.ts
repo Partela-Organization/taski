@@ -4,6 +4,8 @@ import type { JsonSchemaType } from "@modelcontextprotocol/server";
 import { definitions, serverInstructions } from "../api/contract.ts";
 import { Operations } from "../api/operations.ts";
 import { TicketService } from "../../application/tickets.ts";
+import { AreaPlanService } from "../../application/areas.ts";
+import { D1AreaPlanRepository } from "../storage/d1-area-plans.ts";
 import { TaskiError } from "../../domain/ticket.ts";
 import { D1TicketRepository } from "../storage/d1-tickets.ts";
 import { TeamAccess } from "../access/team-access.ts";
@@ -17,7 +19,7 @@ const tools = definitions.map((definition) => ({ ...definition,
   input: fromJsonSchema(definition.inputSchema as JsonSchemaType, validator),
   output: fromJsonSchema(definition.outputSchema as JsonSchemaType, validator),
 }));
-const reads = new Set(["get_project", "list_tickets", "get_ticket", "list_activity"]);
+const reads = new Set(["get_project", "list_tickets", "get_ticket", "list_activity", "list_areas"]);
 
 export async function mcp(request: Request, env: AccessEnvironment, config: InstallationConfig): Promise<Response> {
   try {
@@ -29,7 +31,8 @@ export async function mcp(request: Request, env: AccessEnvironment, config: Inst
       return rejected;
     }
     const actor = await new TeamAccess(env, config).authenticate(request, "mcp");
-    const operations = new Operations(new TicketService(new D1TicketRepository(env.DB), config, runtime), config);
+    const operations = new Operations(new TicketService(new D1TicketRepository(env.DB), config, runtime), config,
+      new AreaPlanService(new D1AreaPlanRepository(env.DB), config, runtime));
     const handler = createMcpHandler(() => {
       const server = new McpServer({ name: "taski", version: "0.0.0" }, { instructions: serverInstructions, jsonSchemaValidator: validator });
       for (const tool of tools) {

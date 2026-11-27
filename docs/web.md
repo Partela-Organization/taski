@@ -12,6 +12,8 @@ El servidor Vite local reenvía `/api` al Worker de 8787. Reescribe únicamente 
 
 La app conectada sigue la [dirección visual v3](design-direction.md). La navegación usa una barra lateral en escritorio y pestañas en móvil. La búsqueda y el filtro comparten una barra y la captura de tareas se hace en una línea. Por defecto, las áreas de la instalación aparecen como secciones con su cantidad de entradas cargadas y cada fila muestra su estado. **Agrupar por** permite cambiar a secciones por estado. **Terminado** empieza plegado en ambas vistas. El detalle abre a la derecha en escritorio y ocupa la pantalla en móvil.
 
+En **Por área**, el encabezado de cada área muestra su prioridad (P1 alta, P2 media, P3 baja) y la fecha en que debe estar listo el track. Pulsa **Editar**, elige la prioridad y la fecha **Listo antes de** y pulsa **Guardar**. Deja la fecha vacía para quitarla. Por ejemplo, marca Web como P1 con fecha 5 de diciembre y el encabezado mostrará "P1 · Listo antes del 5 dic". Si otra persona cambió el track mientras editabas, Taski muestra los valores actuales y pide guardar de nuevo. Si se pierde la respuesta, **Reintentar** envía el mismo cambio. Consulta los [tracks en la API](api.md#tracks-prioridad-y-fecha).
+
 Usa **Lista** o **Tarjetas** en la barra del espacio de trabajo. Por ejemplo, filtra por Web y elige **Por estado** para revisar esa área por etapa. Las tarjetas muestran dos columnas cuando hay espacio y una en móvil o con el panel abierto en un espacio estrecho. Puedes abrir un ticket desde toda su fila o tarjeta. El enlace al PR sigue abriendo el PR. La presentación y el agrupamiento se guardan en el navegador y cambiar cualquiera conserva la búsqueda, el filtro y el detalle abierto.
 
 ## Uso y límites

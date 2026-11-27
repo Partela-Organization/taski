@@ -17,6 +17,7 @@ import { useFeedbackDone } from "./use-feedback-done.ts";
 import { useQuickCapture } from "./use-quick-capture.ts";
 import { TicketList } from "./ticket-list.tsx";
 import { useTicketList } from "./use-ticket-list.ts";
+import { useTrackPlans } from "./use-track-plans.ts";
 import { initialView, views } from "./views.ts";
 import type { View } from "./views.ts";
 import { FeedbackFilterControl, WorkspaceMobileAccount, WorkspaceSidebar, WorkspaceToolbar, WorkspaceTopbar } from "./workspace-chrome.tsx";
@@ -47,6 +48,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
   const activeArea = feedback ? "" : area;
   const list = useTicketList(client, member?.id, view, activeArea, feedbackFilter, onExpired);
   const route = useTicketRoute(client, member?.id, onExpired);
+  const trackPlans = useTrackPlans(client, member?.id);
   const feedbackDone = useFeedbackDone(client, (row, done) => {
     setDeletion(undefined);
     setNotice(done ? `«${row.title}» marcado como hecho.` : `«${row.title}» vuelve a estar abierto.`);
@@ -170,6 +172,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         }} />}
         <TicketList key={`${view}:${activeArea}`} rows={list.rows} feedback={feedback} project={list.project} selected={route.selected}
           onToggleDone={feedback ? (row) => void feedbackDone.toggle(row) : undefined} pendingDone={feedbackDone.pending}
+          plans={feedback ? undefined : { ...trackPlans, client, onExpired }}
           search={feedback ? "" : search} presentation={presentation} grouping={grouping} onOpen={(key) => {
             setDeletion(undefined);
             void route.open(key);
@@ -177,7 +180,7 @@ export function Workspace({ client, access, member, theme, onTheme, onExpired, o
         {list.loading && <StatusMessage tone="loading" title="Cargando tickets…" />}
         {!list.loading && !list.rows.length && !error && <StatusMessage title={feedback ? emptyFeedback[feedbackFilter] : "No hay tickets en esta vista"} />}
         {error && <StatusMessage tone="error" title={error}>
-          <Button variant="secondary" onClick={signOutError ? () => void signOut() : list.refresh}>Reintentar</Button>
+          <Button variant="secondary" onClick={signOutError ? () => void signOut() : () => { list.refresh(); trackPlans.refresh(); }}>Reintentar</Button>
         </StatusMessage>}
         {(!feedback || list.hasMore) && <footer className="workspace-footer" data-more={list.hasMore || undefined}>
           <div hidden={feedback}>

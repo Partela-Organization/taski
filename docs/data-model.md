@@ -6,6 +6,8 @@ La migración `0002_tickets.sql` crea tickets, comentarios, actividad y recibos 
 
 La migración `0008_ticket_deletion.sql` añade `tickets.deleted_at`. La operación de borrado marca esa fecha, avanza la versión y añade el evento y el recibo en un mismo batch. Las lecturas de tickets omiten filas eliminadas, incluidos accesos por ID o alias. Las filas y sus códigos se conservan para que la actividad siga siendo consultable.
 
+La migración `0009_area_plans.sql` crea `area_plans` y `area_activity`. `area_plans` guarda por área configurada la prioridad (1–3), la fecha límite opcional, la versión y la última persona o agente que la cambió. No guarda rótulos: siguen en la configuración. Un área sin fila equivale a prioridad 2, sin fecha y versión 0. Los triggers exigen versión 1 al insertar y versión+1 al actualizar, e impiden borrar planes.
+
 La instalación vincula project.id/prefix al primer uso. Reutilizar la base con otro ID/prefijo produce conflicto, sin reescribir tickets. Un proyecto distinto usa otra base. Los rótulos y nombres siguen en configuración; los registros guardan IDs de referencia y snapshots de actor para mantener la atribución histórica.
 
 Los índices cubren estado/fecha, responsable/estado, tipo, área, comentarios por versión y actividad por secuencia. Comentarios y actividad son append-only; no se habilitan edición/retirada en esta versión. Cada versión de ticket tiene un único evento. `mutation_receipts` reserva claves por actor/operación y conserva el resultado confirmado para reintentos. Sus garantías se implementan y prueban en los siguientes issues B3-02–04.

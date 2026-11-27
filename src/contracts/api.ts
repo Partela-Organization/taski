@@ -48,3 +48,13 @@ export interface ProjectResult {
     policy: { agentsCanComplete: boolean };
   };
 }
+
+export type Priority = 1 | 2 | 3;
+/** A configured area with its plan. Unplanned tracks report priority 2, no date and version 0. */
+export interface Track {
+  id: string; label: string; priority: Priority; targetDate: string | null; version: number;
+  updatedBy: string | null; updatedAt: string | null;
+}
+export interface TrackList { items: Track[] }
+export interface UpdateTrack { expectedVersion: number; idempotencyKey: string; priority?: Priority; targetDate?: string | null }
+export interface TrackReceipt { areaId: string; version: number; changed: string[] }

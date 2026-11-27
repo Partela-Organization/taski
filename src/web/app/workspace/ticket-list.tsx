@@ -3,6 +3,8 @@ import type { Status, WorkSummary } from "../../../client/index.ts";
 import { Button, StatusMessage } from "../../components.tsx";
 import type { Grouping, Presentation } from "./presentation.ts";
 import { TicketRow } from "./ticket-row.tsx";
+import { TrackPlanControl } from "./track-plan.tsx";
+import type { TrackPlans } from "./use-track-plans.ts";
 import type { TicketRowContext } from "./ticket-row.tsx";
 
 const stateOrder: Status[] = ["in_progress", "todo", "in_review", "done"];
@@ -49,8 +51,8 @@ function FinishedTickets({ rows, context, grouping, searching }: {
   </details>;
 }
 
-function Areas({ rows, context, searching }: {
-  rows: WorkSummary[]; context: TicketRowContext; searching: boolean;
+function Areas({ rows, context, searching, plans }: {
+  rows: WorkSummary[]; context: TicketRowContext; searching: boolean; plans?: TrackPlans | undefined;
 }) {
   const groups = new Map<string, WorkSummary[]>();
   for (const row of rows) {
@@ -66,8 +68,12 @@ function Areas({ rows, context, searching }: {
     const label = labels.get(id) ?? id;
     const finished = group.filter((row) => row.status === "done");
     const active = group.filter((row) => row.status !== "done");
+    const track = plans?.tracks.get(id);
     return <section key={id} className="ticket-group ticket-group--area" aria-label={label}>
-      <h2>{label}<span className="group-count">{group.length}</span></h2>
+      <div className="ticket-group__header">
+        <h2>{label}<span className="group-count">{group.length}</span></h2>
+        {plans && track && <TrackPlanControl key={track.id} track={track} plans={plans} />}
+      </div>
       {active.length > 0 && <TicketRows rows={active} context={context} grouping="area" label={label} searching={searching} />}
       {finished.length > 0 && <FinishedTickets rows={finished} context={context} grouping="area" searching={searching} />}
     </section>;
@@ -89,15 +95,15 @@ function States({ rows, context, searching }: {
   });
 }
 
-export function TicketList({ rows, search, presentation, grouping, ...context }: TicketRowContext & {
-  rows: WorkSummary[]; search: string; presentation: Presentation; grouping: Grouping;
+export function TicketList({ rows, search, presentation, grouping, plans, ...context }: TicketRowContext & {
+  rows: WorkSummary[]; search: string; presentation: Presentation; grouping: Grouping; plans?: TrackPlans | undefined;
 }) {
   if (context.feedback) return <TicketRows rows={rows} context={context} label="Feedback" searching={false} />;
   const query = search.trim().toLocaleLowerCase("es");
   const visible = rows.filter((row) => `${row.key} ${row.title}`.toLocaleLowerCase("es").includes(query));
   if (query && rows.length && !visible.length) return <StatusMessage title="No hay coincidencias en las páginas cargadas" />;
   return <div className="ticket-groups" data-presentation={presentation}>
-    {grouping === "area" ? <Areas rows={visible} context={context} searching={!!query} />
+    {grouping === "area" ? <Areas rows={visible} context={context} searching={!!query} plans={plans} />
       : <States rows={visible} context={context} searching={!!query} />}
   </div>;
 }

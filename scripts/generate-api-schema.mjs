@@ -15,15 +15,16 @@ const routes = [
   ["patch", "/api/v1/tickets/{key}", "update_ticket"], ["post", "/api/v1/tickets/{key}/comments", "add_comment"],
   ["delete", "/api/v1/tickets/{key}", "delete_ticket"],
   ["get", "/api/v1/activity", "list_activity"], ["put", "/api/v1/tickets/{key}/pull-request", "link_pull_request"],
+  ["get", "/api/v1/areas", "list_areas"], ["patch", "/api/v1/areas/{areaId}", "update_area"],
 ];
 for (const [method, path, name] of routes) {
   const definition = httpDefinitions.find((entry) => entry.name === name);
   const input = structuredClone(definition.inputSchema);
   const parameters = [];
-  if (path.includes("{key}")) {
-    parameters.push({ name: "key", in: "path", required: true, schema: input.properties.key });
-    delete input.properties.key;
-    input.required = input.required.filter((key) => key !== "key");
+  for (const [, param] of path.matchAll(/\{(\w+)\}/g)) {
+    parameters.push({ name: param, in: "path", required: true, schema: input.properties[param] });
+    delete input.properties[param];
+    input.required = input.required.filter((key) => key !== param);
   }
   if (method === "get") for (const [name, schema] of Object.entries(input.properties)) {
     parameters.push({ name, in: "query", required: input.required.includes(name), schema });

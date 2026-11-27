@@ -1,4 +1,4 @@
-import type { ActivityResult, CreateTicket, ListOptions, ListResult, ListView, Mutation, ProjectResult, Receipt, TicketResult, TicketView, UpdateTicket } from "../contracts/api.ts";
+import type { ActivityResult, CreateTicket, ListOptions, ListResult, ListView, Mutation, ProjectResult, Receipt, TicketResult, TicketView, TrackList, TrackReceipt, UpdateTicket, UpdateTrack } from "../contracts/api.ts";
 import type { Attachment, AttachmentContentType, AttachmentList } from "../contracts/attachments.ts";
 export type * from "../contracts/api.ts";
 export * from "../contracts/attachments.ts";
@@ -69,6 +69,8 @@ export class TaskiClient {
   createTicket(input: CreateTicket): Promise<Receipt> { return this.request("tickets", "POST", input); }
   updateTicket(key: string, input: UpdateTicket): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "PATCH", input); }
   deleteTicket(key: string, input: Mutation): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}`, "DELETE", input); }
+  listAreas(): Promise<TrackList> { return this.request("areas"); }
+  updateArea(areaId: string, input: UpdateTrack): Promise<TrackReceipt> { return this.request(`areas/${encodeURIComponent(areaId)}`, "PATCH", input); }
   addComment(key: string, input: Mutation & { body: string }): Promise<Receipt> { return this.request(`tickets/${encodeURIComponent(key)}/comments`, "POST", input); }
   listAttachments(key: string): Promise<AttachmentList> { return this.request(`tickets/${encodeURIComponent(key)}/attachments`); }
   attachmentUrl(key: string, id: string): string { return this.apiUrl(`tickets/${encodeURIComponent(key)}/attachments/${encodeURIComponent(id)}`); }

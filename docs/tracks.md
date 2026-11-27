@@ -5,7 +5,8 @@ Plan para que Taski sirva como recap rápido: ver cómo va cada track, qué venc
 | Bloque | Estado |
 | --- | --- |
 | T1 · Check de hecho en feedback | Implementado: [web](web.md#compartir-feedback-b8-01) y filtro `open` de la [API](api.md) |
-| T2–T7 | Pendientes |
+| T2 · Prioridad y fecha por track | Implementado: [API](api.md#tracks-prioridad-y-fecha), [MCP](mcp.md#diez-herramientas) y encabezados de área en la [web](web.md#espacio-de-trabajo) |
+| T3–T7 | Pendientes |
 
 ## Conceptos
 
@@ -55,7 +56,7 @@ Entrega el valor más inmediato y no requiere migraciones.
 - **Dominio** `src/domain/area.ts`: tipo `AreaPlan` y validación de prioridad y fecha. Un área sin fila equivale a P2 sin fecha.
 - **Aplicación**: un `AreaPlanService` con el puerto `AreaPlanRepository`. Se apoya en la tabla de idempotencia existente con la operación `update_area`. Valida que el área exista en la configuración (`UNKNOWN_AREA`) y exige la versión consultada (`VERSION_CONFLICT`).
 - **API y MCP**: dos operaciones nuevas, `list_areas` (áreas con su plan y versión) y `update_area` (`areaId`, `priority`, `targetDate`, `expectedVersion`, `idempotencyKey`). No se incluyen en `get_project`, porque esa respuesta usa `configVersion`/`notModified` y debe seguir dependiendo solo de la configuración. Las herramientas MCP pasan de 8 a 10; hay que revisar las instrucciones del servidor y el contexto incremental.
-- **Agentes**: pueden cambiar prioridad y fecha porque el cambio queda auditado. Es una decisión abierta: si el equipo prefiere reservarlo a personas, se añade una política como la de `done`.
+- **Agentes**: pueden cambiar prioridad y fecha porque el cambio queda auditado. Si el equipo prefiere reservarlo a personas, se añade una política como la de `done`.
 - **Web mínima**: en la agrupación **Por área**, el encabezado de cada sección muestra la prioridad y la fecha y permite editarlas. La vista completa del track llega en T5.
 - **Pruebas**: carreras y reintentos sobre D1 emulado, auditoría atómica y API/MCP con SDK.
 - **Documentación**: [modelo de datos](data-model.md), [auditoría](audit.md), [API](api.md), [MCP](mcp.md) y [cliente](client.md).
@@ -117,6 +118,6 @@ Hoy la lista pagina de 20 en 20, y las cifras no pueden calcularse en el navegad
 
 ## Decisiones abiertas
 
-1. ¿Pueden los agentes cambiar prioridad y fecha de un track? La propuesta es que sí, con auditoría.
+1. Resuelto en T2: los agentes pueden cambiar prioridad y fecha de un track, con auditoría.
 2. Umbral de **En riesgo**: la propuesta es siete días y 25% pendiente. Una alternativa es comparar el ritmo de la última semana con lo que falta.
 3. ¿Resumen pasa a ser la vista inicial de todos en escritorio, o solo de quien lo elija en `defaultView`?

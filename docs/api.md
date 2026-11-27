@@ -2,12 +2,12 @@
 
 Rutas implementadas sobre el mismo `TicketService` y repositorio D1 auditado, sin endpoints de SQL. Todos los tickets/actividad/proyecto exigen cookie de sesión o código Bearer y X-Taski-Member; ver [acceso](access.md). El [MCP](mcp.md) ya comparte este núcleo; la UI conectada se añade en B7.
 
-El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
+El [OpenAPI 3.1](api/openapi.json) se genera desde los diez contratos compartidos por HTTP y MCP. `npm run api:generate` lo actualiza y `api:check` detecta cambios sin versionar. Los campos/tipos de entrada, proyecciones y recibos están definidos en código; el núcleo valida de nuevo sus reglas y referencias.
 
 | Método/ruta | Operación |
 | --- | --- |
 | GET /api/v1/project | Configuración, miembros/áreas/rótulos, configVersion y cursor actual. knownVersion coincidente omite project. |
-| GET /api/v1/tickets | 20 resúmenes por defecto, máximo 50. Filtros status, assigneeId, areaId y type, orden opcional y cursor opaco. |
+| GET /api/v1/tickets | 20 resúmenes por defecto, máximo 50. Filtros status, open, assigneeId, areaId y type, orden opcional y cursor opaco. |
 | POST /api/v1/tickets | Crear/asignar en una operación. Título + idempotencyKey obligatorios. |
 | GET /api/v1/tickets/{key} | summary/work/full; work incluye descripción íntegra y cinco comentarios recientes. |
 | PATCH /api/v1/tickets/{key} | expectedVersion + idempotencyKey y changes/descriptionPatch/comment, atómicos. |
@@ -15,6 +15,8 @@ El [OpenAPI 3.1](api/openapi.json) se genera desde los ocho contratos compartido
 | POST /api/v1/tickets/{key}/comments | Añadir body con versión y clave de reintento. |
 | PUT /api/v1/tickets/{key}/pull-request | URL manual con versión y clave; no consulta GitHub. |
 | GET /api/v1/activity | Cambios desde cursor; filtro ticketKey opcional. |
+| GET /api/v1/areas | Tracks: áreas configuradas con prioridad, fecha límite y versión. |
+| PATCH /api/v1/areas/{areaId} | Cambiar prioridad y/o fecha límite con `expectedVersion` e `idempotencyKey`. |
 
 ## Respuestas adecuadas por defecto
 
@@ -66,3 +68,15 @@ Ejemplo de `changes` con datos ficticios:
 ```
 
 La regla admite HTTPS sin credenciales, parámetros ni fragmentos. Recorta espacios exteriores, normaliza esquema y host a minúsculas y omite el puerto 443. Conserva la ruta y los puertos HTTPS explícitos distintos de 443. La validación es local y se aplica también a `update_ticket` y `link_pull_request` por MCP. Los enlaces ya guardados se leen tal como están hasta que se edita el campo.
+
+## Tracks: prioridad y fecha
+
+Un track es un área de la configuración con un plan: prioridad 1 (alta), 2 (media) o 3 (baja) y una fecha límite opcional `YYYY-MM-DD`. Los IDs y rótulos siguen en la configuración. El plan cambia con frecuencia y se guarda en D1. `GET /api/v1/areas` devuelve los tracks en el orden configurado. Un track que nunca se editó devuelve prioridad 2, `targetDate: null` y versión 0.
+
+`PATCH /api/v1/areas/{areaId}` recibe `expectedVersion`, `idempotencyKey` y al menos `priority` o `targetDate`. `targetDate: null` quita la fecha. Ejemplo con datos ficticios para un track sin plan:
+
+```json
+{"expectedVersion":0,"idempotencyKey":"plan-web-001","priority":1,"targetDate":"2026-12-05"}
+```
+
+El recibo devuelve `areaId`, la nueva versión y los campos cambiados. Una versión desactualizada devuelve `VERSION_CONFLICT`. Un área que no está en la configuración devuelve `UNKNOWN_AREA`. Una fecha inexistente, como `2026-02-30`, devuelve `INVALID_INPUT`. Enviar los mismos valores devuelve `EMPTY_UPDATE`. Personas y agentes pueden editar el plan, y cada cambio queda auditado.

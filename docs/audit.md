@@ -9,3 +9,7 @@ IDs, hash de petición y reloj se generan en el adaptador de runtime del servido
 Una prueba fuerza fallo en INSERT de actividad después de preparar cambio/comentario: D1 revierte todos, incluida la reserva de reintento. Otra verifica actor, hora común y un solo evento para estado+avance. Son pruebas de D1 emulado; el despliegue y recuperación del servicio remoto se validan en B11.
 
 Los recibos almacenan key/URL/versión/campos afectados y commentId cuando existe. La [protección de carreras y traducción de conflictos](retries.md) recupera recibos confirmados después de una colisión o pérdida de respuesta. Estas operaciones todavía no se exponen mediante HTTP/MCP.
+
+## Tracks
+
+Cambiar la prioridad o la fecha de un track usa el mismo patrón en un solo `db.batch`: reserva de reintento, alta o edición de `area_plans`, evento en `area_activity` y recibo confirmado. La actividad de tickets exige un ticket, por eso los tracks tienen su propia tabla append-only con área, versión, snapshot del actor, hora del servidor y cambios antes/después. Dos primeras ediciones simultáneas de un track confirman una sola versión; la otra recibe `VERSION_CONFLICT`.
