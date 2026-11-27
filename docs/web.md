@@ -18,6 +18,20 @@ En escritorio, Taski abre en **Resumen**: un recap para ver en segundos cómo va
 - **Así sale en Telegram** muestra el texto con barras. **Copiar para Telegram** lo copia dentro de un bloque de código para que Telegram conserve la alineación.
 - **Cerrado en los últimos 7 días** lista las últimas tareas terminadas.
 
+### Tracks
+
+La barra lateral lista los tracks por prioridad y fecha, con una mini barra y su porcentaje. Pulsa un track, o su número del 1 al 9 en el teclado, para abrir su vista. Las teclas no actúan mientras escribes en un campo ni con un diálogo abierto. En el teléfono, abre los tracks desde Resumen.
+
+La vista de un track tiene su propia dirección, por ejemplo `/track/web`, que se puede recargar o compartir con el equipo. Incluye:
+
+- una fila de chips para saltar a otro track y **← Resumen** para volver;
+- el estado con una frase, por ejemplo "En riesgo · quedan 3 por hacer y 4 días", y la prioridad y la fecha editables;
+- la barra grande con terminadas, por revisar, por hacer y total;
+- la captura en una línea: la tarea se crea en ese track;
+- las tareas del track por estado, con Terminado plegado.
+
+Al abrir una tarea, el panel usa su enlace `/t/…`; al cerrarlo con Escape vuelves al track. **Atrás** del navegador vuelve al track anterior. Por ejemplo, pulsa `2`, escribe "Conciliar transferencias" en la captura y pulsa Enter: la tarea queda en ese track y su barra se actualiza.
+
 Las cifras salen del [resumen del servidor](api.md#resumen-del-proyecto) y no dependen de las páginas cargadas. **Actualizar** vuelve a consultarlo; también se actualiza al guardar o eliminar desde el panel. Por ejemplo, marca un track como P1 con fecha en tres días y deja una de sus cuatro tareas pendientes: aparecerá En riesgo en **Lo que toca ahora**.
 
 ## Espacio de trabajo

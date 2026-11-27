@@ -7,11 +7,12 @@ import { Wordmark, WorkspaceIcon } from "../shared/marks.tsx";
 import { ThemeControl } from "../shared/theme-control.tsx";
 import type { FeedbackFilter, Grouping, Presentation } from "./presentation.ts";
 import { views } from "./views.ts";
-import type { View } from "./views.ts";
+import type { NavigationView, View } from "./views.ts";
 import licenses from "../../assets/THIRD_PARTY_NOTICES.txt?url";
 
-export function WorkspaceSidebar({ brand, project, members, view, disabled, onView, account }: {
-  brand: string; project: string; members: Member[]; view: View; disabled: boolean; onView: (view: View) => void; account?: ReactNode;
+export function WorkspaceSidebar({ brand, project, members, view, disabled, onView, account, tracks }: {
+  brand: string; project: string; members: Member[]; view: View; disabled: boolean; onView: (view: NavigationView) => void;
+  account?: ReactNode; tracks?: ReactNode;
 }) {
   return <aside className="app-sidebar">
     <div className="sidebar-heading"><Wordmark name={brand} />{account}</div>
@@ -20,6 +21,7 @@ export function WorkspaceSidebar({ brand, project, members, view, disabled, onVi
       <Button key={id} aria-pressed={view === id} disabled={disabled} onClick={() => onView(id)}>
         <WorkspaceIcon name={id} />{label}
       </Button>)}</nav>
+    {tracks}
     <div className="sidebar-footer">
       {members.length > 0 && <>
         <p>Equipo · {members.length} personas</p>

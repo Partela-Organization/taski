@@ -12,6 +12,8 @@ export interface TicketRowContext {
   /** Feedback only: confirmed done toggle and the keys still waiting for the server. */
   onToggleDone?: ((row: WorkSummary) => void) | undefined;
   pendingDone?: ReadonlySet<string> | undefined;
+  /** Inside a track every row shares the area, so it is not repeated. */
+  hideArea?: boolean | undefined;
 }
 
 export function TicketRow({ row, context, showArea, statusLabel }: {
